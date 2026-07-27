@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Phone } from 'lucide-react'
+import { ArrowRight, CalendarDays, CheckCircle2, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
 import './styles.css'
 
 const asset = '/assets/'
@@ -11,7 +11,7 @@ function isMobileDevice() {
   return mobileUserAgent || touchDevice
 }
 
-function Header() {
+function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
@@ -26,7 +26,7 @@ function Header() {
         <a href="#contact">Contact</a>
       </nav>
       <a className="header-phone" href="tel:+15555555555"><Phone size={17} strokeWidth={2.4} /> (555) 555-5555</a>
-      <a className="header-quote" href="#contact">Request a quote</a>
+      <button className="header-quote" type="button" onClick={onBookAppointment}><CalendarDays aria-hidden="true" /> <span>Book an Appointment</span> <ArrowRight aria-hidden="true" /></button>
       <button className="menu-button" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><span /><span /></button>
       {menuOpen && <nav className="mobile-nav" aria-label="Mobile navigation">
         <a href="#services" onClick={() => setMenuOpen(false)}>Services</a>
@@ -38,7 +38,7 @@ function Header() {
   )
 }
 
-function Hero() {
+function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
   const skyTrackRef = useRef<HTMLDivElement>(null)
   const skyImageRef = useRef<HTMLImageElement>(null)
 
@@ -77,11 +77,66 @@ function Hero() {
         <h1>Custom roofing<br /><span>since year 4-211.</span></h1>
         <p className="hero-description">Complete roofing systems, exterior protection, and water<span className="desktop-break"><br /></span>management—installed by a local crew that sweats every detail.<span className="desktop-break"><br /></span> Clear pricing, exacting standards, and zero shortcuts.</p>
         <div className="hero-actions">
-          <a className="button button-primary" href="#contact">Request a quote</a>
+          <button className="button button-primary" type="button" onClick={onBookAppointment}><CalendarDays aria-hidden="true" /> <span>Book an Appointment</span> <ArrowRight aria-hidden="true" /></button>
           <a className="button button-call" href="tel:+15555555555"><Phone size={20} /> <span>(555) 555-5555</span></a>
         </div>
       </div>
     </section>
+  )
+}
+
+function AppointmentModal({ onClose }: { onClose: () => void }) {
+  const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose() }
+    document.body.style.overflow = 'hidden'
+    document.addEventListener('keydown', handleKeyDown)
+    return () => { document.body.style.overflow = ''; document.removeEventListener('keydown', handleKeyDown) }
+  }, [onClose])
+
+  return (
+    <div className="appointment-backdrop" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) onClose() }}>
+      <section className="appointment-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-title">
+        <header className="appointment-modal-header">
+          <div>
+            <p className="appointment-kicker">Northline Roofing</p>
+            <h2 id="appointment-title">Book an Appointment</h2>
+            <p>Free roof inspection — Mon–Fri, 8am–6pm</p>
+          </div>
+          <button className="modal-close" type="button" aria-label="Close appointment form" onClick={onClose}><X aria-hidden="true" /></button>
+        </header>
+        {submitted ? (
+          <div className="appointment-success">
+            <CheckCircle2 aria-hidden="true" />
+            <h3>Request received.</h3>
+            <p>A Northline specialist will call to confirm your appointment and learn more about your roof.</p>
+            <button className="button button-primary" type="button" onClick={onClose}>Back to the site</button>
+          </div>
+        ) : (
+          <form className="appointment-form" onSubmit={(event) => { event.preventDefault(); setSubmitted(true) }}>
+            <div className="form-grid form-grid-two">
+              <label><span>Full Name <b>*</b></span><div className="input-wrap"><UserRound aria-hidden="true" /><input required name="name" placeholder="Your full name" autoComplete="name" /></div></label>
+              <label><span>Phone Number <b>*</b></span><div className="input-wrap"><Phone aria-hidden="true" /><input required name="phone" type="tel" placeholder="(555) 555-5555" autoComplete="tel" /></div></label>
+            </div>
+            <label><span>Email Address <b>*</b></span><div className="input-wrap"><Mail aria-hidden="true" /><input required name="email" type="email" placeholder="you@example.com" autoComplete="email" /></div></label>
+            <label><span>Property Address</span><div className="input-wrap"><MapPin aria-hidden="true" /><input name="address" placeholder="Street address" autoComplete="street-address" /></div></label>
+            <div className="form-grid form-grid-two">
+              <label><span>City</span><input name="city" placeholder="Your city" autoComplete="address-level2" /></label>
+              <label><span>Postal Code</span><input name="postal-code" placeholder="ZIP / postal code" autoComplete="postal-code" /></label>
+            </div>
+            <div className="form-grid form-grid-two">
+              <label><span>Preferred Date <b>*</b></span><div className="input-wrap"><CalendarDays aria-hidden="true" /><input required name="date" type="date" /></div><small>Mon–Fri · 24hr advance notice</small></label>
+              <label><span>Time Preference <b>*</b></span><select required name="time"><option value="">Select a time</option><option>Morning · 8am–12pm</option><option>Afternoon · 12pm–4pm</option><option>Late afternoon · 4pm–6pm</option></select><small>We’ll call when we’re on the way</small></label>
+            </div>
+            <label><span>Service Type <b>*</b></span><select required name="service"><option value="">Select a service</option><option>Residential roofing system</option><option>Commercial roofing system</option><option>Custom metal fabrication</option><option>Storm or weather damage inspection</option><option>Roof repair and maintenance</option></select></label>
+            <label><span>Additional Notes</span><div className="input-wrap textarea-wrap"><MessageSquare aria-hidden="true" /><textarea name="notes" placeholder="Tell us about your roof or project..." /></div></label>
+            <button className="appointment-submit" type="submit"><Send aria-hidden="true" /> <span>Book My Free Appointment</span></button>
+            <p className="appointment-footnote">Mon–Fri, 8am–6pm · We’ll call to confirm · No obligation</p>
+          </form>
+        )}
+      </section>
+    </div>
   )
 }
 
@@ -105,7 +160,8 @@ function BadgeStrip() {
 
 function App() {
   const mobileDevice = isMobileDevice()
-  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header /><main><Hero /><BadgeStrip /></main></div>
+  const [appointmentOpen, setAppointmentOpen] = useState(false)
+  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={() => setAppointmentOpen(true)} /><main><Hero onBookAppointment={() => setAppointmentOpen(true)} /><BadgeStrip /></main>{appointmentOpen && <AppointmentModal onClose={() => setAppointmentOpen(false)} />}</div>
 }
 
 createRoot(document.getElementById('root')!).render(<App />)
