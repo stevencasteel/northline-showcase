@@ -58,7 +58,16 @@ function Hero() {
 function BadgeStrip() {
   return (
     <section className="badge-strip" id="about" aria-label="Northline Roofing qualifications">
-      <img className="badge-banner" src={`${asset}sec3_1_banner.png`} alt="Northline Roofing qualifications: 300 years experience, Tropics licensed, residential and commercial roofing, and custom metal fabrication." />
+      <div className="badge-sprite-canvas" aria-hidden="true">
+        <div className="badge-slice badge-slice-one"><img src={`${asset}sec3_1_banner.png`} alt="" /></div>
+        <div className="badge-slice badge-divider-one"><img src={`${asset}sec3_1_banner.png`} alt="" /></div>
+        <div className="badge-slice badge-slice-two"><img src={`${asset}sec3_1_banner.png`} alt="" /></div>
+        <div className="badge-slice badge-divider-two"><img src={`${asset}sec3_1_banner.png`} alt="" /></div>
+        <div className="badge-slice badge-slice-three"><img src={`${asset}sec3_1_banner.png`} alt="" /></div>
+        <div className="badge-slice badge-divider-three"><img src={`${asset}sec3_1_banner.png`} alt="" /></div>
+        <div className="badge-slice badge-slice-four"><img src={`${asset}sec3_1_banner.png`} alt="" /></div>
+      </div>
+      <img className="badge-banner visually-hidden" src={`${asset}sec3_1_banner.png`} alt="Northline Roofing qualifications: 300 years experience, Tropics licensed, residential and commercial roofing, and custom metal fabrication." />
       <p className="visually-hidden">Northline Roofing qualifications: 300 years experience. Tropics licensed. Residential and commercial roofing. Custom metal fabrication.</p>
     </section>
   )
