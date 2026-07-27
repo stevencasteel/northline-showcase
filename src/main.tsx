@@ -26,6 +26,7 @@ function Header() {
         <a href="#contact">Contact</a>
       </nav>
       <a className="header-phone" href="tel:+15555555555"><Phone size={17} strokeWidth={2.4} /> (555) 555-5555</a>
+      <a className="header-quote" href="#contact">Request a quote</a>
       <button className="menu-button" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><span /><span /></button>
       {menuOpen && <nav className="mobile-nav" aria-label="Mobile navigation">
         <a href="#services" onClick={() => setMenuOpen(false)}>Services</a>

@@ -5,36 +5,40 @@
 html { scroll-behavior: smooth; }
 body { margin: 0; min-width: 320px; }
 a { color: inherit; text-decoration: none; }
-.site-header { aspect-ratio: 6821 / 550.3; padding: 2.2% 5.1%; background: #e5dcd2; display: flex; align-items: center; gap: 2%; position: relative; z-index: 2; }
+.site-header { aspect-ratio: 6821 / 385.21; padding: 1.55% 2.55%; background: #e5dcd2; display: flex; align-items: center; gap: 1.4%; position: relative; z-index: 2; }
 .brand { display: flex; align-items: center; gap: 10px; margin-right: auto; }
-.brand-logo { display: block; width: 36.225vw; height: auto; }
+.brand-logo { display: block; width: 25.36vw; height: auto; }
 .brand-copy { display: flex; flex-direction: column; gap: 3px; }
 .brand-copy strong { font-family: Antonio, sans-serif; font-size: 2.3vw; font-weight: 600; letter-spacing: .02em; line-height: .92; }
 .brand-copy small { color: #15354a; font-family: 'IBM Plex Mono', monospace; font-size: .7vw; letter-spacing: .19em; white-space: nowrap; }
 .brand-copy em { color: #d25f26; font-style: normal; }
-.primary-nav { display: flex; gap: 8px; align-items: center; }
-.primary-nav a { padding: .58vw .66vw .52vw; background: #fff; border-radius: .14vw; font-family: Antonio, sans-serif; font-size: 1.55vw; font-weight: 600; letter-spacing: .025em; text-transform: uppercase; transition: background .2s, color .2s; }
+.primary-nav { display: flex; gap: .45em; align-items: center; font-size: 1.35vw; }
+.primary-nav a { padding: .34em .45em .30em; background: #fff; border-radius: .28vw; font-family: Antonio, sans-serif; font-size: 1em; font-weight: 600; letter-spacing: .025em; text-transform: uppercase; transition: background .2s, color .2s; }
 .primary-nav a:hover, .primary-nav a:focus-visible { background: #041421; color: #fff; }
-.header-phone { display: flex; align-items: center; gap: .55vw; padding: .95vw 1.25vw; color: #fff; background: #d25f26; border-radius: .28vw; font-size: 1.05vw; font-weight: 600; white-space: nowrap; }
+.header-phone, .header-quote { display: flex; align-items: center; justify-content: center; gap: .55vw; padding: .65vw .9vw; border-radius: .28vw; font-size: .92vw; font-weight: 600; white-space: nowrap; }
+.header-phone { color: #041421; box-shadow: inset 0 0 0 .14vw #d25f26; }
+.header-phone svg { width: .95vw; height: .95vw; }
+.header-quote { color: #fff; background: #d25f26; text-transform: uppercase; }
 .menu-button { display: none; border: 0; background: transparent; padding: 8px; }
 .menu-button span { display: block; width: 25px; height: 2px; margin: 5px; background: #041421; }
 .mobile-nav { display: none; }
 .hero { aspect-ratio: 6821 / 2354.7; position: relative; overflow: hidden; isolation: isolate; background: #041421; }
 .hero-sky-track { position: absolute; inset: 0; z-index: -3; display: flex; width: max-content; height: 100%; will-change: transform; }
-.hero-sky { display: block; flex: none; width: auto; height: 100%; max-width: none; }
+.hero-sky { display: block; flex: none; width: auto; height: 100%; max-width: none; aspect-ratio: 4599 / 734; }
 .hero-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: -2; }
 .hero-overlay { position: absolute; inset: 0 auto 0 0; width: 78.36%; z-index: -1; background: linear-gradient(90deg, rgba(4,20,33,.98) 0%, rgba(4,20,33,.87) 35%, rgba(4,20,33,.22) 70%, rgba(4,20,33,0) 100%); }
-.hero-content { width: 58%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 0 0 0 5.1%; color: #fff; }
+.hero-content { width: 58%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 0 0 0 2.55%; color: #fff; }
 .eyebrow { display: none; }
-h1 { margin: 0 0 1.55vw; color: #e5dcd2; font-family: Anton, Impact, sans-serif; font-size: 6.5vw; font-weight: 400; letter-spacing: .015em; line-height: 1.02; text-transform: uppercase; text-shadow: 0 2px #041421, 0 4px #041421, 0 6px #041421, 0 8px #041421; }
+h1 { margin: 0 0 1.55vw; color: #e5dcd2; font-family: Anton, Impact, sans-serif; font-size: 6.5vw; font-weight: 400; letter-spacing: .015em; line-height: 1.02; text-transform: uppercase; text-shadow: 0 .02em #041421, 0 .04em #041421, 0 .06em #041421, 0 .08em #041421; }
 h1 span { color: #d25f26; }
 .hero-description { max-width: 46vw; margin: 0; color: #e5dcd2; font-size: 1.35vw; line-height: 1.24; font-weight: 500; }
 .desktop-break { display: inline; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 2.65vw; margin-top: 1.95vw; }
-.button { display: inline-flex; min-height: 4.7vw; align-items: center; justify-content: center; text-transform: uppercase; font-size: 1.25vw; font-weight: 600; }
+.button { display: inline-flex; min-height: 4.7vw; align-items: center; justify-content: center; border-radius: .28vw; text-transform: uppercase; font-size: 1.25vw; font-weight: 600; }
 .button-primary { padding: 0 1.4vw; color: #fff; background: #d25f26; }
 .button-primary:hover, .button-primary:focus-visible { background: #ed7734; }
-.button-call { padding: 0 1.2vw; gap: .65vw; border: .14vw solid #d25f26; color: #fff; }
+.button-call { padding: 0 1.2vw; gap: .65vw; box-shadow: inset 0 0 0 .14vw #d25f26; color: #fff; }
+.button-call svg { width: 1.25vw; height: 1.25vw; }
 .button-call:hover, .button-call:focus-visible { background: rgba(210,95,38,.22); }
 .badge-strip { aspect-ratio: 6821 / 548; position: relative; overflow: hidden; background: #102432; color: #fff; padding: .7% 4.5%; }
 .badge-sprite-canvas { position: absolute; top: 50%; left: 4.5%; width: 91%; aspect-ratio: 2127 / 171; transform: translateY(-50%); }
@@ -72,6 +76,9 @@ h1 span { color: #d25f26; }
 .app.is-mobile-device .menu-button { display: block; }
 .app.is-mobile-device .header-phone { margin-left: auto; padding: 10px; font-size: 0; }
 .app.is-mobile-device .header-phone svg { width: 20px; height: 20px; }
+.app.is-mobile-device .button-call svg { width: 20px; height: 20px; }
+.app.is-mobile-device .header-quote { display: none; }
+.app.is-mobile-device .button, .app.is-mobile-device .header-phone { border-radius: 6px; }
 .app.is-mobile-device .brand { margin-right: 0; }
 .app.is-mobile-device .brand-logo { width: 68vw; height: auto; }
 .app.is-mobile-device .brand-copy strong { font-size: 20px; }
