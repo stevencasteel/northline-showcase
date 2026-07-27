@@ -86,15 +86,15 @@ h1 span { color: #d25f26; }
 .app.is-mobile-device .mobile-nav { position: absolute; top: 100%; left: 0; right: 0; display: grid; padding: 12px 18px 18px; gap: 2px; background: #e5dcd2; box-shadow: 0 12px 20px rgba(4,20,33,.14); }
 .app.is-mobile-device .mobile-nav a { padding: 13px 10px; font-family: Antonio, sans-serif; font-size: 21px; font-weight: 600; text-transform: uppercase; }
 .app.is-mobile-device .mobile-nav a:hover, .app.is-mobile-device .mobile-nav a:focus-visible { background: #fff; }
-.app.is-mobile-device .hero { aspect-ratio: auto; min-height: 600px; }
-.app.is-mobile-device .hero-content { width: auto; padding: 72px var(--mobile-gutter) 48px; }
-.app.is-mobile-device .hero-image { object-position: 65% center; }
-.app.is-mobile-device .hero-overlay { width: 100%; background: linear-gradient(90deg, rgba(4,20,33,.95), rgba(4,20,33,.52)); }
-.app.is-mobile-device h1 { font-size: clamp(53px, 16vw, 76px); }
-.app.is-mobile-device .hero-description { font-size: 16px; }
-.app.is-mobile-device .desktop-break { display: none; }
-.app.is-mobile-device .hero-actions { gap: 14px; margin-top: 24px; }
-.app.is-mobile-device .button { width: 100%; min-height: 56px; font-size: 16px; }
+.app.is-mobile-device .hero { aspect-ratio: 6821 / 2354.7; min-height: 0; }
+.app.is-mobile-device .hero-content { width: 58%; height: 100%; padding: 0 0 0 2.55%; }
+.app.is-mobile-device .hero-image { object-position: center; }
+.app.is-mobile-device .hero-overlay { width: 78.36%; background: linear-gradient(90deg, rgba(4,20,33,.98) 0%, rgba(4,20,33,.87) 35%, rgba(4,20,33,.22) 70%, rgba(4,20,33,0) 100%); }
+.app.is-mobile-device h1 { font-size: 6.5vw; }
+.app.is-mobile-device .hero-description { max-width: 46vw; font-size: 1.35vw; }
+.app.is-mobile-device .desktop-break { display: inline; }
+.app.is-mobile-device .hero-actions { gap: 2.65vw; margin-top: 1.95vw; }
+.app.is-mobile-device .button { width: auto; min-height: 4.7vw; font-size: 1.25vw; }
 .app.is-mobile-device .badge-strip { aspect-ratio: auto; padding: 10px 12px; }
 .app.is-mobile-device .badge-sprite-canvas { position: relative; top: auto; left: auto; width: 100%; transform: none; }
 .app.is-mobile-device .badge-grid { height: auto; grid-template-columns: repeat(2, 1fr); }
