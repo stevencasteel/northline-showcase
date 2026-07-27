@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ArrowRight, CalendarDays, CheckCircle2, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, CalendarDays, CheckCircle2, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
 import './styles.css'
 
 const asset = '/assets/'
@@ -158,10 +158,41 @@ function BadgeStrip() {
   )
 }
 
+const services = [
+  { title: 'Residential', image: 'service-residential-roofing.png', alt: 'Human and orc roofers installing teal slate tiles on an ornate residential roof above a mountain lake.', text: 'Complete roof systems designed for lasting protection and a clean, finished line.' },
+  { title: 'Commercial', image: 'service-commercial-roofing.png', alt: 'A large roofing crew working across the broad copper-trimmed roof of a civic building above a coastal city.', text: 'Durable, carefully coordinated systems for commercial properties of every scale.' },
+  { title: 'Custom Fabrication', image: 'service-custom-metal.png', alt: 'A human metalworker and orc craftsperson shaping ornate copper roofing details in a forge.', text: 'Hand-finished copperwork, flashing, trim, and architectural details built to order.' },
+  { title: 'Repairs & Inspections', image: 'service-repairs-inspections.png', alt: 'A human inspector and orc roofer examining a copper seam on a steep slate roof after a storm.', text: 'Clear assessments and dependable repairs before a small issue becomes a larger one.' },
+]
+
+function Services() {
+  return (
+    <section className="services-section" id="services" aria-labelledby="services-title">
+      <div className="services-brutalist-heading">
+        <p className="section-kicker" id="services-title">04 / Services</p>
+      </div>
+      <div className="services-slice-grid">
+        {services.map((service, index) => (
+          <a className="service-slice" href="#contact" key={service.title} aria-label={`Learn more about ${service.title}`}>
+            <img src={`${asset}${service.image}`} alt={service.alt} />
+            <span className="service-slice-shade" />
+            <span className="service-slice-number">0{index + 1}</span>
+            <span className="service-slice-content">
+              <strong>{service.title}</strong>
+              <span>{service.text}</span>
+              <ArrowUpRight aria-hidden="true" />
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function App() {
   const mobileDevice = isMobileDevice()
   const [appointmentOpen, setAppointmentOpen] = useState(false)
-  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={() => setAppointmentOpen(true)} /><main><Hero onBookAppointment={() => setAppointmentOpen(true)} /><BadgeStrip /></main>{appointmentOpen && <AppointmentModal onClose={() => setAppointmentOpen(false)} />}</div>
+  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={() => setAppointmentOpen(true)} /><main><Hero onBookAppointment={() => setAppointmentOpen(true)} /><BadgeStrip /><Services /></main>{appointmentOpen && <AppointmentModal onClose={() => setAppointmentOpen(false)} />}</div>
 }
 
 createRoot(document.getElementById('root')!).render(<App />)

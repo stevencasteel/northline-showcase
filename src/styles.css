@@ -136,6 +136,27 @@ h1 span { color: #d25f26; }
 .badge-item p strong, .badge-item p span { display: block; font-weight: 600; }
 .badge-item p span { color: #fff; }
 .badge-divider { width: .38vw !important; height: 6.5vw !important; object-fit: contain !important; }
+.services-section { padding: 3.2vw 2.55% 3.8vw; color: #041421; background: #e5dcd2; }
+.services-brutalist-heading { margin-bottom: 1.8vw; border-bottom: .14vw solid #041421; }
+.section-kicker { margin: 0 0 .55vw; color: #d25f26; font-family: Antonio, sans-serif; font-size: 2.2vw; font-weight: 600; letter-spacing: .04em; line-height: .9; text-transform: uppercase; white-space: nowrap; }
+.services-slice-grid { display: flex; height: 29vw; overflow: hidden; background: #e5dcd2; }
+.service-slice { position: relative; min-width: 0; flex: 1 1 0; overflow: hidden; color: #fff; clip-path: polygon(15% 0, 100% 0, 85% 100%, 0 100%); isolation: isolate; transition: flex-grow .55s cubic-bezier(.22, 1, .36, 1), clip-path .55s ease, z-index 0s linear .55s; }
+.service-slice + .service-slice { margin-left: -5vw; }
+.service-slice img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); transition: transform .7s cubic-bezier(.22, 1, .36, 1), filter .5s ease; z-index: -2; }
+.service-slice-shade { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 68%, rgba(4,20,33,.78) 100%); opacity: 1; z-index: -1; }
+.service-slice::after { position: absolute; inset: 0; content: ''; background: linear-gradient(180deg, transparent 42%, rgba(4,20,33,.86) 100%); opacity: 0; pointer-events: none; transition: opacity .5s ease; z-index: -1; }
+.service-slice-number { position: absolute; top: 1.25vw; left: 2.2vw; color: #e5dcd2; font-family: 'IBM Plex Mono', monospace; font-size: .8vw; font-weight: 700; letter-spacing: .12em; }
+.service-slice-content { position: absolute; right: 2vw; bottom: 1.6vw; left: 2.2vw; display: flex; align-items: flex-end; gap: 1vw; }
+.service-slice-content strong { display: block; flex: 0 0 8vw; max-width: 8vw; font-family: Antonio, sans-serif; font-size: 2.05vw; font-style: italic; font-weight: 600; line-height: .95; text-transform: uppercase; transform: skewX(-8deg); transform-origin: left bottom; transition: transform .45s ease; }
+.service-slice-content span { position: static; flex: 0 1 19rem; max-width: 19rem; margin-left: auto; color: #e5dcd2; font-size: .85vw; line-height: 1.4; opacity: 0; transform: translateX(.8vw); transition: opacity .35s ease .12s, transform .45s ease .12s; }
+.service-slice-content svg { position: static; flex: 0 0 auto; width: 1.45vw; height: 1.45vw; color: #f18a54; opacity: 0; transform: translateX(.5vw); transition: opacity .3s ease .15s, transform .45s ease .15s; }
+.services-slice-grid:hover .service-slice:not(:hover) { flex-grow: .84; }
+.service-slice:hover, .service-slice:focus-visible { flex-grow: 1.65; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); z-index: 2; transition-delay: 0s; }
+.service-slice:hover img, .service-slice:focus-visible img { transform: scale(1); filter: saturate(1.12) contrast(1.04); }
+.service-slice:hover::after, .service-slice:focus-visible::after { opacity: 1; }
+.service-slice:hover .service-slice-content strong, .service-slice:focus-visible .service-slice-content strong { transform: skewX(0); }
+.service-slice:hover .service-slice-content span, .service-slice:focus-visible .service-slice-content span { opacity: 1; transform: translateX(0); }
+.service-slice:hover .service-slice-content svg, .service-slice:focus-visible .service-slice-content svg { opacity: 1; transform: translateX(0); }
 .app.is-mobile-device { --mobile-gutter: 24px; }
 .app.is-mobile-device .site-header { aspect-ratio: auto; min-height: 77px; padding: 10px 16px; gap: 8px; }
 .app.is-mobile-device .primary-nav { display: none; }
@@ -172,6 +193,17 @@ h1 span { color: #d25f26; }
 .app.is-mobile-device .badge-content > img { width: 48px; height: 57px; }
 .app.is-mobile-device .badge-item p { font-size: 17px; }
 .app.is-mobile-device .badge-divider { height: 70px; }
+.app.is-mobile-device .services-section { padding: 48px 24px 42px; }
+.app.is-mobile-device .services-brutalist-heading { margin-bottom: 22px; border-bottom: 2px solid #041421; }
+.app.is-mobile-device .section-kicker { margin-bottom: 10px; font-size: 24px; }
+.app.is-mobile-device .services-slice-grid { display: grid; height: auto; gap: 3px; background: #102432; }
+.app.is-mobile-device .service-slice { min-height: 220px; clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%); }
+.app.is-mobile-device .service-slice + .service-slice { margin-left: 0; }
+.app.is-mobile-device .service-slice-number { top: 16px; left: 24px; font-size: 11px; }
+.app.is-mobile-device .service-slice-content { right: 22px; bottom: 20px; left: 24px; width: auto; height: auto; display: grid; gap: 9px; }
+.app.is-mobile-device .service-slice-content strong { position: static; font-size: 28px; }
+.app.is-mobile-device .service-slice-content span { position: static; max-width: 22rem; font-size: 14px; opacity: 1; transform: none; }
+.app.is-mobile-device .service-slice-content svg { position: static; width: 20px; height: 20px; opacity: 1; transform: none; }
 .app.is-mobile-device .appointment-backdrop { place-items: end center; padding: 0; }
 .app.is-mobile-device .appointment-modal { max-height: 96vh; border-radius: 1rem 1rem 0 0; }
 .app.is-mobile-device .appointment-modal-header { padding: 1.4rem 1.25rem 1.2rem; }
