@@ -76,7 +76,6 @@ h1 span { color: #d25f26; }
 .app.is-mobile-device .menu-button { display: block; }
 .app.is-mobile-device .header-phone { margin-left: auto; padding: 10px; font-size: 0; }
 .app.is-mobile-device .header-phone svg { width: 20px; height: 20px; }
-.app.is-mobile-device .button-call svg { width: 20px; height: 20px; }
 .app.is-mobile-device .header-quote { display: none; }
 .app.is-mobile-device .button, .app.is-mobile-device .header-phone { border-radius: 6px; }
 .app.is-mobile-device .brand { margin-right: 0; }
