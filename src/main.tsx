@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Phone } from 'lucide-react'
 import './styles.css'
@@ -38,9 +38,38 @@ function Header() {
 }
 
 function Hero() {
+  const skyTrackRef = useRef<HTMLDivElement>(null)
+  const skyImageRef = useRef<HTMLImageElement>(null)
+
+  useEffect(() => {
+    let frame = 0
+    let offset = 0
+    let previousTime = performance.now()
+    const speed = 13
+
+    const animateSky = (time: number) => {
+      const elapsed = time - previousTime
+      previousTime = time
+      const imageWidth = skyImageRef.current?.getBoundingClientRect().width ?? 0
+      const viewportWidth = skyTrackRef.current?.parentElement?.getBoundingClientRect().width ?? 0
+      const scrollDistance = imageWidth - viewportWidth
+      if (scrollDistance > 0 && skyTrackRef.current) {
+        offset = (offset + speed * elapsed / 1000) % scrollDistance
+        skyTrackRef.current.style.transform = `translate3d(${-offset}px, 0, 0)`
+      }
+      frame = requestAnimationFrame(animateSky)
+    }
+
+    frame = requestAnimationFrame(animateSky)
+    return () => cancelAnimationFrame(frame)
+  }, [])
+
   return (
     <section className="hero" id="top">
-      <img className="hero-image" src={`${asset}sec2_1_hero.jpg`} alt="A panoramic image featuring a steep roof inclined upward toward the top right, where a muscular nordic human roofer with a graying beard and a green-skinned orc in yellow hard hats work closely side-by-side. They install tiles on a teal prismatic roof with ornate copper trim, which slopes down on the left to reveal a bright blue lake and distant mountains with sparse white clouds." />
+      <div className="hero-sky-track" ref={skyTrackRef} aria-hidden="true">
+        <img className="hero-sky" ref={skyImageRef} src={`${asset}sec2_1_hero_sky.png`} alt="" />
+      </div>
+      <img className="hero-image" src={`${asset}sec2_1_hero.png`} alt="A panoramic image featuring a steep roof inclined upward toward the top right, where a muscular nordic human roofer with a graying beard and a green-skinned orc in yellow hard hats work closely side-by-side. They install tiles on a teal prismatic roof with ornate copper trim, which slopes down on the left to reveal a bright blue lake and distant mountains with sparse white clouds." />
       <div className="hero-overlay" />
       <div className="hero-content">
         <p className="eyebrow">Northline Roofing</p>
