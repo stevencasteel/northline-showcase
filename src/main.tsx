@@ -539,10 +539,19 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
+    const previousRootOverflow = document.documentElement.style.overflow
+    const previousPaddingRight = document.body.style.paddingRight
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
     document.body.style.overflow = 'hidden'
+    document.documentElement.style.overflow = 'hidden'
+    document.body.classList.add('gallery-modal-open')
+    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`
     modalFrameRef.current?.focus()
     return () => {
       document.body.style.overflow = previousOverflow
+      document.documentElement.style.overflow = previousRootOverflow
+      document.body.classList.remove('gallery-modal-open')
+      document.body.style.paddingRight = previousPaddingRight
     }
   }, [])
 
