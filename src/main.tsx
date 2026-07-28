@@ -605,24 +605,35 @@ type GalleryCardProps = {
   image: GalleryImage
   imageIndex: number
   slot: number
+  slideDirections: GallerySlideDirection[]
   onOpen: () => void
 }
 
-function GalleryCard({ image, imageIndex, slot, onOpen }: GalleryCardProps) {
+type GallerySlideDirection = 'top' | 'left' | 'bottom' | 'right'
+
+const gallerySlideDirections: Record<number, GallerySlideDirection[]> = {
+  0: ['top', 'left'],
+  1: ['top', 'right'],
+  2: ['right'],
+  3: ['left', 'bottom'],
+  4: ['bottom'],
+  5: ['right', 'bottom'],
+}
+
+function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen }: GalleryCardProps) {
   const [displayed, setDisplayed] = useState({ image, imageIndex })
   const [incoming, setIncoming] = useState<{ image: GalleryImage; imageIndex: number } | null>(null)
+  const [incomingDirection, setIncomingDirection] = useState<GallerySlideDirection>(slideDirections[0])
+  const directionCursorRef = useRef(0)
 
   useEffect(() => {
-    if (imageIndex !== displayed.imageIndex) setIncoming({ image, imageIndex })
-  }, [displayed.imageIndex, image, imageIndex])
-
-  const slideDirection = slot === 0
-    ? 'top'
-    : slot === 3
-      ? 'left'
-      : slot === 4
-        ? 'bottom'
-        : 'right'
+    if (imageIndex !== displayed.imageIndex) {
+      const direction = slideDirections[directionCursorRef.current % slideDirections.length]
+      directionCursorRef.current += 1
+      setIncomingDirection(direction)
+      setIncoming({ image, imageIndex })
+    }
+  }, [displayed.imageIndex, image, imageIndex, slideDirections])
 
   return (
     <button
@@ -632,10 +643,10 @@ function GalleryCard({ image, imageIndex, slot, onOpen }: GalleryCardProps) {
       aria-label={`Open image ${displayed.imageIndex + 1}: ${displayed.image.alt}`}
       style={{ '--gallery-index': slot } as React.CSSProperties}
     >
-      <img className="gallery-card-image gallery-card-image-current" src={`${asset}gallery/${displayed.image.file}`} alt={displayed.image.alt} loading={slot < 3 ? 'eager' : 'lazy'} />
+      <img className={`gallery-card-image gallery-card-image-current${incoming ? ` gallery-card-image-outgoing gallery-card-image-out-${incomingDirection}` : ''}`} src={`${asset}gallery/${displayed.image.file}`} alt={displayed.image.alt} loading={slot < 3 ? 'eager' : 'lazy'} />
       {incoming && (
         <img
-          className={`gallery-card-image gallery-card-image-incoming gallery-card-image-from-${slideDirection}`}
+          className={`gallery-card-image gallery-card-image-incoming gallery-card-image-from-${incomingDirection}`}
           src={`${asset}gallery/${incoming.image.file}`}
           alt=""
           onAnimationEnd={() => {
@@ -724,7 +735,7 @@ function Gallery() {
     : []
 
   const renderGalleryCard = ({ image, imageIndex, slot }: { image: GalleryImage; imageIndex: number; slot: number }) => (
-    <GalleryCard image={image} imageIndex={imageIndex} slot={slot} onOpen={() => setActiveIndex(imageIndex)} key={`gallery-preview-${slot}`} />
+    <GalleryCard image={image} imageIndex={imageIndex} slot={slot} slideDirections={gallerySlideDirections[slot]} onOpen={() => setActiveIndex(imageIndex)} key={`gallery-preview-${slot}`} />
   )
 
   return (
