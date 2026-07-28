@@ -319,14 +319,8 @@ function Services({ mobileDevice }: { mobileDevice: boolean }) {
 
 type GalleryImage = { file: string; alt: string }
 
-function shuffledGalleryOrder(length: number) {
-  const order = Array.from({ length }, (_, index) => index)
-  for (let index = order.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1))
-    ;[order[index], order[swapIndex]] = [order[swapIndex], order[index]]
-  }
-  return order
-}
+// Keep the preview curated while the modal remains the complete gallery.
+const galleryPreviewIndices = [0, 2, 7, 9, 13, 16]
 
 function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHover, onActivate }: {
   direction: 'previous' | 'next'
@@ -607,15 +601,63 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   )
 }
 
+type GalleryCardProps = {
+  image: GalleryImage
+  imageIndex: number
+  slot: number
+  onOpen: () => void
+}
+
+function GalleryCard({ image, imageIndex, slot, onOpen }: GalleryCardProps) {
+  const [displayed, setDisplayed] = useState({ image, imageIndex })
+  const [incoming, setIncoming] = useState<{ image: GalleryImage; imageIndex: number } | null>(null)
+
+  useEffect(() => {
+    if (imageIndex !== displayed.imageIndex) setIncoming({ image, imageIndex })
+  }, [displayed.imageIndex, image, imageIndex])
+
+  const slideDirection = slot === 0
+    ? 'top'
+    : slot === 3
+      ? 'left'
+      : slot === 4
+        ? 'bottom'
+        : 'right'
+
+  return (
+    <button
+      className={`gallery-card gallery-card-${slot}`}
+      type="button"
+      onClick={onOpen}
+      aria-label={`Open image ${displayed.imageIndex + 1}: ${displayed.image.alt}`}
+      style={{ '--gallery-index': slot } as React.CSSProperties}
+    >
+      <img className="gallery-card-image gallery-card-image-current" src={`${asset}gallery/${displayed.image.file}`} alt={displayed.image.alt} loading={slot < 3 ? 'eager' : 'lazy'} />
+      {incoming && (
+        <img
+          className={`gallery-card-image gallery-card-image-incoming gallery-card-image-from-${slideDirection}`}
+          src={`${asset}gallery/${incoming.image.file}`}
+          alt=""
+          onAnimationEnd={() => {
+            setDisplayed(incoming)
+            setIncoming(null)
+          }}
+        />
+      )}
+      <span className="gallery-card-index">{String(displayed.imageIndex + 1).padStart(2, '0')}</span>
+      <span className="gallery-card-view">View <ArrowUpRight aria-hidden="true" /></span>
+    </button>
+  )
+}
+
 function Gallery() {
   const sectionRef = useRef<HTMLElement>(null)
+  const swapCursorRef = useRef(galleryPreviewIndices.length)
   const [images, setImages] = useState<GalleryImage[]>([])
   const [visible, setVisible] = useState(false)
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
-  const [visibleStart, setVisibleStart] = useState(0)
-  const [layoutIndex, setLayoutIndex] = useState(0)
+  const [previewIndices, setPreviewIndices] = useState<number[]>([])
   const [shufflePaused, setShufflePaused] = useState(false)
-  const [imageOrder, setImageOrder] = useState<number[]>([])
 
   useEffect(() => {
     fetch(`${asset}gallery/gallery-images.json`)
@@ -625,14 +667,43 @@ function Gallery() {
       })
       .then((galleryImages) => {
         setImages(galleryImages)
-        setImageOrder(shuffledGalleryOrder(galleryImages.length))
-        galleryImages.forEach((image) => {
-          const preload = new Image()
-          preload.src = `${asset}gallery/${image.file}`
-        })
+        setPreviewIndices(galleryPreviewIndices.filter((imageIndex) => galleryImages[imageIndex]))
       })
       .catch(() => setImages([]))
   }, [])
+
+  useEffect(() => {
+    if (!visible || shufflePaused || activeIndex !== null || images.length <= previewIndices.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    let cancelled = false
+    const timers = new Set<number>()
+    const scheduleReplacement = (slot: number) => {
+      const timer = window.setTimeout(() => {
+        timers.delete(timer)
+        if (cancelled) return
+        setPreviewIndices((current) => {
+          if (current.length < galleryPreviewIndices.length) return current
+          const next = [...current]
+          let candidate = swapCursorRef.current % images.length
+          let attempts = 0
+          while (next.includes(candidate) && attempts < images.length) {
+            swapCursorRef.current += 1
+            candidate = swapCursorRef.current % images.length
+            attempts += 1
+          }
+          next[slot] = candidate
+          swapCursorRef.current += 1
+          return next
+        })
+        scheduleReplacement(slot)
+      }, 2000 + Math.random() * 4000)
+      timers.add(timer)
+    }
+    for (let slot = 0; slot < galleryPreviewIndices.length; slot += 1) scheduleReplacement(slot)
+    return () => {
+      cancelled = true
+      timers.forEach((timer) => window.clearTimeout(timer))
+    }
+  }, [activeIndex, images.length, previewIndices.length, shufflePaused, visible])
 
   useEffect(() => {
     const section = sectionRef.current
@@ -647,28 +718,14 @@ function Gallery() {
     return () => observer.disconnect()
   }, [])
 
-  useEffect(() => {
-    if (!visible || shufflePaused || activeIndex !== null || images.length <= 7 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const shuffleTimer = window.setInterval(() => {
-      setVisibleStart((current) => {
-        const nextStart = current + 7
-        if (nextStart >= imageOrder.length) {
-          setImageOrder(shuffledGalleryOrder(images.length))
-          return 0
-        }
-        return nextStart
-      })
-      setLayoutIndex((current) => (current + 1) % 3)
-    }, 7200)
-    return () => window.clearInterval(shuffleTimer)
-  }, [activeIndex, imageOrder.length, images.length, shufflePaused, visible])
-
-  const visibleImages = images.length && imageOrder.length
-    ? Array.from({ length: Math.min(7, images.length) }, (_, slot) => {
-        const imageIndex = imageOrder[(visibleStart + slot) % imageOrder.length]
-        return { image: images[imageIndex], imageIndex, slot }
-      })
+  const visibleImages = images.length
+    ? previewIndices
+      .map((imageIndex, slot) => ({ image: images[imageIndex], imageIndex, slot }))
     : []
+
+  const renderGalleryCard = ({ image, imageIndex, slot }: { image: GalleryImage; imageIndex: number; slot: number }) => (
+    <GalleryCard image={image} imageIndex={imageIndex} slot={slot} onOpen={() => setActiveIndex(imageIndex)} key={`gallery-preview-${slot}`} />
+  )
 
   return (
     <section className={`gallery-section${visible ? ' is-visible' : ''}`} id="work" aria-labelledby="gallery-title" ref={sectionRef}>
@@ -676,26 +733,13 @@ function Gallery() {
         <p className="section-kicker" id="gallery-title">05 / Gallery</p>
       </div>
       <div
-        className={`gallery-showcase gallery-layout-${layoutIndex}`}
+        className="gallery-showcase"
         onMouseEnter={() => setShufflePaused(true)}
         onMouseLeave={() => setShufflePaused(false)}
         onFocusCapture={() => setShufflePaused(true)}
         onBlurCapture={() => setShufflePaused(false)}
       >
-        {visibleImages.map(({ image, imageIndex, slot }) => (
-          <button
-            className={`gallery-card gallery-slot-${slot}`}
-            type="button"
-            onClick={() => setActiveIndex(imageIndex)}
-            aria-label={`Open image ${imageIndex + 1}: ${image.alt}`}
-            style={{ '--gallery-index': slot } as React.CSSProperties}
-            key={`gallery-slot-${slot}`}
-          >
-            <img src={`${asset}gallery/${image.file}`} alt={image.alt} />
-            <span className="gallery-card-index">{String(imageIndex + 1).padStart(2, '0')}</span>
-            <span className="gallery-card-view">View <ArrowUpRight aria-hidden="true" /></span>
-          </button>
-        ))}
+        {visibleImages.map(renderGalleryCard)}
       </div>
       {activeIndex !== null && images[activeIndex] && <GalleryModal images={images} activeIndex={activeIndex} onSelect={setActiveIndex} onClose={() => setActiveIndex(null)} />}
     </section>
