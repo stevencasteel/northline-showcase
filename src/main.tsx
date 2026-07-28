@@ -771,11 +771,13 @@ function Gallery() {
 
   return (
     <section className={`gallery-section${visible ? ' is-visible' : ''}`} id="work" aria-labelledby="gallery-title" ref={sectionRef}>
-      <div className="gallery-brutalist-heading">
-        <p className="section-kicker" id="gallery-title">05 / Gallery</p>
-      </div>
-      <div className="gallery-showcase">
-        {visibleImages.map(renderGalleryCard)}
+      <div className="gallery-layout">
+        <div className="gallery-brutalist-heading">
+          <p className="section-kicker" id="gallery-title">05 / Gallery</p>
+        </div>
+        <div className="gallery-showcase">
+          {visibleImages.map(renderGalleryCard)}
+        </div>
       </div>
       {activeIndex !== null && images[activeIndex] && <GalleryModal images={images} activeIndex={activeIndex} onSelect={setActiveIndex} onClose={() => setActiveIndex(null)} />}
     </section>
