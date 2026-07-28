@@ -5,6 +5,10 @@ import './styles.css'
 
 const asset = '/assets/'
 
+function AnimatedHeroLine({ text, accent = false }: { text: string; accent?: boolean }) {
+  return <span className={`hero-line${accent ? ' hero-accent' : ''}`} style={{ '--line-delay': '.14s' } as React.CSSProperties} aria-hidden="true">{Array.from(text).map((character, index) => <span className="hero-char" style={{ '--char-index': index } as React.CSSProperties} key={`${character}-${index}`}>{character === ' ' ? '\u00a0' : character}</span>)}</span>
+}
+
 function isMobileDevice() {
   const mobileUserAgent = /Android|iPhone|iPad|iPod|Windows Phone|webOS|BlackBerry/i.test(navigator.userAgent)
   const touchDevice = navigator.maxTouchPoints > 0 && window.matchMedia('(pointer: coarse)').matches
@@ -74,7 +78,7 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
       <div className="hero-overlay" />
       <div className="hero-content">
         <p className="eyebrow">Northline Roofing</p>
-        <h1>Custom roofing<br /><span>since year 4-211.</span></h1>
+        <h1 aria-label="Custom roofing since year 4-211."><AnimatedHeroLine text="Custom roofing" /><br /><AnimatedHeroLine text="since year 4-211." accent /></h1>
         <p className="hero-description">Complete roofing systems, exterior protection, and water<span className="desktop-break"><br /></span>management—installed by a local crew that sweats every detail.<span className="desktop-break"><br /></span> Clear pricing, exacting standards, and zero shortcuts.</p>
         <div className="hero-actions">
           <button className="button button-primary" type="button" onClick={onBookAppointment}><CalendarDays aria-hidden="true" /> <span>Book an Appointment</span> <ArrowRight aria-hidden="true" /></button>
