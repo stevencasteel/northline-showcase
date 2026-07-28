@@ -607,6 +607,7 @@ type GalleryCardProps = {
   slot: number
   slideDirections: GallerySlideDirection[]
   onOpen: () => void
+  onHoverChange: (slot: number | null) => void
 }
 
 type GallerySlideDirection = 'top' | 'left' | 'bottom' | 'right'
@@ -620,7 +621,7 @@ const gallerySlideDirections: Record<number, GallerySlideDirection[]> = {
   5: ['right', 'bottom'],
 }
 
-function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen }: GalleryCardProps) {
+function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen, onHoverChange }: GalleryCardProps) {
   const [displayed, setDisplayed] = useState({ image, imageIndex })
   const [incoming, setIncoming] = useState<{ image: GalleryImage; imageIndex: number } | null>(null)
   const [incomingDirection, setIncomingDirection] = useState<GallerySlideDirection>(slideDirections[0])
@@ -640,6 +641,10 @@ function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen }: Galle
       className={`gallery-card gallery-card-${slot}`}
       type="button"
       onClick={onOpen}
+      onMouseEnter={() => onHoverChange(slot)}
+      onMouseLeave={() => onHoverChange(null)}
+      onFocus={() => onHoverChange(slot)}
+      onBlur={() => onHoverChange(null)}
       aria-label={`Open image ${displayed.imageIndex + 1}: ${displayed.image.alt}`}
       style={{ '--gallery-index': slot } as React.CSSProperties}
     >
@@ -668,7 +673,7 @@ function Gallery() {
   const [visible, setVisible] = useState(false)
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [previewIndices, setPreviewIndices] = useState<number[]>([])
-  const [shufflePaused, setShufflePaused] = useState(false)
+  const hoveredSlotRef = useRef<number | null>(null)
 
   useEffect(() => {
     fetch(`${asset}gallery/gallery-images.json`)
@@ -684,37 +689,63 @@ function Gallery() {
   }, [])
 
   useEffect(() => {
-    if (!visible || shufflePaused || activeIndex !== null || images.length <= previewIndices.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (!visible || activeIndex !== null || images.length <= previewIndices.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const globalBuffer = 850
+    const adjacencyBuffer = 1700
+    const neighbors: number[][] = [
+      [1, 2, 3, 4],
+      [0, 2],
+      [0, 1, 4, 5],
+      [0, 4],
+      [0, 2, 3, 5],
+      [2, 4],
+    ]
+    const lastFired = Array(galleryPreviewIndices.length).fill(-Infinity)
+    const dueTimes = galleryPreviewIndices.map(() => performance.now() + 2000 + Math.random() * 4000)
+    let lastGlobalFire = -Infinity
     let cancelled = false
-    const timers = new Set<number>()
-    const scheduleReplacement = (slot: number) => {
-      const timer = window.setTimeout(() => {
-        timers.delete(timer)
-        if (cancelled) return
-        setPreviewIndices((current) => {
-          if (current.length < galleryPreviewIndices.length) return current
-          const next = [...current]
-          let candidate = swapCursorRef.current % images.length
-          let attempts = 0
-          while (next.includes(candidate) && attempts < images.length) {
-            swapCursorRef.current += 1
-            candidate = swapCursorRef.current % images.length
-            attempts += 1
-          }
-          next[slot] = candidate
-          swapCursorRef.current += 1
-          return next
+
+    const scheduler = window.setInterval(() => {
+      if (cancelled) return
+      const now = performance.now()
+      if (now - lastGlobalFire < globalBuffer) return
+
+      const eligibleSlots = dueTimes
+        .map((dueTime, slot) => ({ dueTime, slot }))
+        .filter(({ dueTime, slot }) => {
+          if (slot === hoveredSlotRef.current) return false
+          if (dueTime > now || now - lastFired[slot] < adjacencyBuffer) return false
+          return neighbors[slot].every((neighbor) => now - lastFired[neighbor] >= adjacencyBuffer)
         })
-        scheduleReplacement(slot)
-      }, 2000 + Math.random() * 4000)
-      timers.add(timer)
-    }
-    for (let slot = 0; slot < galleryPreviewIndices.length; slot += 1) scheduleReplacement(slot)
+        .sort((a, b) => a.dueTime - b.dueTime)
+
+      const nextSlot = eligibleSlots[0]?.slot
+      if (nextSlot === undefined) return
+
+      lastFired[nextSlot] = now
+      lastGlobalFire = now
+      dueTimes[nextSlot] = now + 2000 + Math.random() * 4000
+      setPreviewIndices((current) => {
+        if (current.length < galleryPreviewIndices.length) return current
+        const next = [...current]
+        let candidate = swapCursorRef.current % images.length
+        let attempts = 0
+        while (next.includes(candidate) && attempts < images.length) {
+          swapCursorRef.current += 1
+          candidate = swapCursorRef.current % images.length
+          attempts += 1
+        }
+        next[nextSlot] = candidate
+        swapCursorRef.current += 1
+        return next
+      })
+    }, 120)
+
     return () => {
       cancelled = true
-      timers.forEach((timer) => window.clearTimeout(timer))
+      window.clearInterval(scheduler)
     }
-  }, [activeIndex, images.length, previewIndices.length, shufflePaused, visible])
+  }, [activeIndex, images.length, previewIndices.length, visible])
 
   useEffect(() => {
     const section = sectionRef.current
@@ -735,7 +766,7 @@ function Gallery() {
     : []
 
   const renderGalleryCard = ({ image, imageIndex, slot }: { image: GalleryImage; imageIndex: number; slot: number }) => (
-    <GalleryCard image={image} imageIndex={imageIndex} slot={slot} slideDirections={gallerySlideDirections[slot]} onOpen={() => setActiveIndex(imageIndex)} key={`gallery-preview-${slot}`} />
+    <GalleryCard image={image} imageIndex={imageIndex} slot={slot} slideDirections={gallerySlideDirections[slot]} onOpen={() => setActiveIndex(imageIndex)} onHoverChange={(hoveredSlot) => { hoveredSlotRef.current = hoveredSlot }} key={`gallery-preview-${slot}`} />
   )
 
   return (
@@ -743,13 +774,7 @@ function Gallery() {
       <div className="gallery-brutalist-heading">
         <p className="section-kicker" id="gallery-title">05 / Gallery</p>
       </div>
-      <div
-        className="gallery-showcase"
-        onMouseEnter={() => setShufflePaused(true)}
-        onMouseLeave={() => setShufflePaused(false)}
-        onFocusCapture={() => setShufflePaused(true)}
-        onBlurCapture={() => setShufflePaused(false)}
-      >
+      <div className="gallery-showcase">
         {visibleImages.map(renderGalleryCard)}
       </div>
       {activeIndex !== null && images[activeIndex] && <GalleryModal images={images} activeIndex={activeIndex} onSelect={setActiveIndex} onClose={() => setActiveIndex(null)} />}
