@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ArrowRight, ArrowUpRight, CalendarDays, CheckCircle2, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
 import './styles.css'
 
 const asset = '/assets/'
@@ -25,7 +25,7 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
       </a>
       <nav className="primary-nav" aria-label="Primary navigation">
         <a href="#services">Services</a>
-        <a href="#work">Work</a>
+        <a href="#work">Gallery</a>
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
       </nav>
@@ -34,7 +34,7 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
       <button className="menu-button" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><span /><span /></button>
       {menuOpen && <nav className="mobile-nav" aria-label="Mobile navigation">
         <a href="#services" onClick={() => setMenuOpen(false)}>Services</a>
-        <a href="#work" onClick={() => setMenuOpen(false)}>Work</a>
+        <a href="#work" onClick={() => setMenuOpen(false)}>Gallery</a>
         <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
         <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
       </nav>}
@@ -317,10 +317,395 @@ function Services({ mobileDevice }: { mobileDevice: boolean }) {
   )
 }
 
+type GalleryImage = { file: string; alt: string }
+
+function shuffledGalleryOrder(length: number) {
+  const order = Array.from({ length }, (_, index) => index)
+  for (let index = order.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1))
+    ;[order[index], order[swapIndex]] = [order[swapIndex], order[index]]
+  }
+  return order
+}
+
+function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHover, onActivate }: {
+  direction: 'previous' | 'next'
+  keyboardActive: boolean
+  pressCount: number
+  suppressHover: boolean
+  onActivate: () => void
+}) {
+  const arrowRef = useRef<HTMLSpanElement>(null)
+  const animationRef = useRef<Animation | null>(null)
+  const chargeFrameRef = useRef<number | null>(null)
+  const hoveringRef = useRef(false)
+  const pressedRef = useRef(false)
+  const pressStartedRef = useRef(0)
+  const keyboardStartedRef = useRef(0)
+  const startShiftRef = useRef(0)
+  const currentShiftRef = useRef(0)
+  const [pointerPressed, setPointerPressed] = useState(false)
+  const [shockwave, setShockwave] = useState(0)
+  const travelOffset = direction === 'previous' ? -10 : 10
+  const pullbackOffset = -travelOffset
+
+  const readArrowShift = useCallback(() => {
+    const arrow = arrowRef.current
+    if (!arrow) return currentShiftRef.current
+    try {
+      const transform = getComputedStyle(arrow).transform
+      if (transform && transform !== 'none') currentShiftRef.current = new DOMMatrixReadOnly(transform).m41
+    } catch {
+      // Keep the last known shift when a browser cannot expose the in-flight matrix.
+    }
+    return currentShiftRef.current
+  }, [])
+
+  const stopArrowMotion = useCallback(() => {
+    animationRef.current?.cancel()
+    animationRef.current = null
+    if (chargeFrameRef.current) cancelAnimationFrame(chargeFrameRef.current)
+    chargeFrameRef.current = null
+  }, [])
+
+  const setArrowShift = useCallback((shift: number) => {
+    currentShiftRef.current = shift
+    if (arrowRef.current) arrowRef.current.style.transform = `translate3d(${shift}px, 0, 0)`
+  }, [])
+
+  const springArrowTo = useCallback((target: number) => {
+    const arrow = arrowRef.current
+    if (!arrow) return
+    const start = readArrowShift()
+    stopArrowMotion()
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setArrowShift(target)
+      return
+    }
+    animationRef.current = arrow.animate([
+      { transform: `translate3d(${start}px, 0, 0)`, offset: 0 },
+      { transform: `translate3d(${target * 1.42}px, 0, 0)`, offset: .58 },
+      { transform: `translate3d(${target * .88}px, 0, 0)`, offset: .82 },
+      { transform: `translate3d(${target}px, 0, 0)`, offset: 1 },
+    ], { duration: 360, easing: 'cubic-bezier(.2,.82,.25,1)' })
+    animationRef.current.onfinish = () => {
+      setArrowShift(target)
+      animationRef.current = null
+    }
+  }, [readArrowShift, setArrowShift, stopArrowMotion])
+
+  const releaseArrow = useCallback((held: boolean, keyboardHold = false) => {
+    const arrow = arrowRef.current
+    if (!arrow) return
+    const start = readArrowShift()
+    stopArrowMotion()
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setArrowShift(0)
+      return
+    }
+    const keyframes = keyboardHold && held
+      ? [
+          { transform: `translate3d(${start}px, 0, 0)`, offset: 0 },
+          { transform: `translate3d(${travelOffset * .72}px, 0, 0)`, offset: .38 },
+          { transform: `translate3d(${travelOffset * .22}px, 0, 0)`, offset: .76 },
+          { transform: 'translate3d(0, 0, 0)', offset: 1 },
+        ]
+      : held
+      ? [
+          { transform: `translate3d(${start}px, 0, 0)`, offset: 0 },
+          { transform: `translate3d(${pullbackOffset}px, 0, 0)`, offset: .12 },
+          { transform: `translate3d(${travelOffset * 1.62}px, 0, 0)`, offset: .48 },
+          { transform: `translate3d(${travelOffset * .74}px, 0, 0)`, offset: .68 },
+          { transform: `translate3d(${travelOffset * 1.08}px, 0, 0)`, offset: .82 },
+          { transform: 'translate3d(0, 0, 0)', offset: 1 },
+        ]
+      : [
+          { transform: `translate3d(${start}px, 0, 0)`, offset: 0 },
+          { transform: `translate3d(${pullbackOffset * .46}px, 0, 0)`, offset: .34 },
+          { transform: `translate3d(${pullbackOffset * .08}px, 0, 0)`, offset: .76 },
+          { transform: 'translate3d(0, 0, 0)', offset: 1 },
+        ]
+    animationRef.current = arrow.animate(keyframes, { duration: keyboardHold && held ? 360 : held ? 510 : 270, easing: keyboardHold && held ? 'cubic-bezier(.22,.8,.3,1)' : 'cubic-bezier(.2,.76,.22,1)' })
+    animationRef.current.onfinish = () => {
+      setArrowShift(0)
+      animationRef.current = null
+    }
+  }, [pullbackOffset, readArrowShift, setArrowShift, stopArrowMotion, travelOffset])
+
+  const releasePointer = useCallback(() => {
+    if (!pressedRef.current) return
+    const held = performance.now() - pressStartedRef.current >= 150
+    pressedRef.current = false
+    setPointerPressed(false)
+    releaseArrow(held)
+  }, [releaseArrow])
+
+  useEffect(() => {
+    if (keyboardActive) {
+      keyboardStartedRef.current = performance.now()
+      stopArrowMotion()
+      setArrowShift(0)
+      const started = performance.now()
+      const detectKeyboardHold = (now: number) => {
+        const elapsed = now - started
+        if (elapsed < 100) chargeFrameRef.current = requestAnimationFrame(detectKeyboardHold)
+        else springArrowTo(travelOffset)
+      }
+      chargeFrameRef.current = requestAnimationFrame(detectKeyboardHold)
+      return
+    }
+    if (!pressedRef.current && keyboardStartedRef.current) {
+      const held = performance.now() - keyboardStartedRef.current >= 100
+      keyboardStartedRef.current = 0
+      releaseArrow(held, true)
+    } else if (!pressedRef.current) {
+      springArrowTo(0)
+    }
+  }, [keyboardActive, pullbackOffset, readArrowShift, releaseArrow, setArrowShift, springArrowTo, stopArrowMotion, travelOffset])
+
+  useEffect(() => {
+    if (pressCount > 0 && keyboardActive) setShockwave((current) => current + 1)
+  }, [keyboardActive, pressCount])
+
+  useEffect(() => () => stopArrowMotion(), [stopArrowMotion])
+
+  return (
+    <button
+      className={`gallery-modal-arrow gallery-modal-${direction}${keyboardActive ? ' is-key-active' : ''}${pointerPressed ? ' is-pointer-pressed' : ''}${suppressHover ? ' suppress-hover' : ''}`}
+      type="button"
+      aria-label={direction === 'previous' ? 'Previous image' : 'Next image'}
+      onPointerEnter={() => {
+        hoveringRef.current = true
+        if (!pressedRef.current && !keyboardActive) springArrowTo(0)
+      }}
+      onPointerLeave={() => {
+        hoveringRef.current = false
+        if (!pressedRef.current && !keyboardActive) springArrowTo(0)
+      }}
+      onPointerDown={(event) => {
+        if (pressedRef.current) return
+        event.currentTarget.setPointerCapture(event.pointerId)
+        pressedRef.current = true
+        setPointerPressed(true)
+        const currentShift = readArrowShift()
+        stopArrowMotion()
+        pressStartedRef.current = performance.now()
+        startShiftRef.current = currentShift
+        const chargePointer = (now: number) => {
+          const progress = Math.min((now - pressStartedRef.current) / 300, 1)
+          const eased = progress < .5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress
+          setArrowShift(startShiftRef.current + (pullbackOffset - startShiftRef.current) * eased)
+          if (progress < 1 && pressedRef.current) chargeFrameRef.current = requestAnimationFrame(chargePointer)
+        }
+        chargeFrameRef.current = requestAnimationFrame(chargePointer)
+      }}
+      onPointerUp={releasePointer}
+      onPointerCancel={releasePointer}
+      onClick={(event) => {
+        if (event.detail !== 0) event.currentTarget.blur()
+        setShockwave((current) => current + 1)
+        onActivate()
+      }}
+    >
+      {shockwave > 0 && <span className="gallery-arrow-shockwave" key={shockwave} aria-hidden="true" />}
+      <span className="gallery-arrow-icon" ref={arrowRef}>
+        {direction === 'previous' ? <ChevronLeft aria-hidden="true" /> : <ChevronRight aria-hidden="true" />}
+      </span>
+    </button>
+  )
+}
+
+function GalleryModal({ images, activeIndex, onSelect, onClose }: {
+  images: GalleryImage[]
+  activeIndex: number
+  onSelect: (index: number) => void
+  onClose: () => void
+}) {
+  const modalFrameRef = useRef<HTMLElement>(null)
+  const sequenceListRef = useRef<HTMLDivElement>(null)
+  const [activeControl, setActiveControl] = useState<'previous' | 'next' | null>(null)
+  const [controlPressCount, setControlPressCount] = useState({ previous: 0, next: 0 })
+  const [suppressArrowHover, setSuppressArrowHover] = useState(false)
+  const activeImage = images[activeIndex]
+
+  const navigate = useCallback((direction: -1 | 1) => {
+    onSelect((activeIndex + direction + images.length) % images.length)
+  }, [activeIndex, images.length, onSelect])
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    modalFrameRef.current?.focus()
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+        event.preventDefault()
+        setSuppressArrowHover(true)
+        if (!event.repeat) {
+          setActiveControl('next')
+          setControlPressCount((current) => ({ ...current, next: current.next + 1 }))
+        }
+        navigate(1)
+      }
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        event.preventDefault()
+        setSuppressArrowHover(true)
+        if (!event.repeat) {
+          setActiveControl('previous')
+          setControlPressCount((current) => ({ ...current, previous: current.previous + 1 }))
+        }
+        navigate(-1)
+      }
+    }
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if ((event.key === 'ArrowRight' || event.key === 'ArrowDown') && activeControl === 'next') setActiveControl(null)
+      if ((event.key === 'ArrowLeft' || event.key === 'ArrowUp') && activeControl === 'previous') setActiveControl(null)
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('keyup', handleKeyUp)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [activeControl, navigate, onClose])
+
+  useEffect(() => {
+    sequenceListRef.current?.querySelector<HTMLElement>('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' })
+  }, [activeIndex])
+
+  return (
+    <div className="gallery-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) onClose() }}>
+      <section className="gallery-modal-frame" role="dialog" aria-modal="true" aria-label="Roofscape gallery viewer" tabIndex={-1} ref={modalFrameRef}>
+        <div className="gallery-modal-stage" onPointerMove={() => setSuppressArrowHover(false)}>
+          <div className="gallery-modal-meta">
+            <span>Roofscape</span>
+            <strong>{String(activeIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}</strong>
+          </div>
+          <img src={`${asset}gallery/${activeImage.file}`} alt={activeImage.alt} />
+          <GalleryArrowButton direction="previous" keyboardActive={activeControl === 'previous'} pressCount={controlPressCount.previous} suppressHover={suppressArrowHover} onActivate={() => navigate(-1)} />
+          <GalleryArrowButton direction="next" keyboardActive={activeControl === 'next'} pressCount={controlPressCount.next} suppressHover={suppressArrowHover} onActivate={() => navigate(1)} />
+        </div>
+        <aside className="gallery-sequence" aria-label="All gallery images">
+          <div className="gallery-sequence-list" ref={sequenceListRef}>
+            {images.map((image, imageIndex) => (
+              <button className={activeIndex === imageIndex ? 'is-active' : ''} type="button" onClick={() => onSelect(imageIndex)} key={image.file} aria-label={`View image ${imageIndex + 1}: ${image.alt}`} aria-current={activeIndex === imageIndex ? 'true' : undefined}>
+                <img src={`${asset}gallery/${image.file}`} alt="" loading="eager" />
+                <span>{String(imageIndex + 1).padStart(2, '0')}</span>
+              </button>
+            ))}
+          </div>
+        </aside>
+        <button className="gallery-modal-close" type="button" aria-label="Close gallery" onClick={onClose}><X aria-hidden="true" /></button>
+      </section>
+    </div>
+  )
+}
+
+function Gallery() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [images, setImages] = useState<GalleryImage[]>([])
+  const [visible, setVisible] = useState(false)
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const [visibleStart, setVisibleStart] = useState(0)
+  const [layoutIndex, setLayoutIndex] = useState(0)
+  const [shufflePaused, setShufflePaused] = useState(false)
+  const [imageOrder, setImageOrder] = useState<number[]>([])
+
+  useEffect(() => {
+    fetch(`${asset}gallery/gallery-images.json`)
+      .then((response) => {
+        if (!response.ok) throw new Error('Unable to load gallery manifest')
+        return response.json() as Promise<GalleryImage[]>
+      })
+      .then((galleryImages) => {
+        setImages(galleryImages)
+        setImageOrder(shuffledGalleryOrder(galleryImages.length))
+        galleryImages.forEach((image) => {
+          const preload = new Image()
+          preload.src = `${asset}gallery/${image.file}`
+        })
+      })
+      .catch(() => setImages([]))
+  }, [])
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setVisible(true)
+        observer.disconnect()
+      }
+    }, { threshold: 0.04 })
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!visible || shufflePaused || activeIndex !== null || images.length <= 7 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const shuffleTimer = window.setInterval(() => {
+      setVisibleStart((current) => {
+        const nextStart = current + 7
+        if (nextStart >= imageOrder.length) {
+          setImageOrder(shuffledGalleryOrder(images.length))
+          return 0
+        }
+        return nextStart
+      })
+      setLayoutIndex((current) => (current + 1) % 3)
+    }, 7200)
+    return () => window.clearInterval(shuffleTimer)
+  }, [activeIndex, imageOrder.length, images.length, shufflePaused, visible])
+
+  const visibleImages = images.length && imageOrder.length
+    ? Array.from({ length: Math.min(7, images.length) }, (_, slot) => {
+        const imageIndex = imageOrder[(visibleStart + slot) % imageOrder.length]
+        return { image: images[imageIndex], imageIndex, slot }
+      })
+    : []
+
+  return (
+    <section className={`gallery-section${visible ? ' is-visible' : ''}`} id="work" aria-labelledby="gallery-title" ref={sectionRef}>
+      <div className="gallery-brutalist-heading">
+        <p className="section-kicker" id="gallery-title">05 / Gallery</p>
+      </div>
+      <div
+        className={`gallery-showcase gallery-layout-${layoutIndex}`}
+        onMouseEnter={() => setShufflePaused(true)}
+        onMouseLeave={() => setShufflePaused(false)}
+        onFocusCapture={() => setShufflePaused(true)}
+        onBlurCapture={() => setShufflePaused(false)}
+      >
+        {visibleImages.map(({ image, imageIndex, slot }) => (
+          <button
+            className={`gallery-card gallery-slot-${slot}`}
+            type="button"
+            onClick={() => setActiveIndex(imageIndex)}
+            aria-label={`Open image ${imageIndex + 1}: ${image.alt}`}
+            style={{ '--gallery-index': slot } as React.CSSProperties}
+            key={`gallery-slot-${slot}`}
+          >
+            <img src={`${asset}gallery/${image.file}`} alt={image.alt} />
+            <span className="gallery-card-index">{String(imageIndex + 1).padStart(2, '0')}</span>
+            <span className="gallery-card-view">View <ArrowUpRight aria-hidden="true" /></span>
+          </button>
+        ))}
+      </div>
+      {activeIndex !== null && images[activeIndex] && <GalleryModal images={images} activeIndex={activeIndex} onSelect={setActiveIndex} onClose={() => setActiveIndex(null)} />}
+    </section>
+  )
+}
+
 function App() {
   const mobileDevice = isMobileDevice()
   const [appointmentOpen, setAppointmentOpen] = useState(false)
-  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={() => setAppointmentOpen(true)} /><main><Hero onBookAppointment={() => setAppointmentOpen(true)} /><BadgeStrip /><Services mobileDevice={mobileDevice} /></main>{appointmentOpen && <AppointmentModal mobileDevice={mobileDevice} onClose={() => setAppointmentOpen(false)} />}</div>
+  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={() => setAppointmentOpen(true)} /><main><Hero onBookAppointment={() => setAppointmentOpen(true)} /><BadgeStrip /><Services mobileDevice={mobileDevice} /><Gallery /></main>{appointmentOpen && <AppointmentModal mobileDevice={mobileDevice} onClose={() => setAppointmentOpen(false)} />}</div>
 }
 
 createRoot(document.getElementById('root')!).render(<App />)
