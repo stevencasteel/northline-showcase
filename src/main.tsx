@@ -628,6 +628,19 @@ function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen, onHover
   const [incoming, setIncoming] = useState<{ image: GalleryImage; imageIndex: number } | null>(null)
   const [incomingDirection, setIncomingDirection] = useState<GallerySlideDirection>(slideDirections[0])
   const directionCursorRef = useRef(0)
+  const getDigitSequence = (from: number, to: number) => {
+    const digits = [from]
+    const incrementDistance = (to - from + 10) % 10
+    const decrementDistance = (from - to + 10) % 10
+    const step = incrementDistance <= decrementDistance ? 1 : -1
+    const distance = Math.min(incrementDistance, decrementDistance)
+    let current = from
+    for (let stepIndex = 0; stepIndex < distance; stepIndex += 1) {
+      current = (current + step + 10) % 10
+      digits.push(current)
+    }
+    return digits
+  }
 
   useEffect(() => {
     if (imageIndex !== displayed.imageIndex) {
@@ -662,7 +675,21 @@ function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen, onHover
           }}
         />
       )}
-      <span className="gallery-card-index">{String(displayed.imageIndex + 1).padStart(2, '0')}</span>
+      <span className="gallery-card-index" aria-hidden="true">
+        {String((incoming?.imageIndex ?? displayed.imageIndex) + 1).padStart(2, '0').split('').map((digit, digitIndex) => {
+          const currentDigits = String(displayed.imageIndex + 1).padStart(2, '0')
+          const sequence = incoming
+            ? getDigitSequence(Number(currentDigits[digitIndex]), Number(digit))
+            : [Number(digit)]
+          return (
+          <span className="gallery-card-index-digit-window" key={`${slot}-${digitIndex}-${digit}`}>
+            <span className="gallery-card-index-digit-track" style={{ '--digit-steps': sequence.length - 1 } as React.CSSProperties}>
+              {sequence.map((sequenceDigit, sequenceIndex) => <span className="gallery-card-index-digit" key={`${sequenceDigit}-${sequenceIndex}`}>{sequenceDigit}</span>)}
+            </span>
+          </span>
+          )
+        })}
+      </span>
       <span className="gallery-card-view">View <ArrowUpRight aria-hidden="true" /></span>
     </button>
   )
