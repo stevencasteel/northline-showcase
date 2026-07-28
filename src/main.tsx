@@ -321,14 +321,22 @@ function Services({ mobileDevice }: { mobileDevice: boolean }) {
 type GalleryImage = { file: string; alt: string }
 
 const roofMaterials = [
-  ['01', 'Fireclay shingles', 'Charcoal / shadow line'],
-  ['02', 'Copperwood shingles', 'Weathered brown / warm metal'],
-  ['03', 'Dragon-metal seam', 'Slate blue / vertical panel'],
-  ['04', 'Kiln barrel tile', 'Terracotta / burnt sienna'],
-  ['05', 'Moon slate', 'Blue-gray / violet edge'],
-  ['06', 'Cedar shakes', 'Driftwood / warm grain'],
-  ['07', 'Graphite composite', 'Black / uniform edge'],
-  ['08', 'Frost membrane', 'White / minimal seam'],
+  ['01', 'Basalt fireclay', 'Charcoal / shadow line'],
+  ['02', 'Copperwood', 'Amber / russet fleck'],
+  ['03', 'Dragon-metal seam', 'Cobalt / vertical panel'],
+  ['04', 'Patinated copper', 'Emerald / living metal'],
+  ['05', 'Moon slate', 'Violet / irregular edge'],
+  ['06', 'Storm slate', 'Blue-black / mineral'],
+  ['07', 'Cedar shakes', 'Silver wood / honey grain'],
+  ['08', 'Frost membrane', 'Pearl / silver seam'],
+  ['09', 'Kiln barrel tile', 'Burnt sienna / clay'],
+  ['10', 'Indigo glaze', 'Plum blue / fired gloss'],
+  ['11', 'Tideglass tile', 'Teal / copper scale'],
+  ['12', 'Sun-baked tile', 'Ochre / warm terracotta'],
+  ['13', 'Graphite composite', 'Slate black / blue variation'],
+  ['14', 'Obsidian slate', 'Matte black / uniform edge'],
+  ['15', 'Pearl membrane', 'White / silver seam'],
+  ['16', 'Cool-roof membrane', 'Pale blue / reflective'],
 ] as const
 
 // Keep the preview curated while the modal remains the complete gallery.
