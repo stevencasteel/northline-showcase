@@ -320,6 +320,17 @@ function Services({ mobileDevice }: { mobileDevice: boolean }) {
 
 type GalleryImage = { file: string; alt: string }
 
+const roofMaterials = [
+  ['01', 'Fireclay shingles', 'Charcoal / shadow line'],
+  ['02', 'Copperwood shingles', 'Weathered brown / warm metal'],
+  ['03', 'Dragon-metal seam', 'Slate blue / vertical panel'],
+  ['04', 'Kiln barrel tile', 'Terracotta / burnt sienna'],
+  ['05', 'Moon slate', 'Blue-gray / violet edge'],
+  ['06', 'Cedar shakes', 'Driftwood / warm grain'],
+  ['07', 'Graphite composite', 'Black / uniform edge'],
+  ['08', 'Frost membrane', 'White / minimal seam'],
+] as const
+
 // Keep the preview curated while the modal remains the complete gallery.
 const galleryPreviewIndices = [0, 2, 7, 9, 13, 16]
 
@@ -837,8 +848,29 @@ function Gallery() {
         <div className="gallery-brutalist-heading" style={{ '--gallery-rendered-height': `${galleryRenderedHeight}px` } as React.CSSProperties}>
           <p className="section-kicker" id="gallery-title">Gallery</p>
         </div>
-        <div className="gallery-showcase" ref={showcaseRef}>
-          {visibleImages.map(renderGalleryCard)}
+        <div className="gallery-content">
+          <div className="gallery-showcase" ref={showcaseRef}>
+            {visibleImages.map(renderGalleryCard)}
+          </div>
+          <aside className="gallery-material-library" aria-labelledby="materials-title" style={{ height: galleryRenderedHeight ? `${galleryRenderedHeight}px` : undefined }}>
+            <div className="gallery-material-heading">
+              <span className="gallery-material-kicker">Northline / Roof systems</span>
+              <h2 id="materials-title">Material library</h2>
+              <span className="gallery-material-rule" />
+            </div>
+            <div className="gallery-material-art">
+              <img src={`${asset}gallery/material-library.png`} alt="A vertical display of eight fantasy roofing material samples arranged like a premium architectural showroom library." />
+              <div className="gallery-material-labels">
+                {roofMaterials.map(([number, name, detail]) => (
+                  <div className="gallery-material-label" key={number}>
+                    <span>{number}</span>
+                    <strong>{name}</strong>
+                    <small>{detail}</small>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
       {activeIndex !== null && images[activeIndex] && <GalleryModal images={images} activeIndex={activeIndex} onSelect={setActiveIndex} onClose={() => setActiveIndex(null)} />}
