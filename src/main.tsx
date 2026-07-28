@@ -284,34 +284,36 @@ function Services({ mobileDevice }: { mobileDevice: boolean }) {
 
   return (
     <section className={`services-section${visible ? ' is-visible' : ''}`} id="services" aria-labelledby="services-title" ref={sectionRef}>
-      <div className="services-brutalist-heading">
-        <p className="section-kicker" id="services-title">04 / Services</p>
-      </div>
-      <div className="services-slice-grid">
-        {services.map((service, index) => (
-          <a
-            className={`service-slice${activeService === index ? ' is-active' : ''}`}
-            href="#contact"
-            key={service.title}
-            aria-label={`${activeService === index ? 'Close' : 'Open'} ${service.title} service details`}
-            aria-expanded={mobileDevice ? activeService === index : undefined}
-            onClick={(event) => {
-              if (!mobileDevice) return
-              event.preventDefault()
-              setActiveService(activeService === index ? null : index)
-            }}
-            style={{ '--service-index': index } as React.CSSProperties}
-          >
-            <img src={`${asset}${service.image}`} alt={service.alt} />
-            <span className="service-slice-shade" />
-            <span className="service-slice-number">0{index + 1}</span>
-            <span className="service-slice-content">
-              <strong>{service.title}</strong>
-              <span>{service.text}</span>
-              <ArrowUpRight aria-hidden="true" />
-            </span>
-          </a>
-        ))}
+      <div className="services-layout">
+        <div className="services-brutalist-heading">
+          <p className="section-kicker" id="services-title">Services</p>
+        </div>
+        <div className="services-slice-grid">
+          {services.map((service, index) => (
+            <a
+              className={`service-slice${activeService === index ? ' is-active' : ''}`}
+              href="#contact"
+              key={service.title}
+              aria-label={`${activeService === index ? 'Close' : 'Open'} ${service.title} service details`}
+              aria-expanded={mobileDevice ? activeService === index : undefined}
+              onClick={(event) => {
+                if (!mobileDevice) return
+                event.preventDefault()
+                setActiveService(activeService === index ? null : index)
+              }}
+              style={{ '--service-index': index } as React.CSSProperties}
+            >
+              <img src={`${asset}${service.image}`} alt={service.alt} />
+              <span className="service-slice-shade" />
+              <span className="service-slice-number">0{index + 1}</span>
+              <span className="service-slice-content">
+                <strong>{service.title}</strong>
+                <span>{service.text}</span>
+                <ArrowUpRight aria-hidden="true" />
+              </span>
+            </a>
+          ))}
+        </div>
       </div>
     </section>
   )
@@ -668,12 +670,24 @@ function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen, onHover
 
 function Gallery() {
   const sectionRef = useRef<HTMLElement>(null)
+  const showcaseRef = useRef<HTMLDivElement>(null)
   const swapCursorRef = useRef(galleryPreviewIndices.length)
   const [images, setImages] = useState<GalleryImage[]>([])
   const [visible, setVisible] = useState(false)
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [previewIndices, setPreviewIndices] = useState<number[]>([])
+  const [galleryRenderedHeight, setGalleryRenderedHeight] = useState(0)
   const hoveredSlotRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    const showcase = showcaseRef.current
+    if (!showcase) return
+    const updateHeight = () => setGalleryRenderedHeight(showcase.offsetHeight * .65)
+    updateHeight()
+    const observer = new ResizeObserver(updateHeight)
+    observer.observe(showcase)
+    return () => observer.disconnect()
+  }, [visible, previewIndices.length])
 
   useEffect(() => {
     fetch(`${asset}gallery/gallery-images.json`)
@@ -772,10 +786,10 @@ function Gallery() {
   return (
     <section className={`gallery-section${visible ? ' is-visible' : ''}`} id="work" aria-labelledby="gallery-title" ref={sectionRef}>
       <div className="gallery-layout">
-        <div className="gallery-brutalist-heading">
-          <p className="section-kicker" id="gallery-title">05 / Gallery</p>
+        <div className="gallery-brutalist-heading" style={{ '--gallery-rendered-height': `${galleryRenderedHeight}px` } as React.CSSProperties}>
+          <p className="section-kicker" id="gallery-title">Gallery</p>
         </div>
-        <div className="gallery-showcase">
+        <div className="gallery-showcase" ref={showcaseRef}>
           {visibleImages.map(renderGalleryCard)}
         </div>
       </div>
