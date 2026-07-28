@@ -522,7 +522,17 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   const [activeControl, setActiveControl] = useState<'previous' | 'next' | null>(null)
   const [controlPressCount, setControlPressCount] = useState({ previous: 0, next: 0 })
   const [suppressArrowHover, setSuppressArrowHover] = useState(false)
+  const [isClosing, setIsClosing] = useState(false)
+  const [closeShockwave, setCloseShockwave] = useState(0)
+  const [closePressed, setClosePressed] = useState(false)
   const activeImage = images[activeIndex]
+
+  const handleClose = () => {
+    if (isClosing) return
+    setCloseShockwave((current) => current + 1)
+    setIsClosing(true)
+    window.setTimeout(onClose, 360)
+  }
 
   const navigate = useCallback((direction: -1 | 1) => {
     onSelect((activeIndex + direction + images.length) % images.length)
@@ -539,7 +549,7 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') handleClose()
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
         event.preventDefault()
         setSuppressArrowHover(true)
@@ -569,15 +579,15 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
       document.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('keyup', handleKeyUp)
     }
-  }, [activeControl, navigate, onClose])
+  }, [activeControl, handleClose, navigate])
 
   useEffect(() => {
     sequenceListRef.current?.querySelector<HTMLElement>('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' })
   }, [activeIndex])
 
   return (
-    <div className="gallery-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) onClose() }}>
-      <section className="gallery-modal-frame" role="dialog" aria-modal="true" aria-label="Roofscape gallery viewer" tabIndex={-1} ref={modalFrameRef}>
+    <div className={`gallery-modal-backdrop${isClosing ? ' is-closing' : ''}`} role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) handleClose() }}>
+      <section className={`gallery-modal-frame${isClosing ? ' is-closing' : ''}`} role="dialog" aria-modal="true" aria-label="Roofscape gallery viewer" tabIndex={-1} ref={modalFrameRef}>
         <div className="gallery-modal-stage" onPointerMove={() => setSuppressArrowHover(false)}>
           <div className="gallery-modal-meta">
             <span>Roofscape</span>
@@ -597,7 +607,10 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
             ))}
           </div>
         </aside>
-        <button className="gallery-modal-close" type="button" aria-label="Close gallery" onClick={onClose}><X aria-hidden="true" /></button>
+        <button className={`gallery-modal-close${closePressed ? ' is-pointer-pressed' : ''}`} type="button" aria-label="Close gallery" onClick={handleClose} onPointerDown={() => setClosePressed(true)} onPointerUp={() => setClosePressed(false)} onPointerLeave={() => setClosePressed(false)} onPointerCancel={() => setClosePressed(false)}>
+          {closeShockwave > 0 && <span className="gallery-arrow-shockwave" key={closeShockwave} aria-hidden="true" />}
+          <span className={`gallery-arrow-icon${closePressed ? ' is-pointer-pressed' : ''}`}><X aria-hidden="true" /></span>
+        </button>
       </section>
     </div>
   )

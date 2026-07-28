@@ -172,7 +172,7 @@ h1 .hero-accent { color: #d25f26; }
 .service-slice-number { position: absolute; top: 1.25vw; left: 2.2vw; color: #e5dcd2; font-family: 'IBM Plex Mono', monospace; font-size: .8vw; font-weight: 700; letter-spacing: .12em; }
 .service-slice-content { position: absolute; right: 2vw; bottom: 1.6vw; left: 2.2vw; height: 4.2vw; }
 .service-slice-content strong { position: absolute; bottom: 0; left: 0; width: 8vw; font-family: Antonio, sans-serif; font-size: 2.05vw; font-style: italic; font-weight: 600; line-height: .95; text-transform: uppercase; transform: skewX(-8deg); transform-origin: left bottom; transition: transform .45s ease; }
-.service-slice-content span { position: absolute; right: 2.2vw; bottom: 0; width: 25vw; max-width: none; color: #e5dcd2; font-size: calc(.85vw + 1pt); font-style: italic; line-height: 1.4; text-wrap: balance; opacity: 0; transform: translateX(.8vw); transition: opacity .35s ease, transform .45s ease; }
+.service-slice-content span { position: absolute; right: 1.8vw; bottom: 0; width: 25vw; max-width: none; color: #e5dcd2; font-size: calc(.85vw + 1pt); font-style: italic; line-height: 1.4; text-align: right; text-wrap: balance; opacity: 0; transform: translateX(.8vw); transition: opacity .35s ease, transform .45s ease; }
 .service-slice-content svg { position: absolute; right: 0; bottom: 0; width: 1.45vw; height: 1.45vw; color: #f18a54; opacity: 0; transform: translateX(.5vw); transition: opacity .3s ease, transform .45s ease; }
 .services-slice-grid:hover .service-slice:not(:hover) { flex-grow: .84; }
 .services-slice-grid:has(.service-slice.is-active) .service-slice:not(.is-active) { flex-grow: .84; }
@@ -240,7 +240,9 @@ h1 .hero-accent { color: #d25f26; }
 @keyframes gallery-image-slide-out-left { from { transform: translate3d(0, 0, 0) scale(1.11); } to { transform: translate3d(-100%, 0, 0) scale(1.11); } }
 @keyframes gallery-image-slide-out-right { from { transform: translate3d(0, 0, 0) scale(1.11); } to { transform: translate3d(100%, 0, 0) scale(1.11); } }
 .gallery-modal-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 3vw; background: rgba(4,20,33,.82); -webkit-backdrop-filter: blur(18px) saturate(115%); backdrop-filter: blur(18px) saturate(115%); animation: gallery-backdrop-in .25s ease-out; }
+.gallery-modal-backdrop.is-closing { animation: gallery-backdrop-out .36s ease-in both; }
 .gallery-modal-frame { --gallery-rail-width: 15vw; position: relative; display: flex; width: auto; max-width: 94vw; height: min(82dvh, 59.25vw); overflow: hidden; border: 1px solid rgba(229,220,210,.26); color: #fff; background: rgba(14,39,55,.55); box-shadow: 0 2.5vw 7vw rgba(0,0,0,.44), inset 0 1px rgba(255,255,255,.08); -webkit-backdrop-filter: blur(28px) saturate(125%); backdrop-filter: blur(28px) saturate(125%); animation: gallery-frame-in .4s cubic-bezier(.22,1,.36,1); }
+.gallery-modal-frame.is-closing { animation: gallery-frame-out .36s cubic-bezier(.4,0,1,1) both; }
 .gallery-modal-frame:focus { outline: none; }
 .gallery-modal-stage { position: relative; width: auto; height: 100%; aspect-ratio: 4 / 3; flex: none; overflow: hidden; display: grid; place-items: center; background: rgba(2,13,21,.72); }
 .gallery-modal-stage > img { width: 100%; height: 100%; display: block; object-fit: contain; }
@@ -251,7 +253,7 @@ h1 .hero-accent { color: #d25f26; }
 .gallery-modal-arrow { position: absolute; top: 50%; z-index: 4; width: clamp(50px, 4.4vw, 68px); height: clamp(50px, 4.4vw, 68px); overflow: visible; border-radius: 50%; transform: translateY(-50%); }
 .gallery-modal-previous { left: 1.25vw; }
 .gallery-modal-next { right: 1.25vw; }
-.gallery-arrow-icon { position: relative; z-index: 2; display: grid; place-items: center; will-change: transform; }
+.gallery-arrow-icon { position: relative; z-index: 2; display: grid; place-items: center; will-change: transform; transition: transform .34s cubic-bezier(.34,1.56,.64,1); }
 .gallery-modal-arrow svg { width: clamp(30px, 2.55vw, 40px); height: clamp(30px, 2.55vw, 40px); stroke-width: 1.7; }
 .gallery-arrow-shockwave { position: absolute; inset: 0; z-index: 1; border-radius: 50%; background: #d25f26; pointer-events: none; animation: gallery-arrow-shockwave .38s ease-out both; }
 .gallery-modal-arrow:hover, .gallery-modal-arrow:focus-visible, .gallery-modal-close:hover, .gallery-modal-close:focus-visible { border-color: #d25f26; color: #fff; background: rgba(210,95,38,.86); outline: none; }
@@ -271,9 +273,14 @@ h1 .hero-accent { color: #d25f26; }
 .gallery-sequence-list button.is-active img { opacity: 1; }
 .gallery-sequence-list span { position: absolute; right: .55vw; bottom: .9vw; z-index: 2; font-family: 'IBM Plex Mono', monospace; font-size: .58vw; letter-spacing: .12em; text-shadow: 0 1px 5px rgba(0,0,0,.8); }
 .gallery-modal-close { position: absolute; top: 1vw; right: calc(var(--gallery-rail-width) + 1vw); z-index: 5; width: 2.8vw; height: 2.8vw; border-radius: 50%; }
+.gallery-modal-close.is-pointer-pressed { transform: scale(.9); }
+.gallery-modal-close.is-pointer-pressed { border-color: #f18a54; background: #d25f26; box-shadow: 0 0 0 .22vw rgba(210,95,38,.18), 0 0 1.4vw rgba(210,95,38,.5); }
+.gallery-modal-close.is-pointer-pressed .gallery-arrow-icon { transform: scale(1.2); }
 .gallery-modal-close svg { width: 1.15vw; height: 1.15vw; }
 @keyframes gallery-backdrop-in { from { opacity: 0; } }
 @keyframes gallery-frame-in { from { opacity: 0; transform: translateY(1.5vw) scale(.985); } }
+@keyframes gallery-backdrop-out { to { opacity: 0; } }
+@keyframes gallery-frame-out { to { opacity: 0; transform: translateY(1.5vw) scale(.985); } }
 @keyframes gallery-arrow-shockwave { from { opacity: .68; transform: scale(.88); } to { opacity: 0; transform: scale(1.65); } }
 .app.is-mobile-device { --mobile-gutter: 24px; }
 .app.is-mobile-device .site-header { aspect-ratio: auto; min-height: 77px; padding: 10px 16px; gap: 8px; }
