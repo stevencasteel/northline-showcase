@@ -170,10 +170,13 @@ h1 .hero-accent { color: #d25f26; }
 .service-slice-shade { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 68%, rgba(4,20,33,.78) 100%); opacity: 1; z-index: -1; }
 .service-slice::after { position: absolute; inset: 0; content: ''; background: linear-gradient(180deg, transparent 42%, rgba(4,20,33,.86) 100%); opacity: 0; pointer-events: none; transition: opacity .5s ease; z-index: -1; }
 .service-slice-number { position: absolute; top: 1.25vw; left: 2.2vw; color: #e5dcd2; font-family: 'IBM Plex Mono', monospace; font-size: .8vw; font-weight: 700; letter-spacing: .12em; }
-.service-slice-content { position: absolute; right: 2vw; bottom: 1.6vw; left: 2.2vw; height: 4.2vw; }
-.service-slice-content strong { position: absolute; bottom: 0; left: 0; width: 8vw; font-family: Antonio, sans-serif; font-size: 2.05vw; font-style: italic; font-weight: 600; line-height: .95; text-transform: uppercase; transform: skewX(-8deg); transform-origin: left bottom; transition: transform .45s ease; }
-.service-slice-content span { position: absolute; right: 1.8vw; bottom: 0; width: 25vw; max-width: none; color: #e5dcd2; font-size: calc(.85vw + 1pt); font-style: italic; line-height: 1.4; text-align: right; text-wrap: balance; opacity: 0; transform: translateX(.8vw); transition: color .24s ease, opacity .35s ease, transform .45s ease; }
-.service-slice-content svg { position: absolute; right: 0; bottom: 0; width: 1.45vw; height: 1.45vw; color: #f18a54; opacity: 0; transform: translateX(.5vw); transition: opacity .3s ease, transform .45s ease; }
+.service-slice-content { position: absolute; right: 2vw; bottom: 1.6vw; left: 2.2vw; display: grid; grid-template-columns: minmax(5vw, 8vw) 25vw auto; align-items: end; column-gap: 1vw; }
+.service-slice-content { align-items: last baseline; }
+.service-slice-content strong { width: auto; font-family: Antonio, sans-serif; font-size: 2.05vw; font-style: italic; font-weight: 600; line-height: .95; text-transform: uppercase; white-space: nowrap; transform: skewX(-8deg); transform-origin: left bottom; transition: transform .45s ease; }
+.service-slice-content span { width: 25vw; max-width: none; color: #e5dcd2; font-size: calc(.85vw + 1pt); font-style: italic; line-height: 1.4; text-align: right; text-wrap: balance; opacity: 0; transform: translateX(-.8vw); transition: color .24s ease, opacity .35s ease, transform .45s ease; }
+.service-slice-content span::before { content: '「'; margin-right: .25em; color: #f18a54; font-style: italic; font-weight: 400; transition: font-weight .2s ease; }
+.service-slice-content span::after { content: '」'; margin-left: .25em; color: #f18a54; font-style: italic; font-weight: 400; transition: font-weight .2s ease; }
+.service-slice-content svg { width: 1.45vw; height: 1.45vw; color: #f18a54; opacity: 0; transform: translateX(.5vw); transition: opacity .3s ease, transform .45s ease; }
 .services-slice-grid:hover .service-slice:not(:hover) { flex-grow: .84; }
 .services-slice-grid:has(.service-slice.is-active) .service-slice:not(.is-active) { flex-grow: .84; }
 .service-slice:hover, .service-slice:focus-visible, .service-slice.is-active { flex-grow: 1.65; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); z-index: 2; transition-delay: 0s; }
@@ -182,6 +185,7 @@ h1 .hero-accent { color: #d25f26; }
 .service-slice:hover .service-slice-content strong, .service-slice:focus-visible .service-slice-content strong, .service-slice.is-active .service-slice-content strong { transform: skewX(0); }
 .service-slice:hover .service-slice-content span, .service-slice:focus-visible .service-slice-content span, .service-slice.is-active .service-slice-content span { opacity: 1; transform: translateX(0); transition-delay: .12s; }
 .service-slice-content:hover > span, .service-slice-content:has(span:hover) > span { color: #fff; }
+.service-slice-content:hover > span::before, .service-slice-content:hover > span::after, .service-slice-content:has(span:hover) > span::before, .service-slice-content:has(span:hover) > span::after { font-weight: 700; }
 .service-slice:hover .service-slice-content svg, .service-slice:focus-visible .service-slice-content svg, .service-slice.is-active .service-slice-content svg { opacity: 1; transform: translateX(0); transition-delay: .15s; }
 .service-slice-content svg { transition: color .2s ease, transform .26s cubic-bezier(.34,1.56,.64,1); }
 .service-slice:hover .service-slice-content:hover svg, .service-slice:hover .service-slice-content:has(span:hover) svg, .service-slice:hover .service-slice-content:has(svg:hover) svg { color: #f18a54; transform: translate(.5vw, -.5vw) scale(1.25); }

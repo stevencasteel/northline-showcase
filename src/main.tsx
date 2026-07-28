@@ -307,9 +307,8 @@ function Services({ mobileDevice }: { mobileDevice: boolean }) {
               <span className="service-slice-shade" />
               <span className="service-slice-number">0{index + 1}</span>
               <span className="service-slice-content">
-                <strong>{service.title}</strong>
+                <strong>{service.title === 'Repairs & Inspections' ? <>Repairs &<br />Inspections</> : service.title === 'Custom Fabrication' ? <>Custom<br />Fabrication</> : service.title}</strong>
                 <span>{service.text}</span>
-                <ArrowUpRight aria-hidden="true" />
               </span>
             </a>
           ))}
