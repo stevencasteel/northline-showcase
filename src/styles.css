@@ -214,11 +214,13 @@ h1 .hero-accent { color: #d25f26; }
 .gallery-material-kicker { color: #d25f26; font-family: 'IBM Plex Mono', monospace; font-size: .55vw; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .gallery-material-heading h2 { margin: 0; color: #e5dcd2; font-family: Anton, sans-serif; font-size: 1.55vw; font-weight: 400; letter-spacing: .03em; line-height: .95; text-transform: uppercase; }
 .gallery-material-rule { width: 100%; height: 1px; margin-top: .3vw; background: #d25f26; }
-.gallery-material-art { position: absolute; right: 0; bottom: 0; left: 0; aspect-ratio: 2 / 3; overflow: hidden; border: 1px solid rgba(229,220,210,.25); background: #102432; box-shadow: 0 .8vw 2vw rgba(0,0,0,.18); }
+.gallery-material-art { position: absolute; right: 0; bottom: 0; left: 0; aspect-ratio: 2 / 3; overflow: hidden; border: 0; background: #102432; box-shadow: 0 .8vw 2vw rgba(0,0,0,.18); }
 .gallery-material-art > img { width: 100%; height: 100%; display: block; object-fit: contain; object-position: center; }
 .gallery-material-labels { position: absolute; inset: 0; display: grid; grid-auto-flow: column; grid-template-rows: repeat(8, 1fr); grid-template-columns: repeat(2, 1fr); }
 .gallery-material-label { display: grid; align-content: center; justify-items: end; gap: .08vw; padding: 0 .7vw; text-align: right; opacity: 0; transition: opacity .25s ease, background .25s ease; }
 .gallery-material-label:hover { opacity: 1; background: linear-gradient(90deg, transparent, rgba(4,20,33,.82)); }
+.gallery-material-label:nth-child(-n + 8) { justify-items: start; text-align: left; }
+.gallery-material-label:nth-child(-n + 8):hover { background: linear-gradient(90deg, rgba(4,20,33,.82), transparent); }
 .gallery-material-label span { color: #f18a54; font-family: 'IBM Plex Mono', monospace; font-size: .5vw; font-weight: 700; letter-spacing: .1em; }
 .gallery-material-label strong { color: #fff; font-family: Antonio, sans-serif; font-size: .75vw; font-weight: 600; line-height: 1; text-transform: uppercase; }
 .gallery-material-label small { color: #e5dcd2; font-size: .48vw; line-height: 1.1; }
