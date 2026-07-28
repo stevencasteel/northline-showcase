@@ -89,8 +89,92 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
   )
 }
 
-function AppointmentModal({ onClose }: { onClose: () => void }) {
+type AppointmentSelectOption = { value: string; label: string }
+
+function AppointmentSelect({ name, placeholder, value, options, invalid, onChange }: {
+  name: string
+  placeholder: string
+  value: string
+  options: AppointmentSelectOption[]
+  invalid: boolean
+  onChange: (value: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const fieldRef = useRef<HTMLDivElement>(null)
+  const selectedLabel = options.find((option) => option.value === value)?.label
+
+  useEffect(() => {
+    if (!open) return
+    const closeOnOutsidePress = (event: PointerEvent) => {
+      if (!fieldRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOnOutsidePress)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePress)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [open])
+
+  return (
+    <div className="appointment-custom-select" ref={fieldRef}>
+      <input type="hidden" name={name} value={value} />
+      <button
+        className="appointment-select-trigger"
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-invalid={invalid}
+        onClick={() => setOpen(!open)}
+      >
+        <span>{selectedLabel ?? placeholder}</span>
+        <span className="appointment-select-chevron" aria-hidden="true" />
+      </button>
+      {open && (
+        <div className="appointment-select-menu" role="listbox" aria-label={placeholder}>
+          {options.map((option) => (
+            <button
+              className={value === option.value ? 'is-selected' : ''}
+              type="button"
+              role="option"
+              aria-selected={value === option.value}
+              key={option.value}
+              onClick={() => {
+                onChange(option.value)
+                setOpen(false)
+              }}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+const appointmentTimes: AppointmentSelectOption[] = [
+  { value: 'morning', label: 'Morning · 8am–12pm' },
+  { value: 'afternoon', label: 'Afternoon · 12pm–4pm' },
+  { value: 'late-afternoon', label: 'Late afternoon · 4pm–6pm' },
+]
+
+const appointmentServices: AppointmentSelectOption[] = [
+  { value: 'residential', label: 'Residential roofing system' },
+  { value: 'commercial', label: 'Commercial roofing system' },
+  { value: 'custom-metal', label: 'Custom metal fabrication' },
+  { value: 'storm-inspection', label: 'Storm or weather damage inspection' },
+  { value: 'repair', label: 'Roof repair and maintenance' },
+]
+
+function AppointmentModal({ onClose, mobileDevice }: { onClose: () => void; mobileDevice: boolean }) {
   const [submitted, setSubmitted] = useState(false)
+  const [timePreference, setTimePreference] = useState('')
+  const [serviceType, setServiceType] = useState('')
+  const [validationAttempted, setValidationAttempted] = useState(false)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose() }
@@ -118,23 +202,34 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
             <button className="button button-primary" type="button" onClick={onClose}>Back to the site</button>
           </div>
         ) : (
-          <form className="appointment-form" onSubmit={(event) => { event.preventDefault(); setSubmitted(true) }}>
-            <div className="form-grid form-grid-two">
+          <form className="appointment-form" onSubmit={(event) => {
+            event.preventDefault()
+            if (mobileDevice && (!timePreference || !serviceType)) {
+              setValidationAttempted(true)
+              requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('.appointment-select-trigger[aria-invalid="true"]')?.focus())
+              return
+            }
+            setSubmitted(true)
+          }}>
+            <div className="form-grid form-grid-two form-grid-contact">
               <label><span>Full Name <b>*</b></span><div className="input-wrap"><UserRound aria-hidden="true" /><input required name="name" placeholder="Your full name" autoComplete="name" /></div></label>
               <label><span>Phone Number <b>*</b></span><div className="input-wrap"><Phone aria-hidden="true" /><input required name="phone" type="tel" placeholder="(555) 555-5555" autoComplete="tel" /></div></label>
             </div>
             <label><span>Email Address <b>*</b></span><div className="input-wrap"><Mail aria-hidden="true" /><input required name="email" type="email" placeholder="you@example.com" autoComplete="email" /></div></label>
             <label><span>Property Address</span><div className="input-wrap"><MapPin aria-hidden="true" /><input name="address" placeholder="Street address" autoComplete="street-address" /></div></label>
-            <div className="form-grid form-grid-two">
+            <div className="form-grid form-grid-two form-grid-address">
               <label><span>City</span><input name="city" placeholder="Your city" autoComplete="address-level2" /></label>
               <label><span>Postal Code</span><input name="postal-code" placeholder="ZIP / postal code" autoComplete="postal-code" /></label>
             </div>
-            <div className="form-grid form-grid-two">
+            <div className="form-grid form-grid-two form-grid-appointment">
               <label><span>Preferred Date <b>*</b></span><div className="input-wrap"><CalendarDays aria-hidden="true" /><input required name="date" type="date" /></div><small>Mon–Fri · 24hr advance notice</small></label>
-              <label><span>Time Preference <b>*</b></span><select required name="time"><option value="">Select a time</option><option>Morning · 8am–12pm</option><option>Afternoon · 12pm–4pm</option><option>Late afternoon · 4pm–6pm</option></select><small>We’ll call when we’re on the way</small></label>
+              <label><span>Time Preference <b>*</b></span>{mobileDevice ? <AppointmentSelect name="time" placeholder="Select a time" value={timePreference} options={appointmentTimes} invalid={validationAttempted && !timePreference} onChange={setTimePreference} /> : <select required name="time"><option value="">Select a time</option><option>Morning · 8am–12pm</option><option>Afternoon · 12pm–4pm</option><option>Late afternoon · 4pm–6pm</option></select>}<small>We’ll call when we’re on the way</small></label>
             </div>
-            <label><span>Service Type <b>*</b></span><select required name="service"><option value="">Select a service</option><option>Residential roofing system</option><option>Commercial roofing system</option><option>Custom metal fabrication</option><option>Storm or weather damage inspection</option><option>Roof repair and maintenance</option></select></label>
-            <label><span>Additional Notes</span><div className="input-wrap textarea-wrap"><MessageSquare aria-hidden="true" /><textarea name="notes" placeholder="Tell us about your roof or project..." /></div></label>
+            <label><span>Service Type <b>*</b></span>{mobileDevice ? <AppointmentSelect name="service" placeholder="Select a service" value={serviceType} options={appointmentServices} invalid={validationAttempted && !serviceType} onChange={setServiceType} /> : <select required name="service"><option value="">Select a service</option><option>Residential roofing system</option><option>Commercial roofing system</option><option>Custom metal fabrication</option><option>Storm or weather damage inspection</option><option>Roof repair and maintenance</option></select>}</label>
+            <label><span>Additional Notes</span><div className="input-wrap textarea-wrap"><MessageSquare aria-hidden="true" /><textarea name="notes" placeholder="Tell us about your roof or project..." onFocus={(event) => {
+              const notesField = event.currentTarget
+              window.setTimeout(() => notesField.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)
+            }} /></div></label>
             <button className="appointment-submit" type="submit"><Send aria-hidden="true" /> <span>Book My Free Appointment</span></button>
             <p className="appointment-footnote">Mon–Fri, 8am–6pm · We’ll call to confirm · No obligation</p>
           </form>
@@ -169,15 +264,44 @@ const services = [
   { title: 'Repairs & Inspections', image: 'service-repairs-inspections.png', alt: 'In bright daylight under a cloud-dappled sky, a humanoid dragon and an alien construction worker inspect the steep roof of an old-fashioned building overlooking lush green mountains. The dragon has vivid cobalt-blue scales, pale-gold scales beneath his jaw, ram-like horns fitted through a yellow hard hat, and a dark-clawed hand resting on polished reddish-gold copper flashing. Beside him, a grey-purple alien with four glowing amber eyes reviews a clipboard. Weathered greenish-grey slate shingles, a tall roof spire, copper, and strong sunlight fill the scene.' , text: 'Clear assessments and dependable repairs before a small issue becomes a larger one.' },
 ]
 
-function Services() {
+function Services({ mobileDevice }: { mobileDevice: boolean }) {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [visible, setVisible] = useState(false)
+  const [activeService, setActiveService] = useState<number | null>(null)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setVisible(true)
+        observer.disconnect()
+      }
+    }, { threshold: 0.16 })
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section className="services-section" id="services" aria-labelledby="services-title">
+    <section className={`services-section${visible ? ' is-visible' : ''}`} id="services" aria-labelledby="services-title" ref={sectionRef}>
       <div className="services-brutalist-heading">
         <p className="section-kicker" id="services-title">04 / Services</p>
       </div>
       <div className="services-slice-grid">
         {services.map((service, index) => (
-          <a className="service-slice" href="#contact" key={service.title} aria-label={`Learn more about ${service.title}`}>
+          <a
+            className={`service-slice${activeService === index ? ' is-active' : ''}`}
+            href="#contact"
+            key={service.title}
+            aria-label={`${activeService === index ? 'Close' : 'Open'} ${service.title} service details`}
+            aria-expanded={mobileDevice ? activeService === index : undefined}
+            onClick={(event) => {
+              if (!mobileDevice) return
+              event.preventDefault()
+              setActiveService(activeService === index ? null : index)
+            }}
+            style={{ '--service-index': index } as React.CSSProperties}
+          >
             <img src={`${asset}${service.image}`} alt={service.alt} />
             <span className="service-slice-shade" />
             <span className="service-slice-number">0{index + 1}</span>
@@ -196,7 +320,7 @@ function Services() {
 function App() {
   const mobileDevice = isMobileDevice()
   const [appointmentOpen, setAppointmentOpen] = useState(false)
-  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={() => setAppointmentOpen(true)} /><main><Hero onBookAppointment={() => setAppointmentOpen(true)} /><BadgeStrip /><Services /></main>{appointmentOpen && <AppointmentModal onClose={() => setAppointmentOpen(false)} />}</div>
+  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={() => setAppointmentOpen(true)} /><main><Hero onBookAppointment={() => setAppointmentOpen(true)} /><BadgeStrip /><Services mobileDevice={mobileDevice} /></main>{appointmentOpen && <AppointmentModal mobileDevice={mobileDevice} onClose={() => setAppointmentOpen(false)} />}</div>
 }
 
 createRoot(document.getElementById('root')!).render(<App />)
