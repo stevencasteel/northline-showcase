@@ -258,10 +258,10 @@ function BadgeStrip() {
 }
 
 const services = [
-  { title: 'Residential', image: 'service-residential-roofing.png', alt: 'In a bright, sunny coastal setting high above a deep blue ocean lined with palm trees and distant islands, a purple-skinned female elf construction worker stands on scaffolding to fit a dark-framed rectangular window into the curved beige stucco wall of a turret. Above her is an elaborate roof of teal-blue patinated standing-seam copper panels with a polished reddish-gold copper edge, alongside light-cream Spanish-style clay roof tiles.' , text: 'Complete roof systems designed for lasting protection and a clean, finished line.' },
-  { title: 'Commercial', image: 'service-commercial-roofing.png', alt: 'Set atop a grand building framed with polished gold beams and a vast roof of deep red tiles, a diverse crew of fantastical creatures constructs and maintains the structure above a sprawling fantasy metropolis. The crew includes a golden-brown insectoid polishing gold trim, a pink axolotl-headed worker smoothing mortar, purple goblin-like workers arranging shingles, a brass robot welding, a small green lizard inspecting wiring, and a stone giant lifting roofing panels. A golden cupola crowns the building above extensive scaffolding, with colorful domes, ornate spires, and a harbor in the distance.' , text: 'Durable, carefully coordinated systems for commercial properties of every scale.' },
-  { title: 'Custom Fabrication', image: 'service-custom-metal.png', alt: 'Inside a dimly lit open-air workshop blending traditional blacksmithing with futuristic technology, a sleek humanoid robot craftsman in a dark leather apron forges ornate copper architecture. The gold-visored robot swings a heavy hammer onto polished reddish copper embossed with raised scrollwork, while a completed copper tower finial rests nearby and an intense orange-gold forge burns beneath a metal hood. Through an open window, a sunny landscape shows a grand copper-roofed building, ornate spire, blue sky, and distant green hills.' , text: 'Hand-finished copperwork, flashing, trim, and architectural details built to order.' },
-  { title: 'Repairs & Inspections', image: 'service-repairs-inspections.png', alt: 'In bright daylight under a cloud-dappled sky, a humanoid dragon and an alien construction worker inspect the steep roof of an old-fashioned building overlooking lush green mountains. The dragon has vivid cobalt-blue scales, pale-gold scales beneath his jaw, ram-like horns fitted through a yellow hard hat, and a dark-clawed hand resting on polished reddish-gold copper flashing. Beside him, a grey-purple alien with four glowing amber eyes reviews a clipboard. Weathered greenish-grey slate shingles, a tall roof spire, copper, and strong sunlight fill the scene.' , text: 'Clear assessments and dependable repairs before a small issue becomes a larger one.' },
+  { title: 'Residential', image: 'service-residential-roofing.jpg', alt: 'In a bright, sunny coastal setting high above a deep blue ocean lined with palm trees and distant islands, a purple-skinned female elf construction worker stands on scaffolding to fit a dark-framed rectangular window into the curved beige stucco wall of a turret. Above her is an elaborate roof of teal-blue patinated standing-seam copper panels with a polished reddish-gold copper edge, alongside light-cream Spanish-style clay roof tiles.' , text: 'Complete roof systems designed for lasting protection and a clean, finished line.' },
+  { title: 'Commercial', image: 'service-commercial-roofing.jpg', alt: 'Set atop a grand building framed with polished gold beams and a vast roof of deep red tiles, a diverse crew of fantastical creatures constructs and maintains the structure above a sprawling fantasy metropolis. The crew includes a golden-brown insectoid polishing gold trim, a pink axolotl-headed worker smoothing mortar, purple goblin-like workers arranging shingles, a brass robot welding, a small green lizard inspecting wiring, and a stone giant lifting roofing panels. A golden cupola crowns the building above extensive scaffolding, with colorful domes, ornate spires, and a harbor in the distance.' , text: 'Durable, carefully coordinated systems for commercial properties of every scale.' },
+  { title: 'Custom Fabrication', image: 'service-custom-metal.jpg', alt: 'Inside a dimly lit open-air workshop blending traditional blacksmithing with futuristic technology, a sleek humanoid robot craftsman in a dark leather apron forges ornate copper architecture. The gold-visored robot swings a heavy hammer onto polished reddish copper embossed with raised scrollwork, while a completed copper tower finial rests nearby and an intense orange-gold forge burns beneath a metal hood. Through an open window, a sunny landscape shows a grand copper-roofed building, ornate spire, blue sky, and distant green hills.' , text: 'Hand-finished copperwork, flashing, trim, and architectural details built to order.' },
+  { title: 'Repairs & Inspections', image: 'service-repairs-inspections.jpg', alt: 'In bright daylight under a cloud-dappled sky, a humanoid dragon and an alien construction worker inspect the steep roof of an old-fashioned building overlooking lush green mountains. The dragon has vivid cobalt-blue scales, pale-gold scales beneath his jaw, ram-like horns fitted through a yellow hard hat, and a dark-clawed hand resting on polished reddish-gold copper flashing. Beside him, a grey-purple alien with four glowing amber eyes reviews a clipboard. Weathered greenish-grey slate shingles, a tall roof spire, copper, and strong sunlight fill the scene.' , text: 'Clear assessments and dependable repairs before a small issue becomes a larger one.' },
 ]
 
 function Services({ mobileDevice }: { mobileDevice: boolean }) {
@@ -319,6 +319,36 @@ function Services({ mobileDevice }: { mobileDevice: boolean }) {
 }
 
 type GalleryImage = { file: string; alt: string }
+
+const galleryImages: GalleryImage[] = [
+  { file: '01-gothic-mountain-house-copper-trim.jpg', alt: 'Stone mountain house with steep slate roofs and copper trim.' },
+  { file: '02-curved-copper-coastal-roof.jpg', alt: 'Modern coastal house with a wide curved copper roof.' },
+  { file: '03-white-metal-roof-gold-trim.jpg', alt: 'White sculptural metal roof with polished gold trim.' },
+  { file: '04-butterfly-copper-roof-house.jpg', alt: 'Modern house with a butterfly-shaped copper and white roof.' },
+  { file: '05-patina-copper-fantasy-villa.jpg', alt: 'Ornate fantasy villa with sweeping green patina copper roofs.' },
+  { file: '06-tiered-dark-metal-roof-house.jpg', alt: 'Modern house with layered dark metal roofs and copper edging.' },
+  { file: '07-coastal-tile-and-patina-roof.jpg', alt: 'Coastal home with clay tiles and green patina roof accents.' },
+  { file: '08-iridescent-curved-slate-roof.jpg', alt: 'Curved fantasy house roof covered in iridescent slate tiles.' },
+  { file: '09-desert-mixed-metal-tile-roof.jpg', alt: 'Desert home with layered metal and tile roofing.' },
+  { file: '10-flared-copper-roof-house.jpg', alt: 'Contemporary house with a dramatic flared copper roof.' },
+  { file: '11-mountain-lodge-slate-copper-roof.jpg', alt: 'Mountain lodge with layered slate roofs and copper trim.' },
+  { file: '12-weathered-patina-copper-roof.jpg', alt: 'Stone house with a weathered green patina copper roof.' },
+  { file: '13-turquoise-tile-copper-trim-roof.jpg', alt: 'Curved turquoise tile roofs outlined with copper trim.' },
+  { file: '14-lakeside-multicolor-slate-roof.jpg', alt: 'Lakeside house with multicolor slate roofs and copper edging.' },
+  { file: '15-ornate-green-tile-copper-roof.jpg', alt: 'Ornate villa with green tile roofs and bright copper trim.' },
+  { file: '16-coastal-curved-shingle-roof.jpg', alt: 'Coastal house with curved gray shingles and copper details.' },
+  { file: '17-desert-standing-seam-copper-roof.jpg', alt: 'Desert house with sculpted standing-seam copper roofing.' },
+  { file: '18-curved-dark-shingle-lake-house.jpg', alt: 'Lake house with dark curved shingle roofs and copper trim.' },
+  { file: '19-sunset-coastal-curved-roof-home.jpg', alt: 'Coastal home at sunset with layered curved roofs.' },
+  { file: '20-ornate-copper-slate-arched-roof.jpg', alt: 'Ornate house with arched slate roofs and copper framing.' },
+  { file: '21-purple-curved-metal-coastal-roof.jpg', alt: 'Coastal home with a glossy purple curved metal roof.' },
+  { file: '22-desert-copper-tile-estate.jpg', alt: 'Large desert estate with layered copper-colored tile roofs.' },
+  { file: '23-purple-slate-copper-mansion.jpg', alt: 'Fantasy mansion with purple slate roofs and copper trim.' },
+  { file: '24-angular-white-metal-roof.jpg', alt: 'Modern white house with sharp angular metal roofs.' },
+  { file: '25-red-copper-slate-gothic-house.jpg', alt: 'Gothic house with steep slate roofs and red copper accents.' },
+  { file: '26-copper-turret-gothic-mansion.jpg', alt: 'Gothic mansion with copper roofs and tall pointed turrets.' },
+  { file: '27-white-metal-gold-trim-coastal-roof.jpg', alt: 'Coastal building with layered white metal roofs and gold trim.' },
+]
 
 const roofMaterials = [
   ['01', 'Basalt fireclay', 'Charcoal / shadow line'],
@@ -757,16 +787,8 @@ function Gallery() {
   }, [visible, previewIndices.length])
 
   useEffect(() => {
-    fetch(`${asset}gallery/gallery-images.json`)
-      .then((response) => {
-        if (!response.ok) throw new Error('Unable to load gallery manifest')
-        return response.json() as Promise<GalleryImage[]>
-      })
-      .then((galleryImages) => {
-        setImages(galleryImages)
-        setPreviewIndices(galleryPreviewIndices.filter((imageIndex) => galleryImages[imageIndex]))
-      })
-      .catch(() => setImages([]))
+    setImages(galleryImages)
+    setPreviewIndices(galleryPreviewIndices.filter((imageIndex) => galleryImages[imageIndex]))
   }, [])
 
   useEffect(() => {
@@ -867,7 +889,7 @@ function Gallery() {
               <span className="gallery-material-rule" />
             </div>
             <div className="gallery-material-art">
-              <img src={`${asset}gallery/material-library.png`} alt="A vertical display of eight fantasy roofing material samples arranged like a premium architectural showroom library." />
+              <img src={`${asset}material-library.png`} alt="A front-facing display of sixteen fantasy roofing material samples arranged in two columns like a premium architectural showroom library." />
               <div className="gallery-material-labels">
                 {roofMaterials.map(([number, name, detail]) => (
                   <div className="gallery-material-label" key={number}>
