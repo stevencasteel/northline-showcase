@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ArrowRight, ArrowUpRight, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
 import './styles.css'
@@ -778,10 +778,10 @@ function Gallery() {
   const [galleryRenderedHeight, setGalleryRenderedHeight] = useState(0)
   const hoveredSlotRef = useRef<number | null>(null)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const showcase = showcaseRef.current
     if (!showcase) return
-    const updateHeight = () => setGalleryRenderedHeight(showcase.offsetHeight * .65)
+    const updateHeight = () => setGalleryRenderedHeight(showcase.getBoundingClientRect().height)
     updateHeight()
     const observer = new ResizeObserver(updateHeight)
     observer.observe(showcase)
@@ -880,7 +880,7 @@ function Gallery() {
         <div className="gallery-brutalist-heading" style={{ '--gallery-rendered-height': `${galleryRenderedHeight}px` } as React.CSSProperties}>
           <p className="section-kicker" id="gallery-title">Gallery</p>
         </div>
-        <div className="gallery-content">
+        <div className="gallery-content" style={{ height: galleryRenderedHeight ? `${galleryRenderedHeight}px` : undefined }}>
           <div className="gallery-showcase" ref={showcaseRef}>
             {visibleImages.map(renderGalleryCard)}
           </div>
