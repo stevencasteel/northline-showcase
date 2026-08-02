@@ -1,0 +1,11 @@
+Use case: stylized-concept
+Asset type: ultra-wide website edge texture, top divider between cream navigation header and photographic roofing hero
+Primary request: Create a single uninterrupted, perfectly horizontal strip of handcrafted architectural copper roof flashing, designed to span the full width of a premium fantasy roofing company website. This is the TOP edge of the hero section.
+Scene/backdrop: isolated copper flashing rail against a flat exact dark navy background #102432, with ample navy space above and below so the rail can be cleanly cropped into an extremely shallow panoramic strip
+Style/medium: photorealistic macro product photography with subtly fantastical hand-forged craftsmanship; bespoke roofer skeuomorphism; premium, precise, durable
+Composition/framing: extremely wide landscape composition; one slender copper rail runs continuously from the exact left edge to exact right edge, perfectly straight and level, centered vertically; no breaks, no objects, no perspective convergence; the rail should read clearly when cropped to about 8 pixels tall on a website
+Copper design: narrow folded copper flashing with a crisp raised upper lip, tiny hammered irregularities, restrained warm highlights, dark oxidized recess beneath the lip, very subtle repeating hand-tooled marks; no large bolts or decorative emblems
+Lighting/mood: controlled grazing studio light from upper left, polished but not glossy, premium and understated
+Color palette: burnished copper #B85C2F, deeper copper #71351F, restrained highlight #E49A62, oxidized shadow #321B17, backdrop exact #102432
+Constraints: no text, letters, numbers, logos, symbols, people, tools, roof scene, architecture, screws, rivets, gaps, seams that interrupt the strip, diagonal lines, curved rail, large dents, green patina, watermark, vignette, perspective, or depth-of-field blur. Keep both extreme left and extreme right edges continuous and visually tile-friendly.
+Avoid: orange neon glow, gold bar, jewelry, picture frame, wood, leather, rope, fabric, busy ornament, repeated obvious pattern, isolated short object
