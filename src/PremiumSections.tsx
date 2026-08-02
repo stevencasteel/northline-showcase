@@ -44,7 +44,6 @@ const ctaContexts = [
   { section: 'work', eyebrow: 'Found the roof you want?', label: 'Price this roof' },
   { section: 'protection', eyebrow: 'Concerned about hidden layers?', label: 'Inspect my roof' },
   { section: 'reviews', eyebrow: 'Ready for the same care?', label: 'Book an appointment' },
-  { section: 'support', eyebrow: 'Meet face to face', label: 'Book a hologram call' },
   { section: 'location', eyebrow: 'Inside the service area?', label: 'Check availability' },
   { section: 'contact', eyebrow: 'Start with certainty', label: 'Book an appointment' },
 ] as const
@@ -140,30 +139,9 @@ function GoogleReviewsSection(_: BookHandler) {
   )
 }
 
-function SupportConciergeSection({ onBook }: BookHandler) {
-  return (
-    <section className="premium-support premium-shell" id="support" aria-labelledby="premium-support-title">
-      <div className="premium-support-console" data-premium-reveal>
-        <div className="premium-support-art">
-          <img src="/assets/support/support-hologram-concierge.png" alt="A prismatic holographic Northline customer concierge inside a copper and steel diagnostic console" />
-          <div className="premium-support-scanline" aria-hidden="true" />
-          <div className="premium-support-status"><i /> Concierge channel open</div>
-        </div>
-        <div className="premium-support-copy">
-          <p className="premium-kicker">Northline concierge / hologram desk</p>
-          <h2 id="premium-support-title">Bring the roof into the room.</h2>
-          <p>Set up a hologram call with a Northline specialist and walk us through what you are seeing—leaks, storm damage, aging materials, or the ambitious roof you have in mind. We will review it face to face and map the next sensible step.</p>
-          <dl><div><dt>Connection window</dt><dd>One business day</dd></div><div><dt>First hologram</dt><dd>No charge</dd></div><div><dt>Fallback channel</dt><dd>Phone or email</dd></div></dl>
-          <div className="premium-support-actions"><button className="premium-button premium-button-primary" type="button" onClick={onBook}>Set up a hologram call <span>↗</span></button><a className="premium-button premium-button-ghost" href="tel:+15555555555">Call instead</a></div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 export function PremiumSections({ onBook }: BookHandler) {
   usePremiumReveal()
-  return <div className="premium-sections"><HowWeProtectSection onBook={onBook} /><GoogleReviewsSection onBook={onBook} /><SupportConciergeSection onBook={onBook} /></div>
+  return <div className="premium-sections"><HowWeProtectSection onBook={onBook} /><GoogleReviewsSection onBook={onBook} /></div>
 }
 
 export function PremiumFooter({ onBook }: BookHandler) {
@@ -174,8 +152,8 @@ export function PremiumFooter({ onBook }: BookHandler) {
         <div className="premium-footer-primary">
           <div className="premium-footer-brand" data-premium-reveal>
             <div className="premium-footer-brand-plaque">
-              <img className="premium-footer-brand-frame" src="/assets/footer/footer-brand-plaque-v2.png" alt="" aria-hidden="true" />
-              <div className="premium-footer-brand-surface"><img src="/assets/northline_roofing_combination_mark.svg" alt="Northline Roofing" /></div>
+              <img className="premium-footer-brand-frame" src="/assets/footer/brand-plaque.png" alt="" aria-hidden="true" />
+              <div className="premium-footer-brand-surface"><img src="/assets/brand/combination-mark.svg" alt="Northline Roofing" /></div>
             </div>
             <div className="premium-footer-contact">
               <a href="tel:+15555555555"><span>Call</span><strong>(555) 555-5555</strong><i aria-hidden="true">↗</i></a>
@@ -190,7 +168,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
               <a href={serviceLocation.mapsUrl} target="_blank" rel="noreferrer">Open in Google Maps ↗</a>
             </div>
             <div className="premium-footer-map-frame">
-              <img src="/assets/footer/footer-map-frame-v2.png" alt="" aria-hidden="true" />
+              <img src="/assets/footer/map-frame.png" alt="" aria-hidden="true" />
               <iframe src={serviceLocation.embedUrl} title={`Google Map showing ${serviceLocation.name}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
             </div>
           </section>

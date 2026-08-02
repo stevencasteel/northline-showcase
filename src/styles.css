@@ -46,8 +46,8 @@ a { color: inherit; text-decoration: none; }
 .mobile-nav { display: none; }
 .hero { --hero-copper-edge-height: clamp(5px, .55vw, 9px); z-index: 2; aspect-ratio: 6821 / 2354.7; position: relative; overflow: hidden; isolation: isolate; background: #041421; }
 .hero::before, .hero::after { content: ''; position: absolute; right: -32px; left: -32px; z-index: 4; height: var(--hero-copper-edge-height); background-position: center; background-size: 100% 100%; background-repeat: no-repeat; pointer-events: none; }
-.hero::before { top: 0; background-image: url('/assets/dividers/hero-copper-edge-top.png'); filter: drop-shadow(0 3px 3px rgba(4,20,33,.73)); }
-.hero::after { bottom: 0; background-image: url('/assets/dividers/hero-copper-edge-top.png'); }
+.hero::before { top: 0; background-image: url('/assets/hero/hero-copper-edge.png'); filter: drop-shadow(0 3px 3px rgba(4,20,33,.73)); }
+.hero::after { bottom: 0; background-image: url('/assets/hero/hero-copper-edge.png'); }
 .hero-sky-track { position: absolute; inset: 0; z-index: -3; display: flex; width: max-content; height: 100%; will-change: transform; }
 .hero-sky { display: block; flex: none; width: auto; height: 100%; max-width: none; aspect-ratio: 4599 / 734; }
 .hero-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; z-index: -2; }

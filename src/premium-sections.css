@@ -47,8 +47,7 @@
 .premium-section-heading .premium-kicker { grid-column: 1 / -1; }
 
 .premium-section-heading h2,
-.premium-reviews-heading h2,
-.premium-support-copy h2 {
+.premium-reviews-heading h2 {
   margin: 0;
   font-family: Anton, Impact, sans-serif;
   font-size: min(6.2vw, 7.4rem);
@@ -275,24 +274,6 @@
 .premium-review-google-link:focus-visible { color: var(--premium-orange); }
 .premium-review-google-link img { width: min(1.2rem,1.33vw); height: min(1.2rem,1.33vw); }
 
-.premium-support { padding-bottom: min(11vw,11rem); }
-.premium-support-console { padding: min(.75rem,.83vw); border: 1px solid var(--premium-copper-light); display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.8fr); color: #fff; background: linear-gradient(145deg,rgba(255,255,255,.08),transparent 28%),url('/assets/textures/powder-coated-navy-steel.png') center / 900px,var(--premium-ink); box-shadow: var(--premium-shadow),inset 0 0 0 5px rgba(0,0,0,.35); }
-.premium-support-art { position: relative; min-height: min(42.5rem,47vw); overflow: hidden; background: radial-gradient(circle at center,rgba(70,115,167,.45),#06151f 70%); }
-.premium-support-art::before,.premium-support-art::after { content: ''; position: absolute; z-index: 3; inset: .9rem; border: 1px solid rgba(115,223,255,.28); pointer-events: none; }.premium-support-art::after { inset: 1.5rem; border-color: rgba(255,255,255,.08); }
-.premium-support-art > img { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: saturate(1.06); }
-.premium-support-scanline { position: absolute; inset: -30% 0 auto; z-index: 4; height: 28%; background: linear-gradient(0deg,transparent,rgba(113,229,255,.16),transparent); mix-blend-mode: screen; animation: premium-support-scan 5.5s linear infinite; pointer-events: none; }
-@keyframes premium-support-scan { to { transform: translateY(540%); } }
-.premium-support-status { position: absolute; z-index: 5; left: min(2.4rem,2.7vw); bottom: min(2.25rem,2.5vw); padding: min(.7rem,.78vw) min(.9rem,1vw); border: 1px solid rgba(113,229,255,.4); display: flex; align-items: center; gap: min(.65rem,.72vw); color: rgba(255,255,255,.83); background: rgba(3,17,28,.72); backdrop-filter: blur(10px); font-family: 'IBM Plex Mono',monospace; font-size: min(.6rem,.67vw); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-.premium-support-status i { width: .5rem; height: .5rem; border-radius: 50%; background: #70eab4; box-shadow: 0 0 .9rem #70eab4; animation: premium-status-pulse 1.8s ease-in-out infinite; }
-@keyframes premium-status-pulse { 50% { opacity: .45; } }
-.premium-support-copy { padding: min(5.9rem,6vw); display: flex; flex-direction: column; justify-content: center; }
-.premium-support-copy h2 { margin: min(1.1rem,1.2vw) 0 min(1.75rem,1.95vw); font-size: min(6.6rem,5.2vw); }
-.premium-support-copy > p:not(.premium-kicker) { max-width: min(40rem,44.5vw); margin: 0; color: rgba(255,255,255,.7); font-size: min(1rem,1.1vw); line-height: 1.68; }
-.premium-support-copy dl { margin: min(2.35rem,2.6vw) 0; border-top: 1px solid rgba(255,255,255,.12); }
-.premium-support-copy dl > div { padding: min(.95rem,1.05vw) 0; border-bottom: 1px solid rgba(255,255,255,.12); display: flex; justify-content: space-between; gap: min(1.25rem,1.4vw); }
-.premium-support-copy dt { color: var(--premium-copper-light); font-family: 'IBM Plex Mono',monospace; font-size: min(.6rem,.67vw); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }.premium-support-copy dd { margin: 0; font-size: min(1rem,1.1vw); font-weight: 600; }
-.premium-support-actions { display: flex; flex-wrap: wrap; gap: min(.75rem,.83vw); }
-
 .premium-footer { position: relative; height: 72vw; min-height: 0; overflow: hidden; color: #fff; background: var(--premium-ink); }
 .premium-footer-matte { position: absolute; inset: 0; pointer-events: none; }
 .premium-footer-matte::after { position: absolute; inset: 0; content: ''; background: linear-gradient(0deg,#031018 2%,rgba(3,16,24,.9) 30%,rgba(3,16,24,.36) 68%,rgba(3,16,24,.76)); opacity: .85; }
@@ -345,10 +326,8 @@
 .app.is-mobile-device .premium-kicker { font-size: .72rem; }
 .app.is-mobile-device .premium-section-heading { grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 2rem; }
 .app.is-mobile-device .premium-section-heading h2,
-.app.is-mobile-device .premium-reviews-heading h2,
-.app.is-mobile-device .premium-support-copy h2 { font-size: clamp(3rem,15vw,5rem); }
-.app.is-mobile-device .premium-section-heading > p:last-child,
-.app.is-mobile-device .premium-support-copy > p:not(.premium-kicker) { max-width: none; font-size: 1rem; }
+.app.is-mobile-device .premium-reviews-heading h2 { font-size: clamp(3rem,15vw,5rem); }
+.app.is-mobile-device .premium-section-heading > p:last-child { max-width: none; font-size: 1rem; }
 .app.is-mobile-device .premium-button { min-height: 3.55rem; padding-inline: 1.5rem; gap: .9rem; font-size: .76rem; }
 .app.is-mobile-device .premium-google-mark { width: 100%; min-width: 0; padding: 1rem 1.25rem; gap: .85rem; }
 .app.is-mobile-device .premium-google-mark img { width: 1.75rem; height: 1.75rem; }
@@ -371,17 +350,6 @@
 .app.is-mobile-device .premium-review-card blockquote { margin-block: 2rem; font-size: clamp(1.4rem,6vw,2rem); }
 .app.is-mobile-device .premium-review-card footer { padding-top: 1.1rem; font-size: .58rem; }
 .app.is-mobile-device .premium-review-google-link img { width: 1.2rem; height: 1.2rem; }
-.app.is-mobile-device .premium-support { padding-bottom: 6.5rem; }
-.app.is-mobile-device .premium-support-console { padding: .45rem; grid-template-columns: 1fr; }
-.app.is-mobile-device .premium-support-art { min-height: 35rem; }
-.app.is-mobile-device .premium-support-status { left: 2.4rem; bottom: 2.25rem; padding: .7rem .9rem; gap: .65rem; font-size: .6rem; }
-.app.is-mobile-device .premium-support-copy { padding: 2.4rem 1.2rem 2.75rem; }
-.app.is-mobile-device .premium-support-copy h2 { margin: 1.1rem 0 1.75rem; }
-.app.is-mobile-device .premium-support-copy dl { margin: 2.35rem 0; }
-.app.is-mobile-device .premium-support-copy dl > div { padding: .95rem 0; align-items: flex-start; flex-direction: column; gap: .35rem; }
-.app.is-mobile-device .premium-support-copy dt { font-size: .6rem; }
-.app.is-mobile-device .premium-support-copy dd { font-size: 1rem; }
-.app.is-mobile-device .premium-support-actions { display: grid; gap: .75rem; }
 .app.is-mobile-device .premium-footer,
 .app.is-mobile-device .premium-footer-content { min-height: 0; }
 .app.is-mobile-device .premium-footer { height: auto; }
