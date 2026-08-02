@@ -1,4 +1,5 @@
 import { useEffect, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
+import { ArrowRight, CalendarDays } from 'lucide-react'
 
 type BookHandler = { onBook: () => void }
 
@@ -177,10 +178,10 @@ export function PremiumFooter({ onBook }: BookHandler) {
               <div className="premium-footer-brand-surface"><img src="/assets/northline_roofing_combination_mark.svg" alt="Northline Roofing" /></div>
             </div>
             <div className="premium-footer-contact">
-              <a href="tel:+15555555555">(555) 555-5555</a>
-              <a href="mailto:hello@northlineroofing.com">hello@northlineroofing.com</a>
+              <a href="tel:+15555555555"><span>Call</span><strong>(555) 555-5555</strong><i aria-hidden="true">↗</i></a>
+              <a href="mailto:hello@northlineroofing.com"><span>Email</span><strong>hello@northlineroofing.com</strong><i aria-hidden="true">↗</i></a>
             </div>
-            <button className="premium-button premium-button-primary premium-footer-book" type="button" onClick={onBook}>Book an appointment <span>↗</span></button>
+            <button className="premium-footer-book" type="button" onClick={onBook}><CalendarDays aria-hidden="true" /><span>Book an Appointment</span><ArrowRight aria-hidden="true" /></button>
           </div>
 
           <section className="premium-footer-map" id="location" aria-labelledby="premium-footer-map-title" data-premium-reveal>

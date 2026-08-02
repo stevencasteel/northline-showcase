@@ -307,11 +307,22 @@
 .premium-footer-brand-frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
 .premium-footer-brand-surface { position: absolute; inset: 5% 2.5% 7%; padding: 7% 6%; display: grid; place-items: center; overflow: hidden; }
 .premium-footer-brand-surface img { width: 100%; height: auto; display: block; }
-.premium-footer-contact { margin-bottom: 1.4vw; padding-block: 1.1vw; border-block: 1px solid rgba(240,183,124,.32); display: grid; gap: .61vw; font-size: 1.1vw; }
-.premium-footer-contact a { width: fit-content; color: rgba(255,255,255,.9); font-weight: 700; transition: color .2s ease; }
-.premium-footer-contact a:hover,.premium-footer-contact a:focus-visible { color: var(--premium-copper-light); }
-.premium-footer-book { width: min(22vw,100%); min-height: 4vw; padding-inline: 1.7vw; gap: 1vw; font-size: .85vw; }
-.premium-footer-map { min-width: 0; }
+.premium-footer-contact { margin: .75vw 0 1.05vw; padding: .34vw; border: 1px solid rgba(240,183,124,.32); display: grid; gap: .3vw; background: rgba(3,16,24,.62); box-shadow: inset 0 0 0 1px rgba(255,255,255,.04),0 .8vw 1.8vw rgba(0,0,0,.2); backdrop-filter: blur(12px); }
+.premium-footer-contact a { min-height: 3.05vw; padding: .42vw .48vw .42vw .82vw; border: 1px solid rgba(255,255,255,.1); display: grid; grid-template-columns: 3.5vw minmax(0,1fr) 2.05vw; align-items: center; gap: .72vw; color: rgba(255,255,255,.92); background: linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.025)); transition: color .2s ease,border-color .2s ease,background .2s ease,transform .2s ease; }
+.premium-footer-contact a > span { color: var(--premium-copper-light); font-family: 'IBM Plex Mono',monospace; font-size: .52vw; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.premium-footer-contact a > strong { overflow: hidden; font-family: Inter,sans-serif; font-size: .88vw; font-weight: 700; letter-spacing: -.015em; text-overflow: ellipsis; white-space: nowrap; }
+.premium-footer-contact a > i { width: 2.05vw; height: 2.05vw; display: grid; place-items: center; color: #fff; background: rgba(210,95,38,.82); font-size: .76vw; font-style: normal; transition: background .2s ease,transform .2s ease; }
+.premium-footer-contact a:hover,.premium-footer-contact a:focus-visible { border-color: rgba(240,183,124,.5); color: #fff; background: linear-gradient(90deg,rgba(240,183,124,.14),rgba(255,255,255,.04)); outline: none; transform: translateX(.18vw); }
+.premium-footer-contact a:hover > i,.premium-footer-contact a:focus-visible > i { background: var(--premium-orange); transform: translate(.08vw,-.08vw); }
+.premium-footer-book { position: relative; width: min(22vw,100%); height: 4.39vw; padding: 0 .9vw; border: 0; border-radius: .28vw; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: .55vw; color: #fff; background: var(--premium-orange); font: inherit; font-size: .92vw; font-weight: 600; text-transform: uppercase; cursor: pointer; transition: transform .2s ease,box-shadow .2s ease,background .2s ease; }
+.premium-footer-book > * { position: relative; z-index: 1; }
+.premium-footer-book::after { position: absolute; top: -55%; bottom: -55%; left: -65%; width: 32%; content: ''; background: rgba(255,255,255,.22); transform: skewX(-20deg) translateX(-220%); pointer-events: none; }
+.premium-footer-book:hover,.premium-footer-book:focus-visible { background: var(--premium-orange); box-shadow: 0 .45vw .9vw rgba(4,20,33,.28); outline: none; transform: translateY(-2px); }
+.premium-footer-book:hover::after,.premium-footer-book:focus-visible::after { animation: cta-sheen .7s ease-out; }
+.premium-footer-book:active { box-shadow: 0 .12vw .25vw rgba(4,20,33,.22); transform: translateY(0); }
+.premium-footer-book:focus-visible { outline: .14vw solid var(--premium-cream); outline-offset: .18vw; }
+.premium-footer-book svg { width: .95vw; height: .95vw; flex: none; }
+.premium-footer-map { min-width: 0; margin-top: -2.5vw; }
 .premium-footer-map-heading { min-height: 2.5vw; padding-inline: .39vw; display: flex; align-items: center; justify-content: space-between; gap: 1.1vw; color: rgba(255,255,255,.78); font-family: 'IBM Plex Mono',monospace; font-size: .64vw; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .premium-footer-map-heading > span { color: var(--premium-copper-light); }
 .premium-footer-map-heading a { border-bottom: 1px solid transparent; transition: color .2s ease,border-color .2s ease; }
@@ -379,8 +390,15 @@
 .app.is-mobile-device .premium-footer-primary { grid-template-columns: 1fr; gap: 2.25rem; }
 .app.is-mobile-device .premium-footer-brand { max-width: none; }
 .app.is-mobile-device .premium-footer-brand-plaque { width: min(32rem,100%); }
-.app.is-mobile-device .premium-footer-contact { margin-bottom: 1.25rem; padding-block: 1rem; gap: .55rem; font-size: 1rem; }
-.app.is-mobile-device .premium-footer-book { width: 100%; max-width: none; }
+.app.is-mobile-device .premium-footer-contact { margin: .75rem 0 1.25rem; padding: .35rem; gap: .35rem; }
+.app.is-mobile-device .premium-footer-contact a { min-height: 3.75rem; padding: .45rem .5rem .45rem .85rem; grid-template-columns: 3.5rem minmax(0,1fr) 2.7rem; gap: .7rem; }
+.app.is-mobile-device .premium-footer-contact a > span { font-size: .58rem; }
+.app.is-mobile-device .premium-footer-contact a > strong { font-size: .92rem; }
+.app.is-mobile-device .premium-footer-contact a > i { width: 2.7rem; height: 2.7rem; font-size: .8rem; }
+.app.is-mobile-device .premium-footer-contact a:hover,.app.is-mobile-device .premium-footer-contact a:focus-visible { transform: none; }
+.app.is-mobile-device .premium-footer-book { width: 100%; max-width: none; height: 3.75rem; padding-inline: 1rem; border-radius: 6px; gap: .65rem; font-size: .82rem; }
+.app.is-mobile-device .premium-footer-book svg { width: 1rem; height: 1rem; }
+.app.is-mobile-device .premium-footer-map { margin-top: 0; }
 .app.is-mobile-device .premium-footer-map-heading { min-height: 2.25rem; padding-inline: 0; gap: 1rem; font-size: .58rem; }
 .app.is-mobile-device .premium-footer-utility { margin-top: 1.25rem; padding: 1rem 1.25rem; align-items: flex-start; flex-direction: column; gap: 1.5rem; }
 .app.is-mobile-device .premium-footer-utility nav,
