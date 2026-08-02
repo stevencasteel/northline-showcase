@@ -62,7 +62,6 @@
 }
 
 .premium-section-heading > p:last-child,
-.premium-reviews-action p,
 .premium-location-copy > p {
   margin: 0;
   color: rgba(4,20,33,.7);
@@ -128,7 +127,6 @@
   box-shadow: var(--premium-shadow), inset 0 0 0 3px rgba(0,0,0,.28), inset 0 0 0 5px rgba(240,183,124,.22);
 }
 
-.premium-console-rail,
 .premium-map-label {
   min-height: 3rem;
   padding: 0 1.15rem;
@@ -204,24 +202,8 @@
 .premium-protection-divider i { width: 1.3rem; height: 2px; background: rgba(52,23,10,.68); box-shadow: 0 1px rgba(255,255,255,.2); }
 
 .premium-protection-range { position: absolute; inset: 0; z-index: 10; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; }
-.premium-stage-label { position: absolute; top: 1.35rem; z-index: 4; padding: .65rem .8rem; border: 1px solid rgba(255,255,255,.2); color: #fff; background: rgba(4,18,28,.78); backdrop-filter: blur(10px); font-size: .65rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-.premium-stage-label-finished { left: 1.35rem; }
-.premium-stage-label-layer { right: 1.35rem; color: var(--premium-copper-light); }
-
-.premium-underlayment-story { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(320px,.65fr); background: var(--premium-ink); }
-.premium-underlayment-specs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); }
-.premium-underlayment-specs > div { min-height: 12rem; padding: 1.6rem; border-top: 1px solid rgba(255,255,255,.11); border-right: 1px solid rgba(255,255,255,.11); display: flex; flex-direction: column; align-items: flex-start; }
-.premium-underlayment-specs span { color: var(--premium-orange); font-family: 'IBM Plex Mono',monospace; font-size: .62rem; font-weight: 700; letter-spacing: .15em; }
-.premium-underlayment-specs strong { margin: auto 0 .65rem; color: #fff; font-family: Antonio,sans-serif; font-size: clamp(1.3rem,1.7vw,2rem); font-weight: 600; line-height: 1; text-transform: uppercase; }
-.premium-underlayment-specs small { color: rgba(255,255,255,.56); font-size: .82rem; line-height: 1.5; }
-.premium-protection-copy { padding: 1.75rem 2.1rem; border-top: 1px solid rgba(255,255,255,.11); color: #fff; }
-.premium-protection-copy > span { color: var(--premium-copper-light); font-family: 'IBM Plex Mono',monospace; font-size: .6rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
-.premium-protection-copy h3 { margin: .5rem 0 .65rem; font-family: Antonio,sans-serif; font-size: clamp(1.6rem,2.2vw,2.5rem); font-weight: 600; line-height: 1; text-transform: uppercase; }
-.premium-protection-copy p { margin: 0 0 1.1rem; color: rgba(255,255,255,.68); line-height: 1.5; }
-.premium-protection-copy .premium-text-link { color: var(--premium-copper-light); }
-
 .premium-reviews { padding-bottom: clamp(6.5rem,11vw,11rem); }
-.premium-reviews-heading { margin-bottom: 3.5rem; display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 3rem; align-items: end; }
+.premium-reviews-heading { margin-bottom: 3.5rem; display: flex; justify-content: flex-end; align-items: end; }
 .premium-reviews-heading h2 { max-width: 1100px; margin-top: .8rem; }
 .premium-google-mark { min-width: 14.5rem; padding: 1rem 1.25rem; border: 1px solid var(--premium-line); display: flex; align-items: center; gap: .85rem; background: rgba(255,255,255,.72); box-shadow: .5rem .5rem 0 rgba(185,110,66,.22); font-weight: 700; }
 .premium-google-mark img { width: 1.75rem; height: 1.75rem; }
@@ -241,7 +223,6 @@
 .premium-review-google-link:hover,
 .premium-review-google-link:focus-visible { color: var(--premium-orange); }
 .premium-review-google-link img { width: 1.2rem; height: 1.2rem; }
-.premium-reviews-action { margin-top: 2.1rem; padding-top: 1.75rem; border-top: 1px solid var(--premium-line); display: flex; justify-content: flex-end; align-items: center; }
 
 .premium-support { padding-bottom: clamp(6.5rem,11vw,11rem); }
 .premium-support-console { padding: .75rem; border: 1px solid var(--premium-copper-light); display: grid; grid-template-columns: minmax(0,1fr) minmax(380px,.8fr); color: #fff; background: linear-gradient(145deg,rgba(255,255,255,.08),transparent 28%),url('/assets/textures/powder-coated-navy-steel.webp') center / 900px,var(--premium-ink); box-shadow: var(--premium-shadow),inset 0 0 0 5px rgba(0,0,0,.35); }
@@ -292,8 +273,6 @@
 
 @media (max-width: 1180px) {
   .premium-shell { width: min(1320px,calc(100% - 48px)); }
-  .premium-underlayment-story { grid-template-columns: 1fr; }
-  .premium-protection-copy { min-height: 13rem; }
   .premium-review-grid { grid-template-columns: 1fr; }
   .premium-review-card { min-height: 24rem; transform: none; }
   .premium-support-console,.premium-location-plate { grid-template-columns: 1fr; }
@@ -303,14 +282,12 @@
 
 @media (max-width: 760px) {
   .premium-shell { width: calc(100% - 28px); }
-  .premium-section-heading,.premium-reviews-heading { grid-template-columns: 1fr; gap: 1.5rem; }
+  .premium-section-heading { grid-template-columns: 1fr; gap: 1.5rem; }
   .premium-section-heading { margin-bottom: 2rem; }.premium-section-heading h2,.premium-reviews-heading h2,.premium-support-copy h2,.premium-location-copy h2,.premium-footer-lead h2 { font-size: clamp(3rem,15vw,5rem); }
   .premium-google-mark { width: 100%; min-width: 0; }
-  .premium-protection-console { padding: .45rem; }.premium-console-rail { min-height: 2.5rem; font-size: .48rem; }.premium-console-rail span:last-child { display: none; }
-  .premium-protection-stage { aspect-ratio: 16 / 9; }.premium-protection-divider > span { width: 2.7rem; height: 4.2rem; }.premium-stage-label { top: .65rem; padding: .4rem .5rem; font-size: .48rem; }.premium-stage-label-finished { left: .65rem; }.premium-stage-label-layer { right: .65rem; }
-  .premium-underlayment-specs { grid-template-columns: 1fr; }.premium-underlayment-specs > div { min-height: 9rem; }.premium-protection-copy { min-height: 0; padding: 1.5rem 1.2rem; }
+  .premium-protection-console { padding: .45rem; }
+  .premium-protection-stage { aspect-ratio: 16 / 9; }.premium-protection-divider > span { width: 2.7rem; height: 4.2rem; }
   .premium-review-grid { display: flex; width: calc(100% + 28px); margin-inline: -14px; padding-inline: 14px; overflow-x: auto; scroll-snap-type: x mandatory; }.premium-review-card { flex: 0 0 88vw; min-height: 30rem; scroll-snap-align: center; }.premium-review-card header { grid-template-columns: 3.65rem 1fr; }.premium-review-card header img { width: 3.65rem; height: 3.65rem; }.premium-review-rating { grid-column: 2; }
-  .premium-reviews-action { justify-content: flex-start; }
   .premium-support-console,.premium-location-plate { padding: .45rem; }.premium-support-art { min-height: 35rem; }.premium-support-copy,.premium-location-copy { padding: 2.4rem 1.2rem 2.75rem; }.premium-support-copy dl > div { align-items: flex-start; flex-direction: column; gap: .35rem; }.premium-support-actions { display: grid; }
   .premium-map-frame { min-height: 30.5rem; }.premium-map-frame iframe { min-height: 26.9rem; }
   .premium-footer,.premium-footer-content { min-height: 78rem; }.premium-footer-content { padding-bottom: 14rem; }.premium-footer-grid { grid-template-columns: 1fr; gap: 1.75rem; margin-top: 5rem; }.premium-footer-bottom { align-items: flex-start; flex-direction: column; }

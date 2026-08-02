@@ -1,32 +1,32 @@
-import { useEffect, useId, useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 
 type BookHandler = { onBook: () => void }
 
-const underlaymentImage = '/assets/protection/protection-underlayment.png'
+const underlaymentImage = '/assets/source/protection/protection-underlayment.png'
 
 const reviews = [
   {
-    name: 'Kaia Nimbus',
+    name: 'Seris Rhuke',
     role: 'Lakeside homeowner',
     quote: 'The storm rolled across the lake before dawn. Northline had us dry, safe, and fully documented before lunch—and the new slate looks extraordinary.',
     portrait: '/assets/reviews/reviewer-kaia-nimbus.webp',
-    googlePlace: 'Nimbus Reach',
+    googlePlace: 'Illyrion Spire',
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=The%20Garden%2C%2026%20Gandalf%27s%20Cutting%2C%20Waikato%203472%2C%20New%20Zealand',
   },
   {
-    name: 'Vesper Loom',
+    name: 'Nyaren Klourm',
     role: 'Architect & property owner',
     quote: 'They found the ventilation problem everyone else missed, showed me every layer, and left the copper transitions cleaner than the original drawings.',
     portrait: '/assets/reviews/reviewer-vesper-loom.webp',
-    googlePlace: 'Coppervale District',
+    googlePlace: 'Aestir Hollow',
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=Green%20Dragon%20Inn%2C%20Hobbiton%20Movie%20Set%2C%20Waikato%2C%20New%20Zealand',
   },
   {
-    name: 'Bram Hearthstone',
+    name: 'Baeloon Pluhng',
     role: 'Mountain innkeeper',
     quote: 'Our roof has twelve valleys and not one simple line. The crew treated every seam like finish carpentry and left the grounds immaculate.',
     portrait: '/assets/reviews/reviewer-bram-hearthstone.webp',
-    googlePlace: 'Hearthstone Basin',
+    googlePlace: 'The Goorough District',
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=The%20Shire%27s%20Rest%2C%20501%20Buckland%20Road%2C%20Hinuera%2C%20Matamata%203472%2C%20New%20Zealand',
   },
 ] as const
@@ -72,35 +72,15 @@ function usePremiumReveal() {
   }, [])
 }
 
-function PremiumSectionHeading({ kicker, title, copy, id }: { kicker: string; title: string; copy: string; id: string }) {
-  return (
-    <div className="premium-section-heading" data-premium-reveal>
-      <p className="premium-kicker">{kicker}</p>
-      <h2 id={id}>{title}</h2>
-      <p>{copy}</p>
-    </div>
-  )
-}
-
-function HowWeProtectSection({ onBook }: BookHandler) {
+function HowWeProtectSection(_: BookHandler) {
   const [split, setSplit] = useState(54)
-  const titleId = useId()
 
   return (
-    <section className="premium-protection premium-shell" id="protection" aria-labelledby={titleId}>
-      <PremiumSectionHeading
-        kicker="System anatomy / underlayment"
-        title="The roof beneath your roof."
-        copy="Drag across the finished surface to expose the continuous underlayment assembly in the exact same position—the protection that starts working before the first visible piece is installed."
-        id={titleId}
-      />
+    <section className="premium-protection premium-shell" id="protection">
       <div className="premium-protection-console" data-premium-reveal>
-        <div className="premium-console-rail" aria-hidden="true"><span>Underlayment reveal</span><span>Northline deck-to-finish spec / 04–211</span></div>
         <div className="premium-protection-stage" style={{ '--premium-split': `${split}%` } as CSSProperties}>
-          <img className="premium-protection-image" src="/assets/protection/protection-finished-roof.jpg" alt="A completed premium slate and copper roof" />
+          <img className="premium-protection-image" src="/assets/source/protection/protection-finished-roof.jpg" alt="A completed premium slate and copper roof" />
           <img className="premium-protection-image premium-protection-layer" src={underlaymentImage} alt="The same roof with its underlayment construction exposed" />
-          <span className="premium-stage-label premium-stage-label-finished">Finished roof</span>
-          <span className="premium-stage-label premium-stage-label-layer">Underlayment</span>
           <div className="premium-protection-divider" aria-hidden="true"><span><i /><i /><i /></span></div>
           <input
             className="premium-protection-range"
@@ -113,29 +93,15 @@ function HowWeProtectSection({ onBook }: BookHandler) {
             aria-valuetext={`${split}% finished roof, ${100 - split}% underlayment`}
           />
         </div>
-        <div className="premium-underlayment-story">
-          <div className="premium-underlayment-specs" aria-label="Underlayment specification">
-            <div><span>01</span><strong>Continuous coverage</strong><small>One uninterrupted water-shedding plane across the deck.</small></div>
-            <div><span>02</span><strong>Sealed transitions</strong><small>Careful laps and penetrations keep vulnerable seams controlled.</small></div>
-            <div><span>03</span><strong>Dry-in confidence</strong><small>The structure is protected before the finish roof is complete.</small></div>
-          </div>
-          <div className="premium-protection-copy">
-            <span>Northline / protected assembly</span>
-            <h3>The quiet second roof beneath the roof.</h3>
-            <p>Underlayment is the continuous safeguard between the deck and the finished system. It manages incidental water, protects during installation, and gives every visible material a disciplined foundation.</p>
-            <button className="premium-text-link" type="button" onClick={onBook}>Inspect my roof <span>↗</span></button>
-          </div>
-        </div>
       </div>
     </section>
   )
 }
 
-function GoogleReviewsSection({ onBook }: BookHandler) {
+function GoogleReviewsSection(_: BookHandler) {
   return (
-    <section className="premium-reviews premium-shell" id="reviews" aria-labelledby="premium-reviews-title">
+    <section className="premium-reviews premium-shell" id="reviews">
       <div className="premium-reviews-heading" data-premium-reveal>
-        <div><p className="premium-kicker">Customer dispatches / Google places</p><h2 id="premium-reviews-title">Word travels fast above the roofline.</h2></div>
         <div className="premium-google-mark" aria-label="Reviews on Google"><img src="/assets/brand/google-g-logo.svg" alt="Google G" /><span>Reviews on Google</span></div>
       </div>
       <div className="premium-review-grid">
@@ -147,9 +113,6 @@ function GoogleReviewsSection({ onBook }: BookHandler) {
             <footer><a className="premium-review-google-link" href={review.googleUrl} target="_blank" rel="noreferrer" aria-label={`Open ${review.googlePlace} on Google Maps`}><span>{review.googlePlace}</span><img src="/assets/brand/google-g-logo.svg" alt="" aria-hidden="true" /></a></footer>
           </article>
         ))}
-      </div>
-      <div className="premium-reviews-action" data-premium-reveal>
-        <button className="premium-button premium-button-primary" type="button" onClick={onBook}>Schedule an inspection <span>↗</span></button>
       </div>
     </section>
   )
