@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 
 type BookHandler = { onBook: () => void }
 
@@ -75,20 +75,44 @@ function usePremiumReveal() {
 function HowWeProtectSection(_: BookHandler) {
   const [split, setSplit] = useState(54)
 
+  const setSplitFromPointer = (event: ReactPointerEvent<HTMLInputElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect()
+    const nextSplit = ((event.clientX - bounds.left) / bounds.width) * 100
+    setSplit(Math.min(100, Math.max(0, Number(nextSplit.toFixed(1)))))
+  }
+
+  const startSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
+    event.currentTarget.setPointerCapture(event.pointerId)
+    setSplitFromPointer(event)
+  }
+
+  const continueSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) setSplitFromPointer(event)
+  }
+
   return (
     <section className="premium-protection premium-shell" id="protection">
       <div className="premium-protection-console" data-premium-reveal>
         <div className="premium-protection-stage" style={{ '--premium-split': `${split}%` } as CSSProperties}>
           <img className="premium-protection-image" src="/assets/source/protection/protection-finished-roof.jpg" alt="A completed premium slate and copper roof" />
           <img className="premium-protection-image premium-protection-layer" src={underlaymentImage} alt="The same roof with its underlayment construction exposed" />
-          <div className="premium-protection-divider" aria-hidden="true"><span><i /><i /><i /></span></div>
+          <div className="premium-protection-divider" aria-hidden="true">
+            <span className="premium-protection-thumb">
+              <i className="premium-protection-arrow premium-protection-arrow-left" />
+              <i className="premium-protection-grip" />
+              <i className="premium-protection-arrow premium-protection-arrow-right" />
+            </span>
+          </div>
           <input
             className="premium-protection-range"
             type="range"
-            min="8"
-            max="92"
+            min="0"
+            max="100"
+            step="0.1"
             value={split}
             onInput={(event) => setSplit(Number(event.currentTarget.value))}
+            onPointerDown={startSplitDrag}
+            onPointerMove={continueSplitDrag}
             aria-label="Reveal underlayment"
             aria-valuetext={`${split}% finished roof, ${100 - split}% underlayment`}
           />
