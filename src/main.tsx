@@ -1010,7 +1010,7 @@ function App() {
   const [appointmentOpen, setAppointmentOpen] = useState(false)
   useStableViewportOnResize(appointmentOpen)
   const openAppointment = () => setAppointmentOpen(true)
-  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={openAppointment} /><main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services mobileDevice={mobileDevice} /><Gallery /><PremiumSections onBook={openAppointment} /></main><PremiumFooter onBook={openAppointment} /><PersistentPremiumCta onBook={openAppointment} hidden={appointmentOpen} />{appointmentOpen && <AppointmentModal mobileDevice={mobileDevice} onClose={() => setAppointmentOpen(false)} />}</div>
+  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={openAppointment} /><main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services mobileDevice={mobileDevice} /><Gallery /><span className="copper-edge-seam" aria-hidden="true" /><PremiumSections onBook={openAppointment} /></main><PremiumFooter onBook={openAppointment} /><PersistentPremiumCta onBook={openAppointment} hidden={appointmentOpen} />{appointmentOpen && <AppointmentModal mobileDevice={mobileDevice} onClose={() => setAppointmentOpen(false)} />}</div>
 }
 
 createRoot(document.getElementById('root')!).render(<App />)

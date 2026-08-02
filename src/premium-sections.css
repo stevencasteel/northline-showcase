@@ -274,7 +274,8 @@
 .premium-review-google-link:focus-visible { color: var(--premium-orange); }
 .premium-review-google-link img { width: min(1.2rem,1.33vw); height: min(1.2rem,1.33vw); }
 
-.premium-footer { position: relative; height: 72vw; min-height: 0; overflow: hidden; color: #fff; background: var(--premium-ink); }
+.premium-footer { --copper-edge-height: clamp(5px, .55vw, 9px); --copper-edge-shadow-height: clamp(6px, .6vw, 10px); position: relative; height: 72vw; min-height: 0; overflow: hidden; color: #fff; background: var(--premium-ink); }
+.premium-footer::before { position: absolute; top: 0; right: -32px; left: -32px; z-index: 4; height: calc(var(--copper-edge-height) + var(--copper-edge-shadow-height)); content: ''; background-image: linear-gradient(to bottom, transparent 0 var(--copper-edge-height), rgba(4,20,33,.65) calc(var(--copper-edge-height) + 2px), rgba(4,20,33,0) 100%), url('/assets/ui/copper-edge.png'); background-position: 0 0, center top; background-size: 100% 100%, 100% var(--copper-edge-height); background-repeat: no-repeat; filter: drop-shadow(0 3.5px 5px rgba(4,20,33,.65)); pointer-events: none; }
 .premium-footer-matte { position: absolute; inset: 0; pointer-events: none; }
 .premium-footer-matte::after { position: absolute; inset: 0; content: ''; background: linear-gradient(0deg,#031018 2%,rgba(3,16,24,.9) 30%,rgba(3,16,24,.36) 68%,rgba(3,16,24,.76)); opacity: .85; }
 .premium-footer-back { width: 100%; height: 100%; display: block; object-fit: contain; object-position: center top; transform: translateY(-1.5vw); }
