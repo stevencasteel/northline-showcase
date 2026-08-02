@@ -350,75 +350,57 @@ h1 .hero-accent { color: #d25f26; }
 .app.is-mobile-device .badge-content > img { width: 48px; height: 57px; }
 .app.is-mobile-device .badge-item p { font-size: 17px; }
 .app.is-mobile-device .badge-divider { height: 70px; }
-.app.is-mobile-device .gallery-section { padding: 42px 16px 56px; }
 .app.is-mobile-device .services-layout { display: block; }
 .app.is-mobile-device .services-brutalist-heading { margin-bottom: 18px; border-right: 0; border-bottom: 1px solid #041421; }
 .app.is-mobile-device .services-brutalist-heading .section-kicker { position: static; font-size: 2.2vw; writing-mode: horizontal-tb; }
 .app.is-mobile-device .services-brutalist-heading .section-kicker { font-size: 2.2vw; }
-.app.is-mobile-device .gallery-layout { display: block; }
-.app.is-mobile-device .gallery-content { display: block; }
-.app.is-mobile-device .gallery-material-library { position: static; width: auto; height: auto !important; margin-top: 28px; }
-.app.is-mobile-device .gallery-material-art { position: relative; }
-.app.is-mobile-device .gallery-material-kicker { font-size: 9px; }
-.app.is-mobile-device .gallery-material-heading h2 { font-size: 24px; }
-.app.is-mobile-device .gallery-material-label { padding: 0 10px; }
-.app.is-mobile-device .gallery-material-label span { font-size: 8px; }
-.app.is-mobile-device .gallery-material-label strong { font-size: 12px; }
-.app.is-mobile-device .gallery-material-label small { font-size: 8px; }
-.app.is-mobile-device .gallery-brutalist-heading { margin-bottom: 18px; padding-right: 0; border-right: 0; border-bottom: 1px solid #e5dcd2; }
-.app.is-mobile-device .gallery-brutalist-heading::after { display: none; }
-.app.is-mobile-device .gallery-brutalist-heading::after { display: none; }
-.app.is-mobile-device .gallery-brutalist-heading .section-kicker { position: static; font-size: 2.2vw; writing-mode: horizontal-tb; transform: none; }
-.app.is-mobile-device .gallery-showcase { width: 100%; margin: 0; column-gap: 8px; row-gap: 6px; aspect-ratio: auto; }
-.app.is-mobile-device .gallery-card { transform: translateY(12px); }
-.app.is-mobile-device .gallery-card::after { inset: 7px; border-width: 1px; }
-.app.is-mobile-device .gallery-card:hover::after, .app.is-mobile-device .gallery-card:focus-visible::after { border-width: 2px; }
-.app.is-mobile-device .gallery-card-index { top: 10px; left: 11px; font-size: 11.25px; }
-.app.is-mobile-device .gallery-card-view { right: 10px; bottom: 10px; gap: 4px; font-size: 11px; }
-.app.is-mobile-device .gallery-card-view svg { width: 13px; height: 13px; }
-.app.is-mobile-device .gallery-modal-backdrop { padding: 2vw; }
-.app.is-mobile-device .gallery-modal-frame { --gallery-rail-width: 28vw; width: auto; max-width: 96vw; height: 51vw; }
-.app.is-mobile-device .gallery-modal-meta { top: 4vw; left: 4vw; gap: .8vw; }
-.app.is-mobile-device .gallery-modal-meta span { font-size: 1.6vw; }
-.app.is-mobile-device .gallery-modal-meta strong { font-size: 2.6vw; }
-.app.is-mobile-device .gallery-modal-arrow { width: 12vw; height: 12vw; }
-.app.is-mobile-device .gallery-modal-previous { left: 2.5vw; }
-.app.is-mobile-device .gallery-modal-next { right: 2.5vw; }
-.app.is-mobile-device .gallery-modal-arrow svg { width: 7.5vw; height: 7.5vw; }
-.app.is-mobile-device .gallery-sequence-list { padding: 1.2vw; }
-.app.is-mobile-device .gallery-sequence-list button { margin-bottom: 1.2vw; }
-.app.is-mobile-device .gallery-sequence-list span { right: 1.5vw; bottom: 2.5vw; font-size: 1.5vw; }
-.app.is-mobile-device .gallery-modal-close { top: 3vw; right: 31vw; width: 8vw; height: 8vw; }
-.app.is-mobile-device .gallery-modal-close svg { width: 3.2vw; height: 3.2vw; }
+.app.is-mobile-device .gallery-section { padding: 3.2vw 2.55% 6vw; }
+.app.is-mobile-device .gallery-layout { --gallery-rail-width: 8vw; --gallery-layout-gap: 1.8vw; display: grid; grid-template-columns: var(--gallery-rail-width) minmax(0, 1fr); column-gap: var(--gallery-layout-gap); }
+.app.is-mobile-device .gallery-content { position: relative; display: block; }
+.app.is-mobile-device .gallery-brutalist-heading { margin: 0; padding: 0; border: 0; }
+.app.is-mobile-device .gallery-brutalist-heading::after { display: block; }
+.app.is-mobile-device .gallery-brutalist-heading .section-kicker { position: absolute; top: 0; right: 1vw; font-size: 6.6vw; writing-mode: vertical-rl; transform: none; }
+.app.is-mobile-device .gallery-showcase { width: 100%; margin-bottom: -26.25%; column-gap: var(--gallery-gap); row-gap: var(--gallery-gap); }
+.app.is-mobile-device .gallery-material-library { position: absolute; top: 0; right: 0; width: calc(35% - var(--gallery-layout-gap)); height: 100% !important; margin: 0; }
+.app.is-mobile-device .gallery-material-art { position: absolute; }
+.app.is-mobile-device .gallery-material-kicker { font-size: .55vw; }
+.app.is-mobile-device .gallery-material-heading h2 { font-size: 1.55vw; }
+.app.is-mobile-device .gallery-material-label { padding: 0 .7vw; }
+.app.is-mobile-device .gallery-material-label span { font-size: .5vw; }
+.app.is-mobile-device .gallery-material-label strong { font-size: .75vw; }
+.app.is-mobile-device .gallery-material-label small { font-size: .48vw; }
+.app.is-mobile-device .gallery-card { transform: translateY(1.2vw); }
+.app.is-mobile-device .gallery-card::after { inset: .58vw; border-width: 1px; }
+.app.is-mobile-device .gallery-card:hover::after, .app.is-mobile-device .gallery-card:focus-visible::after { border-width: .24vw; }
+.app.is-mobile-device .gallery-card-index { top: 1.15vw; left: 1.25vw; font-size: .81vw; }
+.app.is-mobile-device .gallery-card-view { right: 1.25vw; bottom: 1.15vw; gap: .3vw; font-size: 1.8vw; }
+.app.is-mobile-device .gallery-card-view svg { width: 2vw; height: 2vw; }
+.app.is-mobile-device .gallery-modal-backdrop { place-items: center; padding: max(10px, env(safe-area-inset-top)) 8px max(10px, env(safe-area-inset-bottom)); }
+.app.is-mobile-device .gallery-modal-backdrop::after { display: none; }
+.app.is-mobile-device .gallery-modal-frame { --gallery-rail-width: 104px; width: 100%; max-width: 620px; height: auto; max-height: calc(100dvh - 20px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); flex-direction: column; border-radius: 14px; }
+.app.is-mobile-device .gallery-modal-stage { width: 100%; height: auto; aspect-ratio: 4 / 3; flex: none; min-height: 0; }
+.app.is-mobile-device .gallery-modal-stage > img { object-fit: contain; }
+.app.is-mobile-device .gallery-modal-meta { top: 18px; left: 18px; gap: 3px; }
+.app.is-mobile-device .gallery-modal-meta span { font-size: 9px; }
+.app.is-mobile-device .gallery-modal-meta strong { font-size: 15px; }
+.app.is-mobile-device .gallery-modal-arrow { top: 50%; width: 48px; height: 48px; }
+.app.is-mobile-device .gallery-modal-previous { left: 12px; }
+.app.is-mobile-device .gallery-modal-next { right: 12px; }
+.app.is-mobile-device .gallery-modal-arrow svg { width: 30px; height: 30px; }
+.app.is-mobile-device .gallery-sequence { width: 100%; height: var(--gallery-rail-width); flex: none; border-top: 1px solid rgba(229,220,210,.16); border-left: 0; }
+.app.is-mobile-device .gallery-sequence-list { display: flex; height: 100%; gap: 7px; overflow-x: auto; overflow-y: hidden; padding: 8px; scroll-snap-type: x proximity; }
+.app.is-mobile-device .gallery-sequence-list::-webkit-scrollbar { height: 5px; }
+.app.is-mobile-device .gallery-sequence-list button { width: 112px; height: 84px; flex: 0 0 112px; margin: 0; aspect-ratio: 4 / 3; scroll-snap-align: center; }
+.app.is-mobile-device .gallery-sequence-list span { right: 7px; bottom: 7px; font-size: 9px; }
+.app.is-mobile-device .gallery-modal-close { top: 12px; right: 12px; width: 42px; height: 42px; }
+.app.is-mobile-device .gallery-modal-close svg { width: 18px; height: 18px; }
 @media (max-width: 600px) {
   .services-layout { display: block; }
   .services-brutalist-heading { margin-bottom: 18px; border-right: 0; border-bottom: 1px solid #041421; }
   .services-brutalist-heading .section-kicker { font-size: 2.2vw; }
   .services-brutalist-heading .section-kicker { position: static; writing-mode: horizontal-tb; }
-  .gallery-section { padding: 42px 16px 56px; }
-  .gallery-layout { display: block; }
-  .gallery-content { display: block; }
-  .gallery-material-library { position: static; width: auto; height: auto !important; margin-top: 28px; }
-  .gallery-material-art { position: relative; }
-  .gallery-material-kicker { font-size: 9px; }
-  .gallery-material-heading h2 { font-size: 24px; }
-  .gallery-material-label { padding: 0 10px; }
-  .gallery-material-label span { font-size: 8px; }
-  .gallery-material-label strong { font-size: 12px; }
-  .gallery-material-label small { font-size: 8px; }
-  .gallery-brutalist-heading { margin-bottom: 18px; padding-right: 0; border-right: 0; border-bottom: 1px solid #e5dcd2; }
-  .gallery-brutalist-heading::after { display: none; }
-  .gallery-brutalist-heading::after { display: none; }
-  .gallery-brutalist-heading .section-kicker { position: static; font-size: 2.2vw; writing-mode: horizontal-tb; transform: none; }
-  .gallery-showcase { width: 100%; margin: 0; --gallery-cell-width: calc((100% - 8px) / 2); --gallery-cell-height: calc(var(--gallery-cell-width) * .75); grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; column-gap: 8px; row-gap: 8px; aspect-ratio: auto; }
-  .gallery-card { grid-column: auto; grid-row: auto; aspect-ratio: 4 / 3; }
-  .gallery-card-0 { grid-column: 1 / span 2; }
-  .gallery-card { transform: translateY(12px); }
-  .gallery-card::after { inset: 7px; border-width: 1px; }
-  .gallery-card:hover::after, .gallery-card:focus-visible::after { border-width: 2px; }
-  .gallery-card-index { top: 10px; left: 11px; font-size: 11.25px; }
-  .gallery-card-view { right: 10px; bottom: 10px; gap: 4px; font-size: 22px; }
-  .gallery-card-view svg { width: 26px; height: 26px; }
+  .gallery-section { padding: 3.2vw 2.55% 6vw; }
+  .gallery-layout { --gallery-rail-width: 8vw; --gallery-layout-gap: 1.8vw; grid-template-columns: var(--gallery-rail-width) minmax(0, 1fr); }
 }
 .app.is-mobile-device .appointment-backdrop { place-items: end center; padding: 12px 0 0; background: rgba(4,20,33,.78); }
 .app.is-mobile-device .appointment-modal { width: 100%; max-height: 92dvh; overscroll-behavior: contain; border-radius: 1.15rem 1.15rem 0 0; box-shadow: 0 -1.25rem 3.5rem rgba(4,20,33,.35); animation: mobile-modal-fade-in .24s ease-out; transform: none; }
