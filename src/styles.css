@@ -165,7 +165,7 @@ h1 .hero-accent { color: #d25f26; }
 .badge-item p strong, .badge-item p span { display: block; font-weight: 600; }
 .badge-item p span { color: #fff; }
 .badge-divider { width: .38vw !important; height: 6.5vw !important; object-fit: contain !important; }
-.services-section { position: relative; overflow: hidden; padding: 3.2vw 2.55% 3.8vw; color: #041421; background: #e5dcd2; }
+.services-section { position: relative; overflow: hidden; padding: 3.2vw 2.55% 3.8vw; color: #041421; background: linear-gradient(rgba(229,220,210,.12), rgba(229,220,210,.12)), url('/assets/textures/services-cover-board.webp') center / cover no-repeat, #e5dcd2; }
 .services-section::before { content: ''; position: absolute; top: 0; right: -32px; left: -32px; z-index: 3; height: clamp(18px, 1.75vw, 28px); background: linear-gradient(to bottom, rgba(4,20,33,.85), rgba(4,20,33,.28) 34%, rgba(4,20,33,.10) 64%, rgba(4,20,33,0)); pointer-events: none; }
 .services-layout { --services-rail-width: clamp(6.8rem, 8vw, 9rem); --services-layout-gap: clamp(1rem, 1.8vw, 2rem); display: grid; grid-template-columns: var(--services-rail-width) minmax(0, 1fr); align-items: start; column-gap: var(--services-layout-gap); }
 .services-brutalist-heading { align-self: stretch; margin: 0; border-right: .14vw solid #041421; opacity: 0; transform: translateY(1.2vw); position: relative; z-index: 2; }
