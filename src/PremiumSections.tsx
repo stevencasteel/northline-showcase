@@ -33,22 +33,19 @@ const reviews = [
 
 const serviceLocation = {
   name: 'The Garden',
-  label: 'Northline field coordinate 04–211',
-  address: "26 Gandalf's Cutting, Waikato 3472, New Zealand",
-  note: 'A tucked-away field coordinate inside the rolling landscape of Hobbiton country.',
   embedUrl: 'https://www.google.com/maps?q=The%20Garden%2C%2026%20Gandalf%27s%20Cutting%2C%20Waikato%203472%2C%20New%20Zealand&t=k&z=18&output=embed',
   mapsUrl: 'https://www.google.com/maps/search/?api=1&query=The%20Garden%2C%2026%20Gandalf%27s%20Cutting%2C%20Waikato%203472%2C%20New%20Zealand',
 }
 
 const ctaContexts = [
-  { section: 'top', eyebrow: 'Free roof inspection', label: 'Schedule an inspection' },
+  { section: 'top', eyebrow: 'Free roof inspection', label: 'Book an appointment' },
   { section: 'services', eyebrow: 'Need a recommendation?', label: 'Choose my roof system' },
   { section: 'work', eyebrow: 'Found the roof you want?', label: 'Price this roof' },
   { section: 'protection', eyebrow: 'Concerned about hidden layers?', label: 'Inspect my roof' },
-  { section: 'reviews', eyebrow: 'Ready for the same care?', label: 'Schedule an inspection' },
+  { section: 'reviews', eyebrow: 'Ready for the same care?', label: 'Book an appointment' },
   { section: 'support', eyebrow: 'Meet face to face', label: 'Book a hologram call' },
   { section: 'location', eyebrow: 'Inside the service area?', label: 'Check availability' },
-  { section: 'contact', eyebrow: 'Start with certainty', label: 'Schedule an inspection' },
+  { section: 'contact', eyebrow: 'Start with certainty', label: 'Book an appointment' },
 ] as const
 
 function usePremiumReveal() {
@@ -163,30 +160,9 @@ function SupportConciergeSection({ onBook }: BookHandler) {
   )
 }
 
-function ServiceAreaMapSection({ onBook }: BookHandler) {
-  return (
-    <section className="premium-location premium-shell" id="location" aria-labelledby="premium-location-title">
-      <div className="premium-location-plate" data-premium-reveal>
-        <div className="premium-location-copy">
-          <p className="premium-kicker">Service coordinates / real-world demo pin</p>
-          <h2 id="premium-location-title">Somewhere worth finding.</h2>
-          <p>{serviceLocation.note}</p>
-          <div className="premium-location-address"><span>{serviceLocation.label}</span><strong>{serviceLocation.name}</strong><address>{serviceLocation.address}</address></div>
-          <div className="premium-location-actions"><a className="premium-button premium-button-primary" href={serviceLocation.mapsUrl} target="_blank" rel="noreferrer">View in Google Maps <span>↗</span></a><button className="premium-text-link" type="button" onClick={onBook}>Check availability <span>↗</span></button></div>
-        </div>
-        <div className="premium-map-frame">
-          <div className="premium-map-label"><span>Map field unit</span><span>04–211 / active</span></div>
-          <iframe src={serviceLocation.embedUrl} title={`Google Map showing ${serviceLocation.name}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
-          <div className="premium-map-corner premium-map-corner-a" aria-hidden="true" /><div className="premium-map-corner premium-map-corner-b" aria-hidden="true" />
-        </div>
-      </div>
-    </section>
-  )
-}
-
 export function PremiumSections({ onBook }: BookHandler) {
   usePremiumReveal()
-  return <div className="premium-sections"><HowWeProtectSection onBook={onBook} /><GoogleReviewsSection onBook={onBook} /><SupportConciergeSection onBook={onBook} /><ServiceAreaMapSection onBook={onBook} /></div>
+  return <div className="premium-sections"><HowWeProtectSection onBook={onBook} /><GoogleReviewsSection onBook={onBook} /><SupportConciergeSection onBook={onBook} /></div>
 }
 
 export function PremiumFooter({ onBook }: BookHandler) {
@@ -194,13 +170,35 @@ export function PremiumFooter({ onBook }: BookHandler) {
     <footer className="premium-footer" id="contact">
       <div className="premium-footer-matte" aria-hidden="true"><img className="premium-footer-back" src="/assets/footer/footer-roofscape-backdrop.webp" alt="" /><img className="premium-footer-front" src="/assets/footer/footer-eaves-foreground.png" alt="" /></div>
       <div className="premium-footer-content premium-shell">
-        <div className="premium-footer-lead" data-premium-reveal><img src="/assets/northline_roofing_combination_mark.svg" alt="Northline Roofing" /><h2>Build the roof people remember.</h2><button className="premium-button premium-button-primary" type="button" onClick={onBook}>Schedule an inspection <span>↗</span></button></div>
-        <div className="premium-footer-grid">
-          <div><span>Navigate</span><a href="#services">Services</a><a href="#work">Gallery</a><a href="#protection">Protection</a><a href="#reviews">Reviews</a></div>
-          <div><span>Talk to us</span><a href="tel:+15555555555">(555) 555-5555</a><a href="mailto:hello@northlineroofing.com">hello@northlineroofing.com</a><a href="#location">Service coordinates</a></div>
-          <div><span>Field office</span><p>Mon–Fri / 8am–6pm</p><p>Residential & commercial systems</p><a href="#top">Back to top ↑</a></div>
+        <div className="premium-footer-primary">
+          <div className="premium-footer-brand" data-premium-reveal>
+            <div className="premium-footer-brand-plaque">
+              <img className="premium-footer-brand-frame" src="/assets/footer/footer-brand-plaque-v2.webp" alt="" aria-hidden="true" />
+              <div className="premium-footer-brand-surface"><img src="/assets/northline_roofing_combination_mark.svg" alt="Northline Roofing" /></div>
+            </div>
+            <div className="premium-footer-contact">
+              <a href="tel:+15555555555">(555) 555-5555</a>
+              <a href="mailto:hello@northlineroofing.com">hello@northlineroofing.com</a>
+            </div>
+            <button className="premium-button premium-button-primary premium-footer-book" type="button" onClick={onBook}>Book an appointment <span>↗</span></button>
+          </div>
+
+          <section className="premium-footer-map" id="location" aria-labelledby="premium-footer-map-title" data-premium-reveal>
+            <div className="premium-footer-map-heading">
+              <span id="premium-footer-map-title">Service area</span>
+              <a href={serviceLocation.mapsUrl} target="_blank" rel="noreferrer">Open in Google Maps ↗</a>
+            </div>
+            <div className="premium-footer-map-frame">
+              <img src="/assets/footer/footer-map-frame-v2.webp" alt="" aria-hidden="true" />
+              <iframe src={serviceLocation.embedUrl} title={`Google Map showing ${serviceLocation.name}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+            </div>
+          </section>
         </div>
-        <div className="premium-footer-bottom"><span>Residential & commercial roofing systems</span><span>© {new Date().getFullYear()} Northline Roofing</span></div>
+
+        <div className="premium-footer-utility">
+          <nav aria-label="Footer navigation"><a href="#services">Services</a><a href="#work">Gallery</a><a href="#protection">Protection</a><a href="#reviews">Reviews</a></nav>
+          <div><span>Mon–Fri / 8am–6pm</span><a href="#top">Back to top ↑</a></div>
+        </div>
       </div>
     </footer>
   )
