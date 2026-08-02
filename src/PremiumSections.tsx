@@ -2,7 +2,7 @@ import { useEffect, useId, useState, type CSSProperties } from 'react'
 
 type BookHandler = { onBook: () => void }
 
-const underlaymentImage = '/assets/protection/protection-underlayment.webp'
+const underlaymentImage = '/assets/protection/protection-underlayment.png'
 
 const reviews = [
   {
@@ -97,7 +97,7 @@ function HowWeProtectSection({ onBook }: BookHandler) {
       <div className="premium-protection-console" data-premium-reveal>
         <div className="premium-console-rail" aria-hidden="true"><span>Underlayment reveal</span><span>Northline deck-to-finish spec / 04–211</span></div>
         <div className="premium-protection-stage" style={{ '--premium-split': `${split}%` } as CSSProperties}>
-          <img className="premium-protection-image" src="/assets/protection/protection-finished-roof.webp" alt="A completed premium slate and copper roof" />
+          <img className="premium-protection-image" src="/assets/protection/protection-finished-roof.jpg" alt="A completed premium slate and copper roof" />
           <img className="premium-protection-image premium-protection-layer" src={underlaymentImage} alt="The same roof with its underlayment construction exposed" />
           <span className="premium-stage-label premium-stage-label-finished">Finished roof</span>
           <span className="premium-stage-label premium-stage-label-layer">Underlayment</span>
