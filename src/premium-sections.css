@@ -295,9 +295,8 @@
 
 .premium-footer { position: relative; height: 72vw; min-height: 0; overflow: hidden; color: #fff; background: var(--premium-ink); }
 .premium-footer-matte { position: absolute; inset: 0; pointer-events: none; }
-.premium-footer-matte::after { position: absolute; inset: 0; content: ''; background: linear-gradient(0deg,#031018 2%,rgba(3,16,24,.9) 30%,rgba(3,16,24,.36) 68%,rgba(3,16,24,.76)); }
-.premium-footer-back { width: 100%; height: 100%; object-fit: cover; object-position: 52% 46%; transform: scale(1.025); animation: premium-footer-breathe 18s ease-in-out infinite alternate; }
-@keyframes premium-footer-breathe { to { transform: scale(1.055) translateY(-.5%); } }
+.premium-footer-matte::after { position: absolute; inset: 0; content: ''; background: linear-gradient(0deg,#031018 2%,rgba(3,16,24,.9) 30%,rgba(3,16,24,.36) 68%,rgba(3,16,24,.76)); opacity: .85; }
+.premium-footer-back { width: 100%; height: 100%; display: block; object-fit: contain; object-position: center top; transform: translateY(-1.5vw); }
 .premium-footer-front { position: absolute; z-index: 2; inset: auto 0 0; width: 100%; height: auto; max-width: none; max-height: none; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 -1.5rem 2.2rem rgba(0,0,0,.42)); }
 .premium-footer-content.premium-shell { width: 94.9%; }
 .premium-footer-content { position: relative; z-index: 3; height: 100%; min-height: 0; padding-block: 5vw 22vw; }
