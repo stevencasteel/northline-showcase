@@ -293,36 +293,37 @@
 .premium-support-copy dt { color: var(--premium-copper-light); font-family: 'IBM Plex Mono',monospace; font-size: min(.6rem,.67vw); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }.premium-support-copy dd { margin: 0; font-size: min(1rem,1.1vw); font-weight: 600; }
 .premium-support-actions { display: flex; flex-wrap: wrap; gap: min(.75rem,.83vw); }
 
-.premium-footer { position: relative; min-height: min(68rem,72vw); overflow: hidden; color: #fff; background: var(--premium-ink); }
+.premium-footer { position: relative; height: 72vw; min-height: 0; overflow: hidden; color: #fff; background: var(--premium-ink); }
 .premium-footer-matte { position: absolute; inset: 0; pointer-events: none; }
 .premium-footer-matte::after { position: absolute; inset: 0; content: ''; background: linear-gradient(0deg,#031018 2%,rgba(3,16,24,.9) 30%,rgba(3,16,24,.36) 68%,rgba(3,16,24,.76)); }
 .premium-footer-back { width: 100%; height: 100%; object-fit: cover; object-position: 52% 46%; transform: scale(1.025); animation: premium-footer-breathe 18s ease-in-out infinite alternate; }
 @keyframes premium-footer-breathe { to { transform: scale(1.055) translateY(-.5%); } }
 .premium-footer-front { position: absolute; z-index: 2; inset: auto 0 0; width: 100%; height: auto; max-width: none; max-height: none; object-fit: contain; object-position: center bottom; filter: drop-shadow(0 -1.5rem 2.2rem rgba(0,0,0,.42)); }
-.premium-footer-content { position: relative; z-index: 3; min-height: min(68rem,72vw); padding-block: min(5rem,5vw) min(21rem,22vw); }
-.premium-footer-primary { display: grid; grid-template-columns: minmax(0,.72fr) minmax(0,1.28fr); gap: min(5rem,4vw); align-items: start; }
-.premium-footer-brand { max-width: min(32rem,35.5vw); }
-.premium-footer-brand-plaque { position: relative; width: 100%; aspect-ratio: 1905 / 826; filter: drop-shadow(0 1.25rem 2.5rem rgba(0,0,0,.4)); }
+.premium-footer-content.premium-shell { width: 94.9%; }
+.premium-footer-content { position: relative; z-index: 3; height: 100%; min-height: 0; padding-block: 5vw 22vw; }
+.premium-footer-primary { display: grid; grid-template-columns: minmax(0,.72fr) minmax(0,1.28fr); gap: 4vw; align-items: start; }
+.premium-footer-brand { max-width: 35.5vw; }
+.premium-footer-brand-plaque { position: relative; width: 100%; aspect-ratio: 1905 / 826; filter: drop-shadow(0 1.25vw 2.5vw rgba(0,0,0,.4)); }
 .premium-footer-brand-frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; }
 .premium-footer-brand-surface { position: absolute; inset: 5% 2.5% 7%; padding: 7% 6%; display: grid; place-items: center; overflow: hidden; }
 .premium-footer-brand-surface img { width: 100%; height: auto; display: block; }
-.premium-footer-contact { margin-bottom: min(1.25rem,1.4vw); padding-block: min(1rem,1.1vw); border-block: 1px solid rgba(240,183,124,.32); display: grid; gap: min(.55rem,.61vw); font-size: min(1rem,1.1vw); }
+.premium-footer-contact { margin-bottom: 1.4vw; padding-block: 1.1vw; border-block: 1px solid rgba(240,183,124,.32); display: grid; gap: .61vw; font-size: 1.1vw; }
 .premium-footer-contact a { width: fit-content; color: rgba(255,255,255,.9); font-weight: 700; transition: color .2s ease; }
 .premium-footer-contact a:hover,.premium-footer-contact a:focus-visible { color: var(--premium-copper-light); }
-.premium-footer-book { width: min(22rem,100%); }
+.premium-footer-book { width: min(22vw,100%); min-height: 4vw; padding-inline: 1.7vw; gap: 1vw; font-size: .85vw; }
 .premium-footer-map { min-width: 0; }
-.premium-footer-map-heading { min-height: min(2.25rem,2.5vw); padding-inline: min(.35rem,.39vw); display: flex; align-items: center; justify-content: space-between; gap: min(1rem,1.1vw); color: rgba(255,255,255,.78); font-family: 'IBM Plex Mono',monospace; font-size: min(.58rem,.64vw); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.premium-footer-map-heading { min-height: 2.5vw; padding-inline: .39vw; display: flex; align-items: center; justify-content: space-between; gap: 1.1vw; color: rgba(255,255,255,.78); font-family: 'IBM Plex Mono',monospace; font-size: .64vw; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .premium-footer-map-heading > span { color: var(--premium-copper-light); }
 .premium-footer-map-heading a { border-bottom: 1px solid transparent; transition: color .2s ease,border-color .2s ease; }
 .premium-footer-map-heading a:hover,.premium-footer-map-heading a:focus-visible { color: #fff; border-bottom-color: var(--premium-orange); }
-.premium-footer-map-frame { position: relative; width: 100%; aspect-ratio: 1672 / 941; filter: drop-shadow(0 1.5rem 3rem rgba(0,0,0,.42)); }
+.premium-footer-map-frame { position: relative; width: 100%; aspect-ratio: 1672 / 941; filter: drop-shadow(0 1.5vw 3vw rgba(0,0,0,.42)); }
 .premium-footer-map-frame > img { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
 .premium-footer-map-frame iframe { position: absolute; z-index: 2; top: 5.2%; left: 2.65%; width: 94.7%; height: 89.2%; border: 0; background: #0b1d2b; filter: saturate(.78) sepia(.1) contrast(1.04); }
-.premium-footer-utility { margin-top: min(.5rem,.55vw); padding: min(1rem,1.1vw) min(1.25rem,1.4vw); border-block: 1px solid rgba(240,183,124,.32); display: flex; align-items: center; justify-content: space-between; gap: min(1.5rem,1.7vw); background: rgba(3,16,24,.56); backdrop-filter: blur(12px); }
-.premium-footer-utility nav,.premium-footer-utility > div { display: flex; flex-wrap: wrap; align-items: center; gap: min(1.75rem,1.8vw); }
+.premium-footer-utility { margin-top: .55vw; padding: 1.1vw 1.4vw; border-block: 1px solid rgba(240,183,124,.32); display: flex; align-items: center; justify-content: space-between; gap: 1.7vw; background: rgba(3,16,24,.56); backdrop-filter: blur(12px); }
+.premium-footer-utility nav,.premium-footer-utility > div { display: flex; flex-wrap: wrap; align-items: center; gap: 1.8vw; }
 .premium-footer-utility a { color: rgba(255,255,255,.88); font-weight: 700; border-bottom: 1px solid transparent; transition: color .2s ease,border-color .2s ease; }
 .premium-footer-utility a:hover,.premium-footer-utility a:focus-visible { color: #fff; border-bottom-color: var(--premium-orange); }
-.premium-footer-utility > div { justify-content: flex-end; color: rgba(255,255,255,.6); font-family: 'IBM Plex Mono',monospace; font-size: min(.56rem,.62vw); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.premium-footer-utility > div { justify-content: flex-end; color: rgba(255,255,255,.6); font-family: 'IBM Plex Mono',monospace; font-size: .62vw; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 
 .premium-persistent-cta { position: fixed; right: 1.6rem; bottom: max(1.6rem,env(safe-area-inset-bottom)); z-index: 18; width: min(24.4rem,calc(100vw - 2.25rem)); min-height: 4.6rem; padding: .45rem; border: 1px solid rgba(240,183,124,.9); display: grid; grid-template-columns: 3.5rem 1fr 3rem; align-items: center; gap: .75rem; color: #fff; background: linear-gradient(145deg,rgba(255,255,255,.11),transparent 32%),url('/assets/textures/powder-coated-navy-steel.png') center / 600px,var(--premium-ink); box-shadow: 0 1.25rem 3.75rem rgba(2,12,19,.36),inset 0 0 0 3px rgba(0,0,0,.28); opacity: 0; transform: translateY(1.75rem) scale(.97); pointer-events: none; cursor: pointer; transition: opacity .3s ease,transform .5s cubic-bezier(.2,.8,.2,1); }
 .premium-persistent-cta.is-visible { opacity: 1; transform: none; pointer-events: auto; }
@@ -373,7 +374,8 @@
 .app.is-mobile-device .premium-support-actions { display: grid; gap: .75rem; }
 .app.is-mobile-device .premium-footer,
 .app.is-mobile-device .premium-footer-content { min-height: 0; }
-.app.is-mobile-device .premium-footer-content { padding-top: 3rem; padding-bottom: 9rem; }
+.app.is-mobile-device .premium-footer { height: auto; }
+.app.is-mobile-device .premium-footer-content { height: auto; padding-top: 3rem; padding-bottom: 9rem; }
 .app.is-mobile-device .premium-footer-primary { grid-template-columns: 1fr; gap: 2.25rem; }
 .app.is-mobile-device .premium-footer-brand { max-width: none; }
 .app.is-mobile-device .premium-footer-brand-plaque { width: min(32rem,100%); }
