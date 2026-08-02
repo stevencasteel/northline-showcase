@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ArrowRight, ArrowUpRight, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
 import './styles.css'
+import './premium-sections.css'
+import { PersistentPremiumCta, PremiumFooter, PremiumSections } from './PremiumSections'
 
 const asset = '/assets/'
 
@@ -911,7 +913,8 @@ function Gallery() {
 function App() {
   const mobileDevice = isMobileDevice()
   const [appointmentOpen, setAppointmentOpen] = useState(false)
-  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={() => setAppointmentOpen(true)} /><main><Hero onBookAppointment={() => setAppointmentOpen(true)} /><BadgeStrip /><Services mobileDevice={mobileDevice} /><Gallery /></main>{appointmentOpen && <AppointmentModal mobileDevice={mobileDevice} onClose={() => setAppointmentOpen(false)} />}</div>
+  const openAppointment = () => setAppointmentOpen(true)
+  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={openAppointment} /><main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services mobileDevice={mobileDevice} /><Gallery /><PremiumSections onBook={openAppointment} /></main><PremiumFooter onBook={openAppointment} /><PersistentPremiumCta onBook={openAppointment} hidden={appointmentOpen} />{appointmentOpen && <AppointmentModal mobileDevice={mobileDevice} onClose={() => setAppointmentOpen(false)} />}</div>
 }
 
 createRoot(document.getElementById('root')!).render(<App />)

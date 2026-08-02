@@ -1,0 +1,5 @@
+Use case: precise-object-edit
+Asset type: pixel-aligned construction reveal variant
+Input image: Image 1 is the canonical finished roof and the edit target.
+Primary request: Reveal the installed ridge vent, soffit intake, ventilation baffles, and unobstructed air channel through selective architectural cutaways. Keep the rest of the roof completely finished. Do not draw arrows or airflow; those will be animated in HTML and CSS.
+Locked invariants: Preserve the exact 3840x2160 camera, crop, pixel geometry, roof silhouette, dormers, gutters, walls, landscape, lighting, shadows, and color grade. Change only the specified roofing layer. Do not add text, arrows, labels, people, tools, logos, watermarks, or extra structures.
