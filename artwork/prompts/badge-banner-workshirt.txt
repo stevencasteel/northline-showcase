@@ -1,0 +1,11 @@
+Use case: stylized-concept
+Asset type: ultra-wide website banner backdrop behind copper badges and white text
+Primary request: Create a premium close-up background of Northline Roofing's blue work T-shirt fabric, using the exact dominant brand color #102432. The image will sit behind copper qualification badges and white lettering, then transition directly into the Services section below.
+Scene/backdrop: the entire frame is a single uninterrupted panel of heavyweight work-shirt jersey fabric; no person, torso, folds shaped like a body, or surrounding environment
+Style/medium: photorealistic macro textile photography, premium durable trade-workwear, understated and believable
+Composition/framing: wide landscape source designed to be cropped to an extremely shallow 12.5:1 website banner. Keep the upper 85 percent visually uniform and quiet. Across the entire bottom edge, place one authentic horizontal double-needle shirt hem with a subtle rolled fabric edge, located within the bottom 8 percent of the frame. The seam must run continuously from the exact left edge to the exact right edge so it becomes the visual boundary leading into the next webpage section.
+Lighting/mood: flat soft studio illumination with only microscopic fiber depth; calm, non-distracting, no dramatic gradient
+Color palette: exact dominant base #102432; thread in a slightly lighter desaturated blue #18384b; extremely restrained warm copper-brown micro flecks no brighter than #70442f and occupying less than one percent
+Materials/textures: tightly knit heavyweight cotton-poly work T-shirt jersey, subtle natural pilling, fine horizontal knit structure, precise double-needle stitching at bottom
+Constraints: no text, lettering, numbers, logo, badge, icon, pocket, button, zipper, collar, person, skin, tools, watermark, large wrinkles, stains, tears, shadows, vignette, bright highlights, or obvious center focal point. White text and copper badge art must remain highly legible over the fabric. The bottom seam must be perfectly horizontal and continuous across the full width.
+Avoid: denim, canvas, leather, wool, silk, blue jeans, folded garment, fashion styling, busy wrinkles, diagonal seam, curved seam, vertical seam, visible shirt silhouette

@@ -114,8 +114,8 @@ h1 .hero-accent { color: #d25f26; }
 .appointment-success p { max-width: 28rem; margin: 0 0 1rem; color: #52616a; line-height: 1.55; }
 @keyframes modal-fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes modal-rise-in { from { opacity: 0; transform: translateY(1rem) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-.badge-strip { aspect-ratio: 6821 / 548; position: relative; overflow: hidden; background: #102432; color: #fff; padding: .7% 4.5%; }
-.badge-sprite-canvas { position: absolute; top: 50%; left: 4.5%; width: 91%; aspect-ratio: 2127 / 171; transform: translateY(-50%); }
+.badge-strip { --shirt-hem-height: clamp(26px, 3.15vw, 52px); height: calc(100vw * 548 / 6821 + var(--shirt-hem-height) - 12px); position: relative; overflow: hidden; background: linear-gradient(rgba(16,36,50,.08), rgba(16,36,50,.08)), url('/assets/textures/badge-banner-workshirt-full-hem.webp') center bottom / 100% var(--shirt-hem-height) no-repeat, url('/assets/textures/badge-banner-workshirt.webp') center bottom / cover no-repeat, #102432; color: #fff; padding: .7% 4.5%; }
+.badge-sprite-canvas { position: absolute; top: calc((100% - var(--shirt-hem-height)) / 2 + 3px); left: 4.5%; width: 91%; aspect-ratio: 2127 / 171; transform: translateY(-50%); }
 .badge-slice { position: absolute; top: 0; height: 100%; overflow: hidden; opacity: 0; transform: translateY(88%) scale(.98); transform-origin: center bottom; animation: badge-cascade .72s cubic-bezier(.22, 1, .36, 1) forwards; }
 .badge-slice img { position: absolute; top: 0; height: auto; max-width: none; }
 .badge-slice-one { left: 3.06%; width: 17.40%; animation-delay: .08s; }
@@ -340,7 +340,7 @@ h1 .hero-accent { color: #d25f26; }
 .app.is-mobile-device .desktop-break { display: inline; }
 .app.is-mobile-device .hero-actions { gap: 2.65vw; margin-top: 1.95vw; }
 .app.is-mobile-device .button { width: auto; min-height: 4.7vw; font-size: 1.25vw; }
-.app.is-mobile-device .badge-strip { aspect-ratio: auto; padding: 10px 12px; }
+.app.is-mobile-device .badge-strip { height: auto; padding: 10px 12px calc(10px + var(--shirt-hem-height)); }
 .app.is-mobile-device .badge-sprite-canvas { position: relative; top: auto; left: auto; width: 100%; transform: none; }
 .app.is-mobile-device .badge-grid { height: auto; grid-template-columns: repeat(2, 1fr); }
 .app.is-mobile-device .badge-item:nth-child(2) { border-right: 0; }
