@@ -21,7 +21,8 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <header className="site-header">
+    <header className="site-header" aria-describedby="site-header-background-description">
+      <span id="site-header-background-description" className="visually-hidden">Background image: A wide, light beige background featuring a subtle, fine-grained texture resembling paper or smooth stone.</span>
       <a className="brand" href="#top" aria-label="Northline Roofing home">
         <img className="brand-logo" src={`${asset}northline_roofing_combination_mark.svg`} alt="Northline Roofing combination logo: a geometric navy, cream, and burnt-orange N emblem beside NORTHLINE ROOFING and the subtitle RESIDENTIAL & COMMERCIAL SYSTEMS." />
       </a>
@@ -285,7 +286,8 @@ function Services({ mobileDevice }: { mobileDevice: boolean }) {
   }, [])
 
   return (
-    <section className={`services-section${visible ? ' is-visible' : ''}`} id="services" aria-labelledby="services-title" ref={sectionRef}>
+    <section className={`services-section${visible ? ' is-visible' : ''}`} id="services" aria-labelledby="services-title" aria-describedby="services-background-description" ref={sectionRef}>
+      <span id="services-background-description" className="visually-hidden">Background image: A wide, light beige background featuring a subtle, fine-grained texture resembling paper or smooth stone.</span>
       <div className="services-layout">
         <div className="services-brutalist-heading">
           <p className="section-kicker" id="services-title">Services</p>

@@ -2,14 +2,14 @@ import { useEffect, useState, type CSSProperties, type PointerEvent as ReactPoin
 
 type BookHandler = { onBook: () => void }
 
-const underlaymentImage = '/assets/source/protection/protection-underlayment.png'
+const underlaymentImage = '/assets/source/protection-underlayment.png'
 
 const reviews = [
   {
     name: 'Seris Rhuke',
     role: 'Lakeside homeowner',
     quote: 'The storm rolled across the lake before dawn. Northline had us dry, safe, and fully documented before lunch—and the new slate looks extraordinary.',
-    portrait: '/assets/reviews/reviewer-kaia-nimbus.webp',
+    portrait: '/assets/reviews/seris-rhuke.png',
     googlePlace: 'Illyrion Spire',
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=The%20Garden%2C%2026%20Gandalf%27s%20Cutting%2C%20Waikato%203472%2C%20New%20Zealand',
   },
@@ -17,7 +17,7 @@ const reviews = [
     name: 'Nyaren Klourm',
     role: 'Architect & property owner',
     quote: 'They found the ventilation problem everyone else missed, showed me every layer, and left the copper transitions cleaner than the original drawings.',
-    portrait: '/assets/reviews/reviewer-vesper-loom.webp',
+    portrait: '/assets/reviews/nyaren-klourm.png',
     googlePlace: 'Aestir Hollow',
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=Green%20Dragon%20Inn%2C%20Hobbiton%20Movie%20Set%2C%20Waikato%2C%20New%20Zealand',
   },
@@ -25,7 +25,7 @@ const reviews = [
     name: 'Baeloon Pluhng',
     role: 'Mountain innkeeper',
     quote: 'Our roof has twelve valleys and not one simple line. The crew treated every seam like finish carpentry and left the grounds immaculate.',
-    portrait: '/assets/reviews/reviewer-bram-hearthstone.webp',
+    portrait: '/assets/reviews/baeloon-pluhng.png',
     googlePlace: 'The Goorough District',
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=The%20Shire%27s%20Rest%2C%20501%20Buckland%20Road%2C%20Hinuera%2C%20Matamata%203472%2C%20New%20Zealand',
   },
@@ -91,7 +91,7 @@ function HowWeProtectSection(_: BookHandler) {
     <section className="premium-protection premium-shell" id="protection">
       <div className="premium-protection-console" data-premium-reveal>
         <div className="premium-protection-stage" style={{ '--premium-split': `${split}%` } as CSSProperties}>
-          <img className="premium-protection-image" src="/assets/source/protection/protection-finished-roof.jpg" alt="A completed premium slate and copper roof" />
+          <img className="premium-protection-image" src="/assets/source/protection-finished-roof.jpg" alt="A completed premium slate and copper roof" />
           <img className="premium-protection-image premium-protection-layer" src={underlaymentImage} alt="The same roof with its underlayment construction exposed" />
           <div className="premium-protection-divider" aria-hidden="true">
             <span className="premium-protection-thumb">
@@ -129,7 +129,7 @@ function GoogleReviewsSection(_: BookHandler) {
         {reviews.map((review, index) => (
           <article className="premium-review-card" data-premium-reveal key={review.name} style={{ '--premium-review-index': index } as CSSProperties}>
             <div className="premium-review-fasteners" aria-hidden="true"><i /><i /><i /><i /></div>
-            <header><img src={review.portrait} alt={`${review.name}, ${review.role}`} /><div><h3>{review.name}</h3><p>{review.role}</p></div><span className="premium-review-rating" aria-label="Rated five out of five">5 / 5</span></header>
+            <header><img src={review.portrait} alt={`${review.name}, ${review.role}`} /><div><h3>{review.name}</h3><p>{review.role}</p></div><span className="premium-review-rating" aria-label="Rated five out of five"><span>5</span><i>/</i><span>5</span></span></header>
             <blockquote>“{review.quote}”</blockquote>
             <footer><a className="premium-review-google-link" href={review.googleUrl} target="_blank" rel="noreferrer" aria-label={`Open ${review.googlePlace} on Google Maps`}><span>{review.googlePlace}</span><img src="/assets/brand/google-g-logo.svg" alt="" aria-hidden="true" /></a></footer>
           </article>
@@ -144,7 +144,7 @@ function SupportConciergeSection({ onBook }: BookHandler) {
     <section className="premium-support premium-shell" id="support" aria-labelledby="premium-support-title">
       <div className="premium-support-console" data-premium-reveal>
         <div className="premium-support-art">
-          <img src="/assets/support/support-hologram-concierge.webp" alt="A prismatic holographic Northline customer concierge inside a copper and steel diagnostic console" />
+          <img src="/assets/support/support-hologram-concierge.png" alt="A prismatic holographic Northline customer concierge inside a copper and steel diagnostic console" />
           <div className="premium-support-scanline" aria-hidden="true" />
           <div className="premium-support-status"><i /> Concierge channel open</div>
         </div>
@@ -168,12 +168,12 @@ export function PremiumSections({ onBook }: BookHandler) {
 export function PremiumFooter({ onBook }: BookHandler) {
   return (
     <footer className="premium-footer" id="contact">
-      <div className="premium-footer-matte" aria-hidden="true"><img className="premium-footer-back" src="/assets/footer/footer-roofscape-backdrop.webp" alt="" /><img className="premium-footer-front" src="/assets/footer/footer-eaves-foreground.png" alt="" /></div>
+      <div className="premium-footer-matte" aria-hidden="true"><img className="premium-footer-back" src="/assets/footer/footer-roofscape-backdrop.png" alt="" /><img className="premium-footer-front" src="/assets/footer/footer-eaves-foreground.png" alt="" /></div>
       <div className="premium-footer-content premium-shell">
         <div className="premium-footer-primary">
           <div className="premium-footer-brand" data-premium-reveal>
             <div className="premium-footer-brand-plaque">
-              <img className="premium-footer-brand-frame" src="/assets/footer/footer-brand-plaque-v2.webp" alt="" aria-hidden="true" />
+              <img className="premium-footer-brand-frame" src="/assets/footer/footer-brand-plaque-v2.png" alt="" aria-hidden="true" />
               <div className="premium-footer-brand-surface"><img src="/assets/northline_roofing_combination_mark.svg" alt="Northline Roofing" /></div>
             </div>
             <div className="premium-footer-contact">
@@ -189,7 +189,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
               <a href={serviceLocation.mapsUrl} target="_blank" rel="noreferrer">Open in Google Maps ↗</a>
             </div>
             <div className="premium-footer-map-frame">
-              <img src="/assets/footer/footer-map-frame-v2.webp" alt="" aria-hidden="true" />
+              <img src="/assets/footer/footer-map-frame-v2.png" alt="" aria-hidden="true" />
               <iframe src={serviceLocation.embedUrl} title={`Google Map showing ${serviceLocation.name}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
             </div>
           </section>

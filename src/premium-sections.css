@@ -122,7 +122,7 @@
   border: 1px solid rgba(240,183,124,.8);
   background:
     linear-gradient(145deg, rgba(255,255,255,.08), transparent 30%),
-    url('/assets/textures/powder-coated-navy-steel.webp') center / 900px,
+    url('/assets/textures/powder-coated-navy-steel.png') center / 900px,
     var(--premium-ink);
   box-shadow: var(--premium-shadow), inset 0 0 0 3px rgba(0,0,0,.28), inset 0 0 0 5px rgba(240,183,124,.22);
 }
@@ -254,15 +254,20 @@
 .premium-google-mark { min-width: min(14.5rem,16vw); padding: min(1rem,1.1vw) min(1.25rem,1.4vw); border: 1px solid var(--premium-line); display: flex; align-items: center; gap: min(.85rem,.95vw); background: rgba(255,255,255,.72); box-shadow: min(.5rem,.55vw) min(.5rem,.55vw) 0 rgba(185,110,66,.22); font-weight: 700; }
 .premium-google-mark img { width: min(1.75rem,1.95vw); height: min(1.75rem,1.95vw); }
 .premium-review-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: min(1.1rem,1.2vw); perspective: 1400px; }
-.premium-review-card { position: relative; min-height: min(30.5rem,34vw); padding: min(2.6rem,2.9vw); border: 1px solid rgba(107,60,31,.36); display: flex; flex-direction: column; overflow: hidden; background: linear-gradient(145deg,rgba(255,255,255,.86),rgba(237,225,208,.62)),url('/assets/textures/roofing-felt-fiber.webp') center / 560px,#f2eadf; box-shadow: 0 1.1rem 3.4rem rgba(4,20,33,.12),inset 0 0 0 8px rgba(185,110,66,.12); transform: rotate(calc((var(--premium-review-index) - 1) * .65deg)); transition: opacity .7s ease, transform .85s cubic-bezier(.2,.78,.2,1), box-shadow .3s ease; transition-delay: calc(var(--premium-review-index) * .1s); }
+.premium-review-card { position: relative; min-height: min(30.5rem,34vw); padding: min(2.6rem,2.9vw); border: 1px solid rgba(107,60,31,.36); display: flex; flex-direction: column; overflow: hidden; background: linear-gradient(145deg,rgba(255,255,255,.86),rgba(237,225,208,.62)),url('/assets/textures/roofing-felt-fiber.png') center / 560px,#f2eadf; box-shadow: 0 1.1rem 3.4rem rgba(4,20,33,.12),inset 0 0 0 8px rgba(185,110,66,.12); transform: rotate(calc((var(--premium-review-index) - 1) * .65deg)); transition: opacity .7s ease, transform .85s cubic-bezier(.2,.78,.2,1), box-shadow .3s ease; transition-delay: calc(var(--premium-review-index) * .1s); }
 .premium-review-card.is-visible:hover { z-index: 2; transform: translateY(-.6rem) rotate(0); box-shadow: 0 2rem 5rem rgba(4,20,33,.22),inset 0 0 0 8px rgba(185,110,66,.16); }
 .premium-review-fasteners i { position: absolute; width: .7rem; height: .7rem; border: 1px solid #6b3b21; border-radius: 50%; background: radial-gradient(circle at 35% 30%,#f1b37c,#7d4323 70%); box-shadow: 0 1px 3px rgba(0,0,0,.4); }
 .premium-review-fasteners i:nth-child(1) { top: .75rem; left: .75rem; }.premium-review-fasteners i:nth-child(2) { top: .75rem; right: .75rem; }.premium-review-fasteners i:nth-child(3) { bottom: .75rem; left: .75rem; }.premium-review-fasteners i:nth-child(4) { right: .75rem; bottom: .75rem; }
-.premium-review-card header { padding-bottom: min(1.5rem,1.7vw); border-bottom: 1px solid rgba(4,20,33,.14); display: grid; grid-template-columns: min(4.5rem,5vw) 1fr auto; gap: min(1rem,1.1vw); align-items: center; }
-.premium-review-card header img { width: min(4.5rem,5vw); height: min(4.5rem,5vw); border: 3px solid var(--premium-copper); border-radius: 50%; object-fit: cover; background: var(--premium-ink-2); }
+.premium-review-card header { padding-bottom: min(1.5rem,1.7vw); border-bottom: 1px solid rgba(4,20,33,.14); display: grid; grid-template-columns: min(6.73rem,7.48vw) 1fr auto; gap: min(1rem,1.1vw); align-items: center; }
+.premium-review-card header img { width: min(6.73rem,7.48vw); height: min(6.73rem,7.48vw); border: 3px solid var(--premium-copper); border-radius: 50%; object-fit: cover; background: var(--premium-ink-2); }
 .premium-review-card h3 { margin: 0; font-family: Antonio,sans-serif; font-size: min(1.55rem,1.72vw); font-weight: 600; text-transform: uppercase; }
 .premium-review-card header p { margin: min(.3rem,.33vw) 0 0; color: rgba(4,20,33,.62); font-size: min(.72rem,.8vw); text-transform: uppercase; }
-.premium-review-rating { color: var(--premium-orange); font-family: 'IBM Plex Mono',monospace; font-size: min(.66rem,.73vw); font-weight: 700; letter-spacing: .1em; }
+.premium-review-rating { position: relative; width: min(3.25rem,3.6vw); height: min(3.25rem,3.6vw); display: block; color: var(--premium-orange); font-family: 'IBM Plex Mono',monospace; font-size: min(1.15rem,1.3vw); font-style: normal; font-weight: 700; letter-spacing: 0; line-height: 1; }
+.premium-review-rating > span,
+.premium-review-rating > i { position: absolute; display: block; }
+.premium-review-rating > span:first-child { top: 0; left: 0; }
+.premium-review-rating > i { top: 50%; left: 50%; font-size: 1.35em; font-style: normal; transform: translate(-50%,-50%); }
+.premium-review-rating > span:last-child { right: 0; bottom: 0; }
 .premium-review-card blockquote { margin: min(2rem,2.2vw) 0; font-family: Antonio,sans-serif; font-size: min(2rem,1.8vw); font-weight: 600; line-height: 1.34; }
 .premium-review-card footer { margin-top: auto; padding-top: min(1.1rem,1.2vw); border-top: 1px solid rgba(4,20,33,.14); display: flex; justify-content: space-between; align-items: center; color: rgba(4,20,33,.55); font-family: 'IBM Plex Mono',monospace; font-size: min(.58rem,.64vw); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .premium-review-google-link { width: 100%; display: flex; justify-content: space-between; align-items: center; color: inherit; }
@@ -271,7 +276,7 @@
 .premium-review-google-link img { width: min(1.2rem,1.33vw); height: min(1.2rem,1.33vw); }
 
 .premium-support { padding-bottom: min(11vw,11rem); }
-.premium-support-console { padding: min(.75rem,.83vw); border: 1px solid var(--premium-copper-light); display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.8fr); color: #fff; background: linear-gradient(145deg,rgba(255,255,255,.08),transparent 28%),url('/assets/textures/powder-coated-navy-steel.webp') center / 900px,var(--premium-ink); box-shadow: var(--premium-shadow),inset 0 0 0 5px rgba(0,0,0,.35); }
+.premium-support-console { padding: min(.75rem,.83vw); border: 1px solid var(--premium-copper-light); display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.8fr); color: #fff; background: linear-gradient(145deg,rgba(255,255,255,.08),transparent 28%),url('/assets/textures/powder-coated-navy-steel.png') center / 900px,var(--premium-ink); box-shadow: var(--premium-shadow),inset 0 0 0 5px rgba(0,0,0,.35); }
 .premium-support-art { position: relative; min-height: min(42.5rem,47vw); overflow: hidden; background: radial-gradient(circle at center,rgba(70,115,167,.45),#06151f 70%); }
 .premium-support-art::before,.premium-support-art::after { content: ''; position: absolute; z-index: 3; inset: .9rem; border: 1px solid rgba(115,223,255,.28); pointer-events: none; }.premium-support-art::after { inset: 1.5rem; border-color: rgba(255,255,255,.08); }
 .premium-support-art > img { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: saturate(1.06); }
@@ -319,7 +324,7 @@
 .premium-footer-utility a:hover,.premium-footer-utility a:focus-visible { color: #fff; border-bottom-color: var(--premium-orange); }
 .premium-footer-utility > div { justify-content: flex-end; color: rgba(255,255,255,.6); font-family: 'IBM Plex Mono',monospace; font-size: min(.56rem,.62vw); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 
-.premium-persistent-cta { position: fixed; right: 1.6rem; bottom: max(1.6rem,env(safe-area-inset-bottom)); z-index: 18; width: min(24.4rem,calc(100vw - 2.25rem)); min-height: 4.6rem; padding: .45rem; border: 1px solid rgba(240,183,124,.9); display: grid; grid-template-columns: 3.5rem 1fr 3rem; align-items: center; gap: .75rem; color: #fff; background: linear-gradient(145deg,rgba(255,255,255,.11),transparent 32%),url('/assets/textures/powder-coated-navy-steel.webp') center / 600px,var(--premium-ink); box-shadow: 0 1.25rem 3.75rem rgba(2,12,19,.36),inset 0 0 0 3px rgba(0,0,0,.28); opacity: 0; transform: translateY(1.75rem) scale(.97); pointer-events: none; cursor: pointer; transition: opacity .3s ease,transform .5s cubic-bezier(.2,.8,.2,1); }
+.premium-persistent-cta { position: fixed; right: 1.6rem; bottom: max(1.6rem,env(safe-area-inset-bottom)); z-index: 18; width: min(24.4rem,calc(100vw - 2.25rem)); min-height: 4.6rem; padding: .45rem; border: 1px solid rgba(240,183,124,.9); display: grid; grid-template-columns: 3.5rem 1fr 3rem; align-items: center; gap: .75rem; color: #fff; background: linear-gradient(145deg,rgba(255,255,255,.11),transparent 32%),url('/assets/textures/powder-coated-navy-steel.png') center / 600px,var(--premium-ink); box-shadow: 0 1.25rem 3.75rem rgba(2,12,19,.36),inset 0 0 0 3px rgba(0,0,0,.28); opacity: 0; transform: translateY(1.75rem) scale(.97); pointer-events: none; cursor: pointer; transition: opacity .3s ease,transform .5s cubic-bezier(.2,.8,.2,1); }
 .premium-persistent-cta.is-visible { opacity: 1; transform: none; pointer-events: auto; }
 .premium-persistent-icon,.premium-persistent-arrow { align-self: stretch; display: grid; place-items: center; }.premium-persistent-icon { border: 1px solid rgba(240,183,124,.5); color: var(--premium-copper-light); background: rgba(185,110,66,.1); font-size: 1.3rem; }.premium-persistent-arrow { color: #fff; background: var(--premium-orange); font-size: 1.15rem; }
 .premium-persistent-copy { display: grid; gap: 3px; text-align: left; animation: premium-cta-copy .35s ease both; }.premium-persistent-copy small { color: var(--premium-copper-light); font-family: 'IBM Plex Mono',monospace; font-size: .55rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }.premium-persistent-copy strong { font-family: Antonio,sans-serif; font-size: 1rem; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; }
@@ -347,11 +352,11 @@
 .app.is-mobile-device .premium-reviews-heading h2 { max-width: 100%; margin-top: .8rem; }
 .app.is-mobile-device .premium-review-grid { display: flex; width: calc(100% + 28px); margin-inline: -14px; padding-inline: 14px; gap: 1.1rem; overflow-x: auto; scroll-snap-type: x mandatory; }
 .app.is-mobile-device .premium-review-card { flex: 0 0 88vw; min-height: 30rem; padding: 1.65rem; scroll-snap-align: center; transform: none; }
-.app.is-mobile-device .premium-review-card header { grid-template-columns: 3.65rem 1fr; gap: 1rem; padding-bottom: 1.5rem; }
-.app.is-mobile-device .premium-review-card header img { width: 3.65rem; height: 3.65rem; }
+.app.is-mobile-device .premium-review-card header { grid-template-columns: 5.46rem 1fr; gap: 1rem; padding-bottom: 1.5rem; }
+.app.is-mobile-device .premium-review-card header img { width: 5.46rem; height: 5.46rem; }
 .app.is-mobile-device .premium-review-card h3 { font-size: 1.55rem; }
 .app.is-mobile-device .premium-review-card header p { margin-top: .3rem; font-size: .72rem; }
-.app.is-mobile-device .premium-review-rating { grid-column: 2; font-size: .66rem; }
+.app.is-mobile-device .premium-review-rating { grid-column: 2; width: 3.25rem; height: 3.25rem; font-size: 1.15rem; }
 .app.is-mobile-device .premium-review-card blockquote { margin-block: 2rem; font-size: clamp(1.4rem,6vw,2rem); }
 .app.is-mobile-device .premium-review-card footer { padding-top: 1.1rem; font-size: .58rem; }
 .app.is-mobile-device .premium-review-google-link img { width: 1.2rem; height: 1.2rem; }
