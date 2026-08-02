@@ -17,6 +17,99 @@ function isMobileDevice() {
   return mobileUserAgent || touchDevice
 }
 
+type ViewportResizeAnchor = {
+  element: HTMLElement
+  elementRatio: number
+  viewportRatio: number
+}
+
+function useStableViewportOnResize(disabled: boolean) {
+  const anchorRef = useRef<ViewportResizeAnchor | null>(null)
+
+  useLayoutEffect(() => {
+    if (disabled) return
+
+    let resizeFrame = 0
+    let scrollFrame = 0
+    let resizing = false
+
+    const captureAnchor = () => {
+      if (document.body.classList.contains('gallery-modal-open')) {
+        anchorRef.current = null
+        return
+      }
+
+      const viewportX = window.innerWidth / 2
+      const viewportY = window.innerHeight / 2
+      const target = document.elementFromPoint(viewportX, viewportY)
+      const element = target?.closest<HTMLElement>('main > section, .premium-sections > section, footer#contact, header.site-header')
+      const bounds = element?.getBoundingClientRect()
+
+      if (!element || !bounds || bounds.height <= 0) {
+        anchorRef.current = null
+        return
+      }
+
+      anchorRef.current = {
+        element,
+        elementRatio: Math.min(1, Math.max(0, (viewportY - bounds.top) / bounds.height)),
+        viewportRatio: window.innerHeight > 0 ? viewportY / window.innerHeight : .5,
+      }
+    }
+
+    const restoreAnchor = () => {
+      const anchor = anchorRef.current
+      if (!anchor?.element.isConnected) {
+        captureAnchor()
+        return
+      }
+
+      const bounds = anchor.element.getBoundingClientRect()
+      const anchoredViewportY = bounds.top + bounds.height * anchor.elementRatio
+      const targetViewportY = window.innerHeight * anchor.viewportRatio
+      const delta = anchoredViewportY - targetViewportY
+
+      if (Math.abs(delta) > .5) {
+        const root = document.documentElement
+        const previousScrollBehavior = root.style.scrollBehavior
+        const maxScroll = Math.max(0, root.scrollHeight - window.innerHeight)
+        const nextScroll = Math.min(maxScroll, Math.max(0, window.scrollY + delta))
+        root.style.scrollBehavior = 'auto'
+        window.scrollTo({ top: nextScroll, left: window.scrollX, behavior: 'auto' })
+        root.style.scrollBehavior = previousScrollBehavior
+      }
+
+      captureAnchor()
+    }
+
+    const handleResize = () => {
+      resizing = true
+      window.cancelAnimationFrame(resizeFrame)
+      resizeFrame = window.requestAnimationFrame(() => {
+        restoreAnchor()
+        resizing = false
+      })
+    }
+
+    const handleScroll = () => {
+      if (resizing) return
+      window.cancelAnimationFrame(scrollFrame)
+      scrollFrame = window.requestAnimationFrame(captureAnchor)
+    }
+
+    captureAnchor()
+    window.addEventListener('resize', handleResize, { passive: true })
+    window.addEventListener('scroll', handleScroll, { passive: true })
+
+    return () => {
+      window.cancelAnimationFrame(resizeFrame)
+      window.cancelAnimationFrame(scrollFrame)
+      window.removeEventListener('resize', handleResize)
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [disabled])
+}
+
 function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -915,6 +1008,7 @@ function Gallery() {
 function App() {
   const mobileDevice = isMobileDevice()
   const [appointmentOpen, setAppointmentOpen] = useState(false)
+  useStableViewportOnResize(appointmentOpen)
   const openAppointment = () => setAppointmentOpen(true)
   return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={openAppointment} /><main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services mobileDevice={mobileDevice} /><Gallery /><PremiumSections onBook={openAppointment} /></main><PremiumFooter onBook={openAppointment} /><PersistentPremiumCta onBook={openAppointment} hidden={appointmentOpen} />{appointmentOpen && <AppointmentModal mobileDevice={mobileDevice} onClose={() => setAppointmentOpen(false)} />}</div>
 }
