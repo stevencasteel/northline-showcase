@@ -1,0 +1,11 @@
+Use case: stylized-concept
+Asset type: ultra-wide website navigation header background texture
+Primary request: Create a premium, extremely subtle macro surface of reinforced synthetic roofing underlayment for Northline Roofing's navigation bar, using the exact dominant base color #E5DCD2. The texture must feel like a real high-end roofer material while remaining quiet enough behind a navy, cream, and burnt-copper logo plus white navigation controls.
+Scene/backdrop: the entire frame is one uninterrupted flat sheet of synthetic roofing underlayment viewed perfectly straight-on; no environment, roll, tools, hands, roof, horizon, or perspective
+Style/medium: photorealistic macro material photography, architectural product sample, understated luxury, tactile but restrained
+Composition/framing: wide landscape source designed to be cropped into an extremely shallow 27.7:1 website navbar. Keep the surface uniform from the exact left edge to exact right edge. Add an exceptionally faint cross-woven reinforcement structure and sparse compressed fiber variations. Any registration structure should be abstract, nearly invisible, and distributed evenly—never a focal point.
+Lighting/mood: flat diffuse studio light, matte, calm, no directional shadow, no vignette, no glossy highlight
+Color palette: exact dominant warm cream #E5DCD2; fibers may vary only within #DDD2C7, #EEE7DF, and a tiny amount of muted warm grey #CFC5BB; no blue, orange, copper, black, or bright white marks
+Materials/textures: premium polymer roofing underlayment, micro cross-woven scrim, fine pressed fibers, subtle matte tooth, occasional minute mineral flecks, extremely shallow embossed grid detectable only on close inspection
+Constraints: no text, letters, numbers, logo, brand name, measurement marks, arrows, icons, printed instructions, stripes, border, seam, tear, hole, fold, large wrinkle, stain, dirt, water, roof granules, tar paper black, watermark, dramatic contrast, center focal point, or visible repeating tile. Navbar logo and controls must remain highly legible. Maintain the exact overall visual color #E5DCD2.
+Avoid: parchment, handmade paper, linen, canvas, burlap, cardboard, leather, plaster, concrete, wood, metal, shingles, felt, fiberglass insulation, fashion fabric, busy weave, deep wrinkles, obvious graph paper

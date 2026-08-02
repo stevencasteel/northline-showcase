@@ -10,7 +10,7 @@ body.gallery-modal-open { background: #102432; }
 ::-webkit-scrollbar-thumb { border: 3px solid #102432; border-radius: 999px; background: #d25f26; }
 ::-webkit-scrollbar-thumb:hover { background: #f18a54; }
 a { color: inherit; text-decoration: none; }
-.site-header { --brand-height: 4.39vw; aspect-ratio: 6821 / 246.57; padding: .99% 2.55%; background: #e5dcd2; display: flex; align-items: center; gap: 1.4%; position: relative; z-index: 2; }
+.site-header { --brand-height: 4.39vw; aspect-ratio: 6821 / 246.57; padding: .99% 2.55%; background: linear-gradient(rgba(229,220,210,.28), rgba(229,220,210,.28)), url('/assets/textures/navbar-underlayment.webp') center / cover no-repeat, #e5dcd2; display: flex; align-items: center; gap: 1.4%; position: relative; z-index: 2; }
 .site-header > * { animation: nav-drop-in .7s cubic-bezier(.22, 1, .36, 1) both; }
 .site-header > .brand { animation-delay: .04s; }
 .site-header > .primary-nav { animation-delay: .12s; }
@@ -166,7 +166,7 @@ h1 .hero-accent { color: #d25f26; }
 .badge-item p span { color: #fff; }
 .badge-divider { width: .38vw !important; height: 6.5vw !important; object-fit: contain !important; }
 .services-section { position: relative; overflow: hidden; padding: 3.2vw 2.55% 3.8vw; color: #041421; background: #e5dcd2; }
-.services-section::before { content: ''; position: absolute; top: 0; right: -32px; left: -32px; z-index: 3; height: clamp(16px, 1.5vw, 24px); background: linear-gradient(to bottom, rgba(4,20,33,.85), rgba(4,20,33,.30) 42%, rgba(4,20,33,0)); pointer-events: none; }
+.services-section::before { content: ''; position: absolute; top: 0; right: -32px; left: -32px; z-index: 3; height: clamp(18px, 1.75vw, 28px); background: linear-gradient(to bottom, rgba(4,20,33,.85), rgba(4,20,33,.28) 34%, rgba(4,20,33,.10) 64%, rgba(4,20,33,0)); pointer-events: none; }
 .services-layout { --services-rail-width: clamp(6.8rem, 8vw, 9rem); --services-layout-gap: clamp(1rem, 1.8vw, 2rem); display: grid; grid-template-columns: var(--services-rail-width) minmax(0, 1fr); align-items: start; column-gap: var(--services-layout-gap); }
 .services-brutalist-heading { align-self: stretch; margin: 0; border-right: .14vw solid #041421; opacity: 0; transform: translateY(1.2vw); position: relative; z-index: 2; }
 .services-brutalist-heading .section-kicker { position: absolute; top: 0; right: 1vw; font-family: Anton, sans-serif; font-size: 6.6vw; font-weight: 400; writing-mode: vertical-rl; }
