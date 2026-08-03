@@ -38,16 +38,6 @@ const serviceLocation = {
   mapsUrl: 'https://www.google.com/maps/search/?api=1&query=The%20Garden%2C%2026%20Gandalf%27s%20Cutting%2C%20Waikato%203472%2C%20New%20Zealand',
 }
 
-const ctaContexts = [
-  { section: 'top', eyebrow: 'Free roof inspection', label: 'Book an appointment' },
-  { section: 'services', eyebrow: 'Need a recommendation?', label: 'Choose my roof system' },
-  { section: 'work', eyebrow: 'Found the roof you want?', label: 'Price this roof' },
-  { section: 'protection', eyebrow: 'Concerned about hidden layers?', label: 'Inspect my roof' },
-  { section: 'reviews', eyebrow: 'Ready for the same care?', label: 'Book an appointment' },
-  { section: 'location', eyebrow: 'Inside the service area?', label: 'Check availability' },
-  { section: 'contact', eyebrow: 'Start with certainty', label: 'Book an appointment' },
-] as const
-
 function usePremiumReveal() {
   useEffect(() => {
     const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-premium-reveal]'))
@@ -183,27 +173,64 @@ export function PremiumFooter({ onBook }: BookHandler) {
   )
 }
 
-export function PersistentPremiumCta({ onBook, hidden }: BookHandler & { hidden: boolean }) {
-  const [activeSection, setActiveSection] = useState('top')
-  const [visible, setVisible] = useState(false)
+export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidden: boolean }) {
+  const [active, setActive] = useState(false)
 
   useEffect(() => {
-    const hero = document.getElementById('top')
-    const sections = ctaContexts.map((item) => document.getElementById(item.section)).filter((node): node is HTMLElement => Boolean(node))
-    const heroObserver = hero ? new IntersectionObserver(([entry]) => setVisible(!entry.isIntersecting), { threshold: .18 }) : null
-    if (hero && heroObserver) heroObserver.observe(hero)
-    const sectionObserver = new IntersectionObserver((entries) => {
-      const candidate = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
-      if (candidate?.target.id) setActiveSection(candidate.target.id)
-    }, { rootMargin: '-25% 0px -55%', threshold: [0, .2, .5, .8] })
-    sections.forEach((section) => sectionObserver.observe(section))
-    return () => { heroObserver?.disconnect(); sectionObserver.disconnect() }
+    let frame = 0
+    let previousScrollY = window.scrollY
+    const update = () => {
+      frame = 0
+      const scrollY = window.scrollY
+      const scrollingUp = scrollY < previousScrollY
+      previousScrollY = scrollY
+
+      if (scrollY <= 1) {
+        setActive(false)
+        return
+      }
+
+      const gallery = document.getElementById('work')
+      if (scrollingUp && gallery) {
+        const bounds = gallery.getBoundingClientRect()
+        const visibleHeight = Math.max(0, Math.min(bounds.bottom, window.innerHeight) - Math.max(bounds.top, 0))
+        const fullyVisibleHeight = Math.min(bounds.height, window.innerHeight)
+        if (fullyVisibleHeight > 0 && visibleHeight / fullyVisibleHeight >= .98) {
+          setActive(false)
+          return
+        }
+      }
+
+      const reviews = document.getElementById('reviews')
+      if (reviews && reviews.getBoundingClientRect().top <= window.innerHeight / 2) setActive(true)
+    }
+    const requestUpdate = () => {
+      if (!frame) frame = window.requestAnimationFrame(update)
+    }
+
+    update()
+    window.addEventListener('scroll', requestUpdate, { passive: true })
+    window.addEventListener('resize', requestUpdate)
+    return () => {
+      window.removeEventListener('scroll', requestUpdate)
+      window.removeEventListener('resize', requestUpdate)
+      if (frame) window.cancelAnimationFrame(frame)
+    }
   }, [])
 
-  const context = ctaContexts.find((item) => item.section === activeSection) ?? ctaContexts[0]
   return (
-    <button type="button" className={`premium-persistent-cta${visible && !hidden ? ' is-visible' : ''}`} onClick={onBook} aria-label={`${context.label}. ${context.eyebrow}`}>
-      <span className="premium-persistent-icon" aria-hidden="true">⌂</span><span className="premium-persistent-copy" key={context.section}><small>{context.eyebrow}</small><strong>{context.label}</strong></span><span className="premium-persistent-arrow" aria-hidden="true">↗</span>
+    <button
+      type="button"
+      className={`customer-service-hologram${active ? ' is-active' : ''}${hidden ? ' is-obscured' : ''}`}
+      onClick={onBook}
+      aria-label="Talk to customer service"
+      aria-hidden={!active || hidden}
+      tabIndex={active && !hidden ? 0 : -1}
+    >
+      <img className="customer-service-hologram-puck" src="/assets/customer service/customer_service_hologram_puck.png" alt="" aria-hidden="true" />
+      <span className="customer-service-hologram-reveal" aria-hidden="true">
+        <img src="/assets/customer service/customer_service_hologram_full.png" alt="" />
+      </span>
     </button>
   )
 }
