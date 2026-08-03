@@ -246,7 +246,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
             <feComposite in="outer-edge" in2="inner-edge" operator="out" result="edge-band" />
             <feFlood x="17%" y="49%" width="11%" height="7%" floodColor="#fff" result="armpit-exclusion" />
             <feComposite in="edge-band" in2="armpit-exclusion" operator="out" result="clean-edge-band" />
-            <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="8" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
+            <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="12" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
             <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" />
           </filter>
           <filter id="customer-service-hologram-ripple-b" x="-8%" y="-4%" width="116%" height="108%" colorInterpolationFilters="sRGB">
@@ -260,7 +260,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
             <feComposite in="outer-edge" in2="inner-edge" operator="out" result="edge-band" />
             <feFlood x="17%" y="49%" width="11%" height="7%" floodColor="#fff" result="armpit-exclusion" />
             <feComposite in="edge-band" in2="armpit-exclusion" operator="out" result="clean-edge-band" />
-            <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="8" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
+            <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="12" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
             <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" />
           </filter>
         </defs>
