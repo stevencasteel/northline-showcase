@@ -60,7 +60,7 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
     let frame = 0
     let offset = 0
     let travelDistance = 0
-    const speed = 65 // Temporarily 5× the original 13px/s while the loop is checked.
+    const speed = 13
 
     const measure = () => {
       const imageWidth = image.getBoundingClientRect().width
@@ -95,7 +95,7 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
       <div className="hero-sky-track" ref={skyTrackRef} aria-hidden="true">
         <img className="hero-sky" ref={skyImageRef} src={`${asset}hero/sky.png`} alt="Bright blue sky with fluffy white cumulus clouds over distant mountain ranges, designed as a seamless background layer for the Northline Roofing hero image." />
       </div>
-        <img className="hero-image" src={`${asset}hero/foreground.png`} alt="A wide panoramic image showing a human construction worker and a green-skinned orc installing tiles on the vast, intricate roof of a grand estate overlooking a pristine lake landscape. A middle-aged human with grey stubble leans forward on the right slope beside a muscular orc operating a bright orange power tool. The sweeping roof is clad in glossy bluish-green solar shingles with polished copper trim, arched dormers, and elegant finials; below, evergreen trees line a deep-blue bay toward distant mountains. The sky area is transparent so this foreground image can be paired with a separate sky layer." />
+        <img className="hero-image" src={`${asset}hero/foreground.png`} alt="A wide panoramic scene showing a human construction worker and a green-skinned orc installing tiles on the vast, intricate roof of a grand estate overlooking a pristine lake landscape. A middle-aged human with grey stubble leans forward on the right slope beside a muscular orc operating a bright orange power tool. The sweeping roof is clad in glossy bluish-green solar shingles with polished copper trim, arched dormers, and elegant finials; below, evergreen trees line a deep-blue bay toward distant mountains. The sky area is transparent so this foreground layer can be paired with a separate sky layer." />
       <div className="hero-overlay" />
       <div className="hero-content">
         <p className="eyebrow">Northline Roofing</p>
@@ -127,6 +127,7 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
           </div>
           <button className="modal-close" type="button" aria-label="Close appointment form" onClick={onClose}><X aria-hidden="true" /></button>
         </header>
+        <div className="appointment-modal-scroll">
         <form className="appointment-form" onSubmit={(event) => {
             event.preventDefault()
             setError('This appointment form is not connected yet. Please call (555) 555-5555 to schedule your inspection.')
@@ -151,6 +152,7 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
             <button className="appointment-submit" type="submit"><Send aria-hidden="true" /> <span>Book My Free Appointment</span></button>
             <p className="appointment-footnote">Mon–Fri, 8am–6pm · We’ll call to confirm · No obligation</p>
           </form>
+        </div>
       </section>
     </div>
   )
@@ -282,6 +284,7 @@ const roofMaterials = [
 
 // Keep the preview curated while the modal remains the complete gallery.
 const galleryPreviewIndices = [0, 2, 7, 9, 13, 16]
+const galleryObserverOptions: IntersectionObserverInit = { rootMargin: '20% 0px', threshold: 0.04 }
 
 function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHover, onActivate }: {
   direction: 'previous' | 'next'
@@ -482,8 +485,10 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   const [controlPressCount, setControlPressCount] = useState({ previous: 0, next: 0 })
   const [suppressArrowHover, setSuppressArrowHover] = useState(false)
   const [isClosing, setIsClosing] = useState(false)
+  const isClosingRef = useRef(false)
   const [closeShockwave, setCloseShockwave] = useState(0)
   const [closePressed, setClosePressed] = useState(false)
+  const closeTimerRef = useRef<number | null>(null)
   const activeImage = images[activeIndex]
 
   useEffect(() => {
@@ -496,30 +501,31 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
     return () => preloads.forEach((image) => { image.src = '' })
   }, [activeIndex, images])
 
-  const handleClose = () => {
-    if (isClosing) return
+  const handleClose = useCallback(() => {
+    if (isClosingRef.current) return
+    isClosingRef.current = true
     setCloseShockwave((current) => current + 1)
     setIsClosing(true)
-    window.setTimeout(onClose, 360)
-  }
+    closeTimerRef.current = window.setTimeout(onClose, 360)
+  }, [onClose])
 
   const navigate = useCallback((direction: -1 | 1) => {
     onSelect((activeIndex + direction + images.length) % images.length)
   }, [activeIndex, images.length, onSelect])
 
   useBodyScrollLock(true)
+  useDialogFocus(modalFrameRef, handleClose)
 
   useEffect(() => {
     document.body.classList.add('gallery-modal-open')
-    modalFrameRef.current?.focus()
     return () => {
       document.body.classList.remove('gallery-modal-open')
+      if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current)
     }
   }, [])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') handleClose()
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
         event.preventDefault()
         setSuppressArrowHover(true)
@@ -549,10 +555,10 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
       document.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('keyup', handleKeyUp)
     }
-  }, [activeControl, handleClose, navigate])
+  }, [activeControl, navigate])
 
   useEffect(() => {
-    sequenceListRef.current?.querySelector<HTMLElement>('[aria-current="true"]')?.scrollIntoView({ block: 'nearest' })
+    sequenceListRef.current?.querySelector<HTMLElement>('[aria-current="true"]')?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
   }, [activeIndex])
 
   return (
@@ -680,21 +686,17 @@ function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen, onHover
 
 function Gallery() {
   const sectionRef = useRef<HTMLElement>(null)
-  const showcaseRef = useRef<HTMLDivElement>(null)
   const swapCursorRef = useRef(galleryPreviewIndices.length)
-  const [images, setImages] = useState<GalleryImage[]>([])
-  const [visible, setVisible] = useState(false)
+  const images = galleryImages
+  const inView = useInView(sectionRef, galleryObserverOptions)
+  const documentVisible = useDocumentVisibility()
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
-  const [previewIndices, setPreviewIndices] = useState<number[]>([])
+  const [previewIndices, setPreviewIndices] = useState<number[]>(() => galleryPreviewIndices.filter((imageIndex) => galleryImages[imageIndex]))
   const hoveredSlotRef = useRef<number | null>(null)
+  const closeGallery = useCallback(() => setActiveIndex(null), [])
 
   useEffect(() => {
-    setImages(galleryImages)
-    setPreviewIndices(galleryPreviewIndices.filter((imageIndex) => galleryImages[imageIndex]))
-  }, [])
-
-  useEffect(() => {
-    if (!visible || activeIndex !== null || images.length <= previewIndices.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (!inView || !documentVisible || activeIndex !== null || images.length <= previewIndices.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const globalBuffer = 850
     const adjacencyBuffer = 1700
     const neighbors: number[][] = [
@@ -757,20 +759,7 @@ function Gallery() {
     return () => {
       window.clearTimeout(scheduler)
     }
-  }, [activeIndex, images.length, previewIndices.length, visible])
-
-  useEffect(() => {
-    const section = sectionRef.current
-    if (!section) return
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setVisible(true)
-        observer.disconnect()
-      }
-    }, { threshold: 0.04 })
-    observer.observe(section)
-    return () => observer.disconnect()
-  }, [])
+  }, [activeIndex, documentVisible, images.length, inView, previewIndices.length])
 
   const visibleImages = images.length
     ? previewIndices
@@ -782,13 +771,13 @@ function Gallery() {
   )
 
   return (
-    <section className={`gallery-section${visible ? ' is-visible' : ''}`} id="work" aria-labelledby="gallery-title" ref={sectionRef}>
+    <section className={`gallery-section${inView ? ' is-visible' : ''}`} id="work" aria-labelledby="gallery-title" ref={sectionRef}>
       <div className="gallery-layout">
         <div className="gallery-brutalist-heading">
           <p className="section-kicker" id="gallery-title">Gallery</p>
         </div>
         <div className="gallery-content">
-          <div className="gallery-showcase" ref={showcaseRef}>
+          <div className="gallery-showcase">
             {visibleImages.map(renderGalleryCard)}
           </div>
           <aside className="gallery-material-library" aria-labelledby="materials-title">
@@ -812,7 +801,7 @@ function Gallery() {
           </aside>
         </div>
       </div>
-      {activeIndex !== null && images[activeIndex] && <GalleryModal images={images} activeIndex={activeIndex} onSelect={setActiveIndex} onClose={() => setActiveIndex(null)} />}
+      {activeIndex !== null && images[activeIndex] && <GalleryModal images={images} activeIndex={activeIndex} onSelect={setActiveIndex} onClose={closeGallery} />}
     </section>
   )
 }
@@ -821,7 +810,7 @@ function App() {
   const [appointmentOpen, setAppointmentOpen] = useState(false)
   const openAppointment = useCallback(() => setAppointmentOpen(true), [])
   const closeAppointment = useCallback(() => setAppointmentOpen(false), [])
-  return <div className="app"><Header onBookAppointment={openAppointment} /><main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services /><Gallery /><span className="copper-edge-seam" aria-hidden="true" /><PremiumSections onBook={openAppointment} /></main><PremiumFooter onBook={openAppointment} /><CustomerServiceHologram onBook={openAppointment} hidden={appointmentOpen} />{appointmentOpen && <AppointmentModal onClose={closeAppointment} />}</div>
+  return <div className="app"><Header onBookAppointment={openAppointment} /><main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services /><Gallery /><span className="copper-edge-seam" aria-hidden="true" /><PremiumSections /></main><PremiumFooter onBook={openAppointment} /><CustomerServiceHologram onBook={openAppointment} hidden={appointmentOpen} />{appointmentOpen && <AppointmentModal onClose={closeAppointment} />}</div>
 }
 
 createRoot(document.getElementById('root')!).render(<App />)

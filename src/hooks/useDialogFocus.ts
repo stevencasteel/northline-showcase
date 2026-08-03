@@ -5,6 +5,7 @@ export function useDialogFocus(ref: RefObject<HTMLElement | null>, onClose: () =
     const dialog = ref.current
     const previous = document.activeElement as HTMLElement | null
     if (!dialog) return
+    let initialFocusFrame = 0
     const focusable = () => Array.from(dialog.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -14,7 +15,11 @@ export function useDialogFocus(ref: RefObject<HTMLElement | null>, onClose: () =
       }
       if (event.key !== 'Tab') return
       const controls = focusable()
-      if (!controls.length) return
+      if (!controls.length) {
+        event.preventDefault()
+        dialog.focus()
+        return
+      }
       const first = controls[0]
       const last = controls[controls.length - 1]
       if (event.shiftKey && document.activeElement === first) {
@@ -25,10 +30,17 @@ export function useDialogFocus(ref: RefObject<HTMLElement | null>, onClose: () =
         first.focus()
       }
     }
+    const handleFocusIn = (event: FocusEvent) => {
+      if (dialog.contains(event.target as Node)) return
+      ;(focusable()[0] ?? dialog).focus()
+    }
     dialog.addEventListener('keydown', handleKeyDown)
-    requestAnimationFrame(() => focusable()[0]?.focus())
+    document.addEventListener('focusin', handleFocusIn)
+    initialFocusFrame = requestAnimationFrame(() => (focusable()[0] ?? dialog).focus())
     return () => {
+      cancelAnimationFrame(initialFocusFrame)
       dialog.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('focusin', handleFocusIn)
       previous?.focus()
     }
   }, [onClose, ref])

@@ -66,7 +66,7 @@ function usePremiumReveal() {
   }, [])
 }
 
-function HowWeProtectSection(_: BookHandler) {
+function HowWeProtectSection() {
   const [split, setSplit] = useState(54)
   const [dragDirection, setDragDirection] = useState<ProtectionDragDirection>(null)
   const isDragging = useRef(false)
@@ -148,7 +148,7 @@ function HowWeProtectSection(_: BookHandler) {
   )
 }
 
-function GoogleReviewsSection(_: BookHandler) {
+function GoogleReviewsSection() {
   return (
     <section className="premium-reviews premium-shell" id="reviews">
       <div className="premium-reviews-heading" data-premium-reveal>
@@ -168,9 +168,9 @@ function GoogleReviewsSection(_: BookHandler) {
   )
 }
 
-export function PremiumSections({ onBook }: BookHandler) {
+export function PremiumSections() {
   usePremiumReveal()
-  return <div className="premium-sections"><HowWeProtectSection onBook={onBook} /><GoogleReviewsSection onBook={onBook} /></div>
+  return <div className="premium-sections"><HowWeProtectSection /><GoogleReviewsSection /></div>
 }
 
 export function PremiumFooter({ onBook }: BookHandler) {
@@ -223,7 +223,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return
-        setActive((current) => entry.target === gallery ? false : true)
+        setActive(entry.target === gallery ? false : true)
       })
     }, { threshold: .35 })
     if (reviews) observer.observe(reviews)
