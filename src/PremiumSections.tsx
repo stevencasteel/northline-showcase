@@ -243,8 +243,10 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
             <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="outer-edge" />
             <feMorphology in="SourceAlpha" operator="erode" radius="9" result="inner-edge" />
             <feComposite in="outer-edge" in2="inner-edge" operator="out" result="edge-band" />
+            <feFlood x="17%" y="49%" width="11%" height="7%" floodColor="#fff" result="armpit-exclusion" />
+            <feComposite in="edge-band" in2="armpit-exclusion" operator="out" result="clean-edge-band" />
             <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="8" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
-            <feComposite in="distorted-hologram" in2="edge-band" operator="in" />
+            <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" />
           </filter>
         </defs>
       </svg>
