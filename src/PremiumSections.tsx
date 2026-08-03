@@ -7,6 +7,7 @@ const underlaymentImage = '/assets/source/protection-underlayment.png'
 const protectionSphereImage = '/assets/ui/copper-sphere-etched-large-generated.png'
 const protectionSphereLeftImage = '/assets/ui/copper-sphere-etched-large-hover-left.png'
 const protectionSphereRightImage = '/assets/ui/copper-sphere-etched-large-hover-right.png'
+const protectionHoverTransitionMs = 240
 
 type ProtectionDragDirection = 'left' | 'right' | null
 
@@ -69,6 +70,11 @@ function HowWeProtectSection(_: BookHandler) {
   const [dragDirection, setDragDirection] = useState<ProtectionDragDirection>(null)
   const isDragging = useRef(false)
   const previousSplit = useRef(split)
+  const releaseTimeout = useRef<number | null>(null)
+
+  useEffect(() => () => {
+    if (releaseTimeout.current !== null) window.clearTimeout(releaseTimeout.current)
+  }, [])
 
   const setSplitFromPointer = (event: ReactPointerEvent<HTMLInputElement>) => {
     const bounds = event.currentTarget.getBoundingClientRect()
@@ -78,9 +84,12 @@ function HowWeProtectSection(_: BookHandler) {
 
   const startSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId)
+    if (releaseTimeout.current !== null) {
+      window.clearTimeout(releaseTimeout.current)
+      releaseTimeout.current = null
+    }
     isDragging.current = true
     previousSplit.current = Number(event.currentTarget.value)
-    setDragDirection(null)
     setSplitFromPointer(event)
   }
 
@@ -96,7 +105,11 @@ function HowWeProtectSection(_: BookHandler) {
   const endSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
     isDragging.current = false
-    setDragDirection(null)
+    if (releaseTimeout.current !== null) window.clearTimeout(releaseTimeout.current)
+    releaseTimeout.current = window.setTimeout(() => {
+      setDragDirection(null)
+      releaseTimeout.current = null
+    }, protectionHoverTransitionMs)
   }
 
   return (
