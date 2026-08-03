@@ -322,10 +322,13 @@
 .customer-service-hologram.is-obscured { opacity: 0; pointer-events: none; transition: opacity .2s ease; }
 .customer-service-hologram:hover { filter: drop-shadow(0 1.15rem 1.7rem rgba(2,12,19,.5)) brightness(1.06); }
 .customer-service-hologram:focus-visible { outline: 2px solid #fff; outline-offset: .2rem; }
-.customer-service-hologram-puck,.customer-service-hologram-reveal,.customer-service-hologram-reveal img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.customer-service-hologram-puck,.customer-service-hologram-reveal,.customer-service-hologram-reveal > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .customer-service-hologram-puck { display: block; }
 .customer-service-hologram-reveal { clip-path: inset(100% 0 0); transition: clip-path .58s cubic-bezier(.55,.05,.35,1); }
 .customer-service-hologram.is-active .customer-service-hologram-reveal { clip-path: inset(0); transition-delay: .48s; }
+.customer-service-hologram-distortion { filter: url('#customer-service-hologram-ripple'); opacity: 0; -webkit-mask-image: linear-gradient(to bottom,transparent 0 22%,rgba(0,0,0,.3) 27%,#000 34% 70%,rgba(0,0,0,.68) 79%,transparent 89%); mask-image: linear-gradient(to bottom,transparent 0 22%,rgba(0,0,0,.3) 27%,#000 34% 70%,rgba(0,0,0,.68) 79%,transparent 89%); animation: customer-service-ripple-cycle 4.2s linear infinite; }
+.customer-service-hologram-filter { position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
+@keyframes customer-service-ripple-cycle { 0%,100% { opacity: 0; } 9% { opacity: .52; } 84% { opacity: .62; } 94% { opacity: 0; } }
 
 .app.is-mobile-device .premium-shell { width: calc(100% - 28px); }
 .app.is-mobile-device .premium-kicker { font-size: .72rem; }
@@ -381,4 +384,5 @@
 @media (prefers-reduced-motion: reduce) {
   [data-premium-reveal] { opacity: 1; transform: none; }
   .premium-sections *, .premium-sections *::before, .premium-sections *::after, .premium-footer *, .premium-footer *::before, .premium-footer *::after, .customer-service-hologram, .customer-service-hologram * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
+  .customer-service-hologram-distortion { display: none; }
 }

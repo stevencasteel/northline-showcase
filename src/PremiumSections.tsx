@@ -230,7 +230,24 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
       <img className="customer-service-hologram-puck" src="/assets/customer service/customer_service_hologram_puck.png" alt="" aria-hidden="true" />
       <span className="customer-service-hologram-reveal" aria-hidden="true">
         <img src="/assets/customer service/customer_service_hologram_full.png" alt="" />
+        <img className="customer-service-hologram-distortion" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
       </span>
+      <svg className="customer-service-hologram-filter" aria-hidden="true">
+        <defs>
+          <filter id="customer-service-hologram-ripple" x="-8%" y="-4%" width="116%" height="108%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency=".012 .055" numOctaves="1" seed="7" result="ripple-noise" />
+            <feTile in="ripple-noise" result="tiled-ripple" />
+            <feOffset in="tiled-ripple" dy="-180" result="moving-ripple">
+              <animate attributeName="dy" from="-180" to="180" dur="4.2s" calcMode="linear" repeatCount="indefinite" />
+            </feOffset>
+            <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="outer-edge" />
+            <feMorphology in="SourceAlpha" operator="erode" radius="9" result="inner-edge" />
+            <feComposite in="outer-edge" in2="inner-edge" operator="out" result="edge-band" />
+            <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="8" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
+            <feComposite in="distorted-hologram" in2="edge-band" operator="in" />
+          </filter>
+        </defs>
+      </svg>
     </button>
   )
 }
