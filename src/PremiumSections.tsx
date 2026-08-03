@@ -1,10 +1,14 @@
-import { useEffect, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent as ReactFormEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import { ArrowRight, CalendarDays } from 'lucide-react'
 
 type BookHandler = { onBook: () => void }
 
 const underlaymentImage = '/assets/source/protection-underlayment.png'
 const protectionSphereImage = '/assets/ui/copper-sphere-etched-large-generated.png'
+const protectionSphereLeftImage = '/assets/ui/copper-sphere-etched-large-hover-left.png'
+const protectionSphereRightImage = '/assets/ui/copper-sphere-etched-large-hover-right.png'
+
+type ProtectionDragDirection = 'left' | 'right' | null
 
 const reviews = [
   {
@@ -62,6 +66,9 @@ function usePremiumReveal() {
 
 function HowWeProtectSection(_: BookHandler) {
   const [split, setSplit] = useState(54)
+  const [dragDirection, setDragDirection] = useState<ProtectionDragDirection>(null)
+  const isDragging = useRef(false)
+  const previousSplit = useRef(split)
 
   const setSplitFromPointer = (event: ReactPointerEvent<HTMLInputElement>) => {
     const bounds = event.currentTarget.getBoundingClientRect()
@@ -71,23 +78,39 @@ function HowWeProtectSection(_: BookHandler) {
 
   const startSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId)
+    isDragging.current = true
+    previousSplit.current = Number(event.currentTarget.value)
+    setDragDirection(null)
     setSplitFromPointer(event)
   }
 
-  const continueSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) setSplitFromPointer(event)
+  const handleSplitInput = (event: ReactFormEvent<HTMLInputElement>) => {
+    const nextSplit = Number(event.currentTarget.value)
+    if (isDragging.current && nextSplit !== previousSplit.current) {
+      setDragDirection(nextSplit > previousSplit.current ? 'right' : 'left')
+    }
+    previousSplit.current = nextSplit
+    setSplit(nextSplit)
+  }
+
+  const endSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+    isDragging.current = false
+    setDragDirection(null)
   }
 
   return (
     <section className="premium-protection premium-shell" id="protection">
       <div className="premium-protection-console" data-premium-reveal>
-        <div className="premium-protection-stage" style={{ '--premium-split': `${split}%` } as CSSProperties}>
+        <div className="premium-protection-stage" data-drag-direction={dragDirection ?? undefined} style={{ '--premium-split': `${split}%` } as CSSProperties}>
           <img className="premium-protection-image" src="/assets/source/protection-finished-roof.jpg" alt="A completed premium slate and copper roof" />
           <img className="premium-protection-image premium-protection-layer" src={underlaymentImage} alt="The same roof with its underlayment construction exposed" />
           <div className="premium-protection-divider" aria-hidden="true">
             <span className="premium-protection-thumb">
               <span className="premium-protection-thumb-surface">
-                <img className="premium-protection-sphere" src={protectionSphereImage} alt="" aria-hidden="true" />
+                <img className="premium-protection-sphere premium-protection-sphere-default" src={protectionSphereImage} alt="" aria-hidden="true" />
+                <img className="premium-protection-sphere premium-protection-sphere-left" src={protectionSphereLeftImage} alt="" aria-hidden="true" />
+                <img className="premium-protection-sphere premium-protection-sphere-right" src={protectionSphereRightImage} alt="" aria-hidden="true" />
               </span>
             </span>
           </div>
@@ -98,9 +121,10 @@ function HowWeProtectSection(_: BookHandler) {
             max="100"
             step="0.1"
             value={split}
-            onInput={(event) => setSplit(Number(event.currentTarget.value))}
+            onInput={handleSplitInput}
             onPointerDown={startSplitDrag}
-            onPointerMove={continueSplitDrag}
+            onPointerUp={endSplitDrag}
+            onPointerCancel={endSplitDrag}
             aria-label="Reveal underlayment"
             aria-valuetext={`${split}% finished roof, ${100 - split}% underlayment`}
           />
