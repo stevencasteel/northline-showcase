@@ -230,6 +230,8 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
       <img className="customer-service-hologram-puck" src="/assets/customer service/customer_service_hologram_puck.png" alt="" aria-hidden="true" />
       <span className="customer-service-hologram-reveal" aria-hidden="true">
         <img src="/assets/customer service/customer_service_hologram_full.png" alt="" />
+        <img className="customer-service-hologram-skew customer-service-hologram-skew-a" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
+        <img className="customer-service-hologram-skew customer-service-hologram-skew-b" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
         <img className="customer-service-hologram-distortion customer-service-hologram-distortion-a" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
         <img className="customer-service-hologram-distortion customer-service-hologram-distortion-b" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
       </span>
@@ -247,7 +249,12 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
             <feFlood x="17%" y="49%" width="11%" height="7%" floodColor="#fff" result="armpit-exclusion" />
             <feComposite in="edge-band" in2="armpit-exclusion" operator="out" result="clean-edge-band" />
             <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="12" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
-            <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" />
+            <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" result="ripple-output" />
+            <feComponentTransfer in="ripple-output">
+              <feFuncA type="linear" slope="0">
+                <animate attributeName="slope" values="0;0;1;1;0" keyTimes="0;.42;.5;.92;1" dur="4.2s" calcMode="linear" repeatCount="indefinite" />
+              </feFuncA>
+            </feComponentTransfer>
           </filter>
           <filter id="customer-service-hologram-ripple-b" x="-8%" y="-4%" width="116%" height="108%" colorInterpolationFilters="sRGB">
             <feTurbulence type="fractalNoise" baseFrequency=".012 .055" numOctaves="1" seed="7" result="ripple-noise" />
@@ -261,7 +268,32 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
             <feFlood x="17%" y="49%" width="11%" height="7%" floodColor="#fff" result="armpit-exclusion" />
             <feComposite in="edge-band" in2="armpit-exclusion" operator="out" result="clean-edge-band" />
             <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="12" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
-            <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" />
+            <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" result="ripple-output" />
+            <feComponentTransfer in="ripple-output">
+              <feFuncA type="linear" slope="0">
+                <animate attributeName="slope" values="0;0;1;1;0" keyTimes="0;.42;.5;.92;1" dur="4.2s" begin="-2.1s" calcMode="linear" repeatCount="indefinite" />
+              </feFuncA>
+            </feComponentTransfer>
+          </filter>
+          <filter id="customer-service-hologram-skew-a" x="-8%" y="-4%" width="116%" height="108%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency=".045 .012" numOctaves="1" seed="11" result="skew-noise" />
+            <feTile in="skew-noise" result="tiled-skew" />
+            <feOffset in="tiled-skew" dy="0" result="moving-skew" />
+            <feDisplacementMap in="SourceGraphic" in2="moving-skew" scale="13" xChannelSelector="R" yChannelSelector="G" result="skewed-hologram" />
+            <feFlood x="17%" y="49%" width="11%" height="7%" floodColor="#fff" result="armpit-exclusion" />
+            <feComposite in="skewed-hologram" in2="armpit-exclusion" operator="out" result="clean-skew" />
+            <feFlood x="29%" y="7%" width="43%" height="25%" floodColor="#fff" result="face-exclusion" />
+            <feComposite in="clean-skew" in2="face-exclusion" operator="out" />
+          </filter>
+          <filter id="customer-service-hologram-skew-b" x="-8%" y="-4%" width="116%" height="108%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency=".045 .012" numOctaves="1" seed="11" result="skew-noise" />
+            <feTile in="skew-noise" result="tiled-skew" />
+            <feOffset in="tiled-skew" dy="0" result="moving-skew" />
+            <feDisplacementMap in="SourceGraphic" in2="moving-skew" scale="13" xChannelSelector="R" yChannelSelector="G" result="skewed-hologram" />
+            <feFlood x="17%" y="49%" width="11%" height="7%" floodColor="#fff" result="armpit-exclusion" />
+            <feComposite in="skewed-hologram" in2="armpit-exclusion" operator="out" result="clean-skew" />
+            <feFlood x="29%" y="7%" width="43%" height="25%" floodColor="#fff" result="face-exclusion" />
+            <feComposite in="clean-skew" in2="face-exclusion" operator="out" />
           </filter>
         </defs>
       </svg>

@@ -326,12 +326,15 @@
 .customer-service-hologram-puck { display: block; }
 .customer-service-hologram-reveal { clip-path: inset(100% 0 0); transition: clip-path .58s cubic-bezier(.55,.05,.35,1); }
 .customer-service-hologram.is-active .customer-service-hologram-reveal { clip-path: inset(0); transition-delay: .48s; }
-.customer-service-hologram-distortion { opacity: 0; -webkit-mask-image: linear-gradient(to bottom,transparent 0 22%,rgba(0,0,0,.3) 27%,#000 34% 70%,rgba(0,0,0,.68) 79%,transparent 89%); mask-image: linear-gradient(to bottom,transparent 0 22%,rgba(0,0,0,.3) 27%,#000 34% 70%,rgba(0,0,0,.68) 79%,transparent 89%); }
-.customer-service-hologram-distortion-a { filter: url('#customer-service-hologram-ripple-a'); animation: customer-service-ripple-a 4.2s linear infinite; }
-.customer-service-hologram-distortion-b { filter: url('#customer-service-hologram-ripple-b'); animation: customer-service-ripple-b 4.2s linear infinite; }
+.customer-service-hologram-skew { opacity: 0; transform-origin: 50% 55%; -webkit-mask-image: linear-gradient(to bottom,rgba(0,0,0,.12) 0 15%,rgba(0,0,0,.24) 27%,rgba(0,0,0,.52) 35%,#000 43% 72%,rgba(0,0,0,.62) 82%,transparent 90%); mask-image: linear-gradient(to bottom,rgba(0,0,0,.12) 0 15%,rgba(0,0,0,.24) 27%,rgba(0,0,0,.52) 35%,#000 43% 72%,rgba(0,0,0,.62) 82%,transparent 90%); }
+.customer-service-hologram-skew-a { filter: url('#customer-service-hologram-skew-a'); animation: customer-service-skew-a 4.2s linear infinite; }
+.customer-service-hologram-skew-b { filter: url('#customer-service-hologram-skew-b'); animation: customer-service-skew-b 4.2s linear infinite; }
+.customer-service-hologram-distortion { opacity: .62; transform-origin: 50% 55%; -webkit-mask-image: linear-gradient(to bottom,transparent 0 22%,rgba(0,0,0,.3) 27%,#000 34% 70%,rgba(0,0,0,.68) 79%,transparent 89%); mask-image: linear-gradient(to bottom,transparent 0 22%,rgba(0,0,0,.3) 27%,#000 34% 70%,rgba(0,0,0,.68) 79%,transparent 89%); }
+.customer-service-hologram-distortion-a { filter: url('#customer-service-hologram-ripple-a'); }
+.customer-service-hologram-distortion-b { filter: url('#customer-service-hologram-ripple-b'); }
 .customer-service-hologram-filter { position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
-@keyframes customer-service-ripple-a { 0%,42%,100% { opacity: 0; } 50%,92% { opacity: .62; } }
-@keyframes customer-service-ripple-b { 0%,42%,100% { opacity: .62; } 50%,92% { opacity: 0; } }
+@keyframes customer-service-skew-a { 0%,42%,100% { opacity: 0; transform: translateX(-2.1px) skewX(-.27deg); } 50% { opacity: .32; transform: translateX(2.1px) skewX(.27deg); } 92% { opacity: .32; transform: translateX(-2.1px) skewX(-.27deg); } }
+@keyframes customer-service-skew-b { 0%,42%,100% { opacity: .32; transform: translateX(2.1px) skewX(.27deg); } 50% { opacity: 0; transform: translateX(-2.1px) skewX(-.27deg); } 92% { opacity: 0; transform: translateX(2.1px) skewX(.27deg); } }
 
 .app.is-mobile-device .premium-shell { width: calc(100% - 28px); }
 .app.is-mobile-device .premium-kicker { font-size: .72rem; }
