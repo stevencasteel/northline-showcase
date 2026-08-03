@@ -4,6 +4,7 @@ import { ArrowRight, CalendarDays } from 'lucide-react'
 type BookHandler = { onBook: () => void }
 
 const underlaymentImage = '/assets/source/protection-underlayment.png'
+const protectionSphereImage = '/assets/ui/copper-sphere-etched-large-generated.png'
 
 const reviews = [
   {
@@ -85,9 +86,9 @@ function HowWeProtectSection(_: BookHandler) {
           <img className="premium-protection-image premium-protection-layer" src={underlaymentImage} alt="The same roof with its underlayment construction exposed" />
           <div className="premium-protection-divider" aria-hidden="true">
             <span className="premium-protection-thumb">
-              <i className="premium-protection-arrow premium-protection-arrow-left" />
-              <i className="premium-protection-grip" />
-              <i className="premium-protection-arrow premium-protection-arrow-right" />
+              <span className="premium-protection-thumb-surface">
+                <img className="premium-protection-sphere" src={protectionSphereImage} alt="" aria-hidden="true" />
+              </span>
             </span>
           </div>
           <input
