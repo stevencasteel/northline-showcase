@@ -353,6 +353,7 @@
 .customer-service-hologram-skew { opacity: 0; transform-origin: 50% 55%; -webkit-mask-image: linear-gradient(to bottom,rgba(0,0,0,.12) 0 15%,rgba(0,0,0,.24) 27%,rgba(0,0,0,.52) 35%,#000 43% 72%,rgba(0,0,0,.62) 82%,transparent 90%); mask-image: linear-gradient(to bottom,rgba(0,0,0,.12) 0 15%,rgba(0,0,0,.24) 27%,rgba(0,0,0,.52) 35%,#000 43% 72%,rgba(0,0,0,.62) 82%,transparent 90%); }
 .customer-service-hologram-skew-a { filter: url('#customer-service-hologram-skew-a'); animation: customer-service-skew-a 4.2s linear infinite; }
 .customer-service-hologram-skew-b { filter: url('#customer-service-hologram-skew-b'); animation: customer-service-skew-b 4.2s linear infinite; }
+.customer-service-hologram:not(.is-active) .customer-service-hologram-skew { animation-play-state: paused; }
 .customer-service-hologram-distortion { opacity: .62; transform-origin: 50% 55%; -webkit-mask-image: linear-gradient(to bottom,transparent 0 22%,rgba(0,0,0,.3) 27%,#000 34% 70%,rgba(0,0,0,.68) 79%,transparent 89%); mask-image: linear-gradient(to bottom,transparent 0 22%,rgba(0,0,0,.3) 27%,#000 34% 70%,rgba(0,0,0,.68) 79%,transparent 89%); }
 .customer-service-hologram-distortion-a { filter: url('#customer-service-hologram-ripple-a'); }
 .customer-service-hologram-distortion-b { filter: url('#customer-service-hologram-ripple-b'); }
@@ -413,4 +414,22 @@
   [data-premium-reveal] { opacity: 1; transform: none; }
   .premium-sections *, .premium-sections *::before, .premium-sections *::after, .premium-footer *, .premium-footer *::before, .premium-footer *::after, .customer-service-hologram, .customer-service-hologram * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
   .customer-service-hologram-distortion { display: none; }
+}
+
+@media (max-width: 700px) {
+  .premium-shell { width: calc(100% - 28px); }
+  .premium-section-heading { grid-template-columns: 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  .premium-section-heading h2, .premium-reviews-heading h2 { font-size: clamp(3rem,15vw,5rem); }
+  .premium-section-heading > p:last-child { max-width: none; font-size: 1rem; }
+  .premium-button { min-height: 3.55rem; padding-inline: 1.5rem; gap: .9rem; font-size: .76rem; }
+  .premium-review-grid { display: flex; width: calc(100% + 28px); margin-inline: -14px; padding-inline: 14px; gap: 1.1rem; overflow-x: auto; scroll-snap-type: x mandatory; }
+  .premium-review-card { flex: 0 0 88vw; min-height: 30rem; padding: 1.65rem; scroll-snap-align: center; transform: none; }
+  .premium-footer { height: auto; }
+  .premium-footer-content { height: auto; padding-top: 3rem; padding-bottom: 9rem; }
+  .premium-footer-primary { grid-template-columns: 1fr; gap: 2.25rem; }
+  .premium-footer-brand { max-width: none; }
+  .premium-footer-book { width: 100%; max-width: none; height: 3.75rem; font-size: .82rem; }
+  .premium-footer-map { margin-top: 0; }
+  .premium-footer-utility { margin-top: 1.25rem; align-items: flex-start; flex-direction: column; gap: 1.5rem; }
+  .customer-service-hologram { right: .45rem; width: clamp(10rem,43vw,13rem); }
 }

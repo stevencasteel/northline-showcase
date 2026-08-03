@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent as ReactFormEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import { ArrowRight, CalendarDays } from 'lucide-react'
+import { useDocumentVisibility } from './hooks/useDocumentVisibility'
 
 type BookHandler = { onBook: () => void }
 
@@ -213,57 +214,33 @@ export function PremiumFooter({ onBook }: BookHandler) {
 
 export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidden: boolean }) {
   const [active, setActive] = useState(false)
+  const documentVisible = useDocumentVisibility()
 
   useEffect(() => {
-    let frame = 0
-    let previousScrollY = window.scrollY
-    const update = () => {
-      frame = 0
-      const scrollY = window.scrollY
-      const scrollingUp = scrollY < previousScrollY
-      previousScrollY = scrollY
-
-      if (scrollY <= 1) {
-        setActive(false)
-        return
-      }
-
-      const gallery = document.getElementById('work')
-      if (scrollingUp && gallery) {
-        const bounds = gallery.getBoundingClientRect()
-        const visibleHeight = Math.max(0, Math.min(bounds.bottom, window.innerHeight) - Math.max(bounds.top, 0))
-        const fullyVisibleHeight = Math.min(bounds.height, window.innerHeight)
-        if (fullyVisibleHeight > 0 && visibleHeight / fullyVisibleHeight >= .98) {
-          setActive(false)
-          return
-        }
-      }
-
-      const reviews = document.getElementById('reviews')
-      if (reviews && reviews.getBoundingClientRect().top <= window.innerHeight / 2) setActive(true)
-    }
-    const requestUpdate = () => {
-      if (!frame) frame = window.requestAnimationFrame(update)
-    }
-
-    update()
-    window.addEventListener('scroll', requestUpdate, { passive: true })
-    window.addEventListener('resize', requestUpdate)
-    return () => {
-      window.removeEventListener('scroll', requestUpdate)
-      window.removeEventListener('resize', requestUpdate)
-      if (frame) window.cancelAnimationFrame(frame)
-    }
+    const reviews = document.getElementById('reviews')
+    const gallery = document.getElementById('work')
+    if (!reviews && !gallery) return
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+        setActive((current) => entry.target === gallery ? false : true)
+      })
+    }, { threshold: .35 })
+    if (reviews) observer.observe(reviews)
+    if (gallery) observer.observe(gallery)
+    return () => observer.disconnect()
   }, [])
+
+  const showEffect = active && !hidden
 
   return (
     <button
       type="button"
-      className={`customer-service-hologram${active ? ' is-active' : ''}${hidden ? ' is-obscured' : ''}`}
+      className={`customer-service-hologram${showEffect ? ' is-active' : ''}${hidden ? ' is-obscured' : ''}`}
       onClick={onBook}
       aria-label="Talk to customer service"
-      aria-hidden={!active || hidden}
-      tabIndex={active && !hidden ? 0 : -1}
+      aria-hidden={!showEffect}
+      tabIndex={showEffect ? 0 : -1}
     >
       <img className="customer-service-hologram-puck" src="/assets/customer service/customer_service_hologram_puck.png" alt="" aria-hidden="true" />
       <span className="customer-service-hologram-reveal" aria-hidden="true">
@@ -273,7 +250,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
         <img className="customer-service-hologram-distortion customer-service-hologram-distortion-a" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
         <img className="customer-service-hologram-distortion customer-service-hologram-distortion-b" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
       </span>
-      <svg className="customer-service-hologram-filter" aria-hidden="true">
+      {showEffect && documentVisible && <svg className="customer-service-hologram-filter" aria-hidden="true">
         <defs>
           <filter id="customer-service-hologram-ripple-a" x="-8%" y="-4%" width="116%" height="108%" colorInterpolationFilters="sRGB">
             <feTurbulence type="fractalNoise" baseFrequency=".012 .055" numOctaves="1" seed="7" result="ripple-noise" />
@@ -334,7 +311,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
             <feComposite in="clean-skew" in2="face-exclusion" operator="out" />
           </filter>
         </defs>
-      </svg>
+      </svg>}
     </button>
   )
 }

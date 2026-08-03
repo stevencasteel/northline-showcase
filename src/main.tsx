@@ -1,113 +1,18 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ArrowRight, ArrowUpRight, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
 import './styles.css'
 import './premium-sections.css'
 import { CustomerServiceHologram, PremiumFooter, PremiumSections } from './PremiumSections'
+import { useBodyScrollLock } from './hooks/useBodyScrollLock'
+import { useDocumentVisibility } from './hooks/useDocumentVisibility'
+import { useInView } from './hooks/useInView'
+import { useDialogFocus } from './hooks/useDialogFocus'
 
 const asset = '/assets/'
 
 function AnimatedHeroLine({ text, accent = false }: { text: string; accent?: boolean }) {
   return <span className={`hero-line${accent ? ' hero-accent' : ''}`} style={{ '--line-delay': '.14s' } as React.CSSProperties} aria-hidden="true">{Array.from(text).map((character, index) => <span className="hero-char" style={{ '--char-index': index } as React.CSSProperties} key={`${character}-${index}`}>{character === ' ' ? '\u00a0' : character}</span>)}</span>
-}
-
-function isMobileDevice() {
-  const mobileUserAgent = /Android|iPhone|iPad|iPod|Windows Phone|webOS|BlackBerry/i.test(navigator.userAgent)
-  const touchDevice = navigator.maxTouchPoints > 0 && window.matchMedia('(pointer: coarse)').matches
-  return mobileUserAgent || touchDevice
-}
-
-type ViewportResizeAnchor = {
-  element: HTMLElement
-  elementRatio: number
-  viewportRatio: number
-}
-
-function useStableViewportOnResize(disabled: boolean) {
-  const anchorRef = useRef<ViewportResizeAnchor | null>(null)
-
-  useLayoutEffect(() => {
-    if (disabled) return
-
-    let resizeFrame = 0
-    let scrollFrame = 0
-    let resizing = false
-
-    const captureAnchor = () => {
-      if (document.body.classList.contains('gallery-modal-open')) {
-        anchorRef.current = null
-        return
-      }
-
-      const viewportX = window.innerWidth / 2
-      const viewportY = window.innerHeight / 2
-      const target = document.elementFromPoint(viewportX, viewportY)
-      const element = target?.closest<HTMLElement>('main > section, .premium-sections > section, footer#contact, header.site-header')
-      const bounds = element?.getBoundingClientRect()
-
-      if (!element || !bounds || bounds.height <= 0) {
-        anchorRef.current = null
-        return
-      }
-
-      anchorRef.current = {
-        element,
-        elementRatio: Math.min(1, Math.max(0, (viewportY - bounds.top) / bounds.height)),
-        viewportRatio: window.innerHeight > 0 ? viewportY / window.innerHeight : .5,
-      }
-    }
-
-    const restoreAnchor = () => {
-      const anchor = anchorRef.current
-      if (!anchor?.element.isConnected) {
-        captureAnchor()
-        return
-      }
-
-      const bounds = anchor.element.getBoundingClientRect()
-      const anchoredViewportY = bounds.top + bounds.height * anchor.elementRatio
-      const targetViewportY = window.innerHeight * anchor.viewportRatio
-      const delta = anchoredViewportY - targetViewportY
-
-      if (Math.abs(delta) > .5) {
-        const root = document.documentElement
-        const previousScrollBehavior = root.style.scrollBehavior
-        const maxScroll = Math.max(0, root.scrollHeight - window.innerHeight)
-        const nextScroll = Math.min(maxScroll, Math.max(0, window.scrollY + delta))
-        root.style.scrollBehavior = 'auto'
-        window.scrollTo({ top: nextScroll, left: window.scrollX, behavior: 'auto' })
-        root.style.scrollBehavior = previousScrollBehavior
-      }
-
-      captureAnchor()
-    }
-
-    const handleResize = () => {
-      resizing = true
-      window.cancelAnimationFrame(resizeFrame)
-      resizeFrame = window.requestAnimationFrame(() => {
-        restoreAnchor()
-        resizing = false
-      })
-    }
-
-    const handleScroll = () => {
-      if (resizing) return
-      window.cancelAnimationFrame(scrollFrame)
-      scrollFrame = window.requestAnimationFrame(captureAnchor)
-    }
-
-    captureAnchor()
-    window.addEventListener('resize', handleResize, { passive: true })
-    window.addEventListener('scroll', handleScroll, { passive: true })
-
-    return () => {
-      window.cancelAnimationFrame(resizeFrame)
-      window.cancelAnimationFrame(scrollFrame)
-      window.removeEventListener('resize', handleResize)
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [disabled])
 }
 
 function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
@@ -139,34 +44,54 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
 }
 
 function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
+  const heroRef = useRef<HTMLElement>(null)
   const skyTrackRef = useRef<HTMLDivElement>(null)
   const skyImageRef = useRef<HTMLImageElement>(null)
+  const inView = useInView(heroRef, { threshold: 0.01 })
+  const documentVisible = useDocumentVisibility()
 
   useEffect(() => {
+    const track = skyTrackRef.current
+    const image = skyImageRef.current
+    if (!track || !image || !inView || !documentVisible) return
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduceMotion) return
+
     let frame = 0
     let offset = 0
-    let previousTime = performance.now()
-    const speed = 13
+    let travelDistance = 0
+    const speed = 65 // Temporarily 5× the original 13px/s while the loop is checked.
 
-    const animateSky = (time: number) => {
+    const measure = () => {
+      const imageWidth = image.getBoundingClientRect().width
+      const viewportWidth = track.parentElement?.getBoundingClientRect().width ?? 0
+      travelDistance = Math.max(0, imageWidth - viewportWidth)
+      offset = travelDistance > 0 ? offset % travelDistance : 0
+    }
+    const animate = (time: number) => {
       const elapsed = time - previousTime
       previousTime = time
-      const imageWidth = skyImageRef.current?.getBoundingClientRect().width ?? 0
-      const viewportWidth = skyTrackRef.current?.parentElement?.getBoundingClientRect().width ?? 0
-      const scrollDistance = imageWidth - viewportWidth
-      if (scrollDistance > 0 && skyTrackRef.current) {
-        offset = (offset + speed * elapsed / 1000) % scrollDistance
-        skyTrackRef.current.style.transform = `translate3d(${-offset}px, 0, 0)`
+      if (travelDistance > 0) {
+        offset = (offset + speed * elapsed / 1000) % travelDistance
+        track.style.transform = `translate3d(${-offset}px, 0, 0)`
       }
-      frame = requestAnimationFrame(animateSky)
+      frame = window.requestAnimationFrame(animate)
     }
-
-    frame = requestAnimationFrame(animateSky)
-    return () => cancelAnimationFrame(frame)
-  }, [])
+    let previousTime = performance.now()
+    measure()
+    image.addEventListener('load', measure)
+    const resizeObserver = new ResizeObserver(measure)
+    resizeObserver.observe(track.parentElement ?? track)
+    frame = window.requestAnimationFrame(animate)
+    return () => {
+      window.cancelAnimationFrame(frame)
+      resizeObserver.disconnect()
+      image.removeEventListener('load', measure)
+    }
+  }, [documentVisible, inView])
 
   return (
-    <section className="hero" id="top">
+    <section className={`hero${inView && documentVisible ? ' is-sky-active' : ''}`} id="top" ref={heroRef}>
       <div className="hero-sky-track" ref={skyTrackRef} aria-hidden="true">
         <img className="hero-sky" ref={skyImageRef} src={`${asset}hero/sky.png`} alt="Bright blue sky with fluffy white cumulus clouds over distant mountain ranges, designed as a seamless background layer for the Northline Roofing hero image." />
       </div>
@@ -185,103 +110,15 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
   )
 }
 
-type AppointmentSelectOption = { value: string; label: string }
-
-function AppointmentSelect({ name, placeholder, value, options, invalid, onChange }: {
-  name: string
-  placeholder: string
-  value: string
-  options: AppointmentSelectOption[]
-  invalid: boolean
-  onChange: (value: string) => void
-}) {
-  const [open, setOpen] = useState(false)
-  const fieldRef = useRef<HTMLDivElement>(null)
-  const selectedLabel = options.find((option) => option.value === value)?.label
-
-  useEffect(() => {
-    if (!open) return
-    const closeOnOutsidePress = (event: PointerEvent) => {
-      if (!fieldRef.current?.contains(event.target as Node)) setOpen(false)
-    }
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false)
-    }
-    document.addEventListener('pointerdown', closeOnOutsidePress)
-    document.addEventListener('keydown', closeOnEscape)
-    return () => {
-      document.removeEventListener('pointerdown', closeOnOutsidePress)
-      document.removeEventListener('keydown', closeOnEscape)
-    }
-  }, [open])
-
-  return (
-    <div className="appointment-custom-select" ref={fieldRef}>
-      <input type="hidden" name={name} value={value} />
-      <button
-        className="appointment-select-trigger"
-        type="button"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-invalid={invalid}
-        onClick={() => setOpen(!open)}
-      >
-        <span>{selectedLabel ?? placeholder}</span>
-        <span className="appointment-select-chevron" aria-hidden="true" />
-      </button>
-      {open && (
-        <div className="appointment-select-menu" role="listbox" aria-label={placeholder}>
-          {options.map((option) => (
-            <button
-              className={value === option.value ? 'is-selected' : ''}
-              type="button"
-              role="option"
-              aria-selected={value === option.value}
-              key={option.value}
-              onClick={() => {
-                onChange(option.value)
-                setOpen(false)
-              }}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-const appointmentTimes: AppointmentSelectOption[] = [
-  { value: 'morning', label: 'Morning · 8am–12pm' },
-  { value: 'afternoon', label: 'Afternoon · 12pm–4pm' },
-  { value: 'late-afternoon', label: 'Late afternoon · 4pm–6pm' },
-]
-
-const appointmentServices: AppointmentSelectOption[] = [
-  { value: 'residential', label: 'Residential roofing system' },
-  { value: 'commercial', label: 'Commercial roofing system' },
-  { value: 'custom-metal', label: 'Custom metal fabrication' },
-  { value: 'storm-inspection', label: 'Storm or weather damage inspection' },
-  { value: 'repair', label: 'Roof repair and maintenance' },
-]
-
-function AppointmentModal({ onClose, mobileDevice }: { onClose: () => void; mobileDevice: boolean }) {
-  const [submitted, setSubmitted] = useState(false)
-  const [timePreference, setTimePreference] = useState('')
-  const [serviceType, setServiceType] = useState('')
-  const [validationAttempted, setValidationAttempted] = useState(false)
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose() }
-    document.body.style.overflow = 'hidden'
-    document.addEventListener('keydown', handleKeyDown)
-    return () => { document.body.style.overflow = ''; document.removeEventListener('keydown', handleKeyDown) }
-  }, [onClose])
+function AppointmentModal({ onClose }: { onClose: () => void }) {
+  const [error, setError] = useState('')
+  const modalRef = useRef<HTMLElement>(null)
+  useBodyScrollLock(true)
+  useDialogFocus(modalRef, onClose)
 
   return (
     <div className="appointment-backdrop" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) onClose() }}>
-      <section className="appointment-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-title">
+      <section className="appointment-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-title" ref={modalRef}>
         <header className="appointment-modal-header">
           <div>
             <p className="appointment-kicker">Northline Roofing</p>
@@ -290,22 +127,9 @@ function AppointmentModal({ onClose, mobileDevice }: { onClose: () => void; mobi
           </div>
           <button className="modal-close" type="button" aria-label="Close appointment form" onClick={onClose}><X aria-hidden="true" /></button>
         </header>
-        {submitted ? (
-          <div className="appointment-success">
-            <CheckCircle2 aria-hidden="true" />
-            <h3>Request received.</h3>
-            <p>A Northline specialist will call to confirm your appointment and learn more about your roof.</p>
-            <button className="button button-primary" type="button" onClick={onClose}>Back to the site</button>
-          </div>
-        ) : (
-          <form className="appointment-form" onSubmit={(event) => {
+        <form className="appointment-form" onSubmit={(event) => {
             event.preventDefault()
-            if (mobileDevice && (!timePreference || !serviceType)) {
-              setValidationAttempted(true)
-              requestAnimationFrame(() => document.querySelector<HTMLButtonElement>('.appointment-select-trigger[aria-invalid="true"]')?.focus())
-              return
-            }
-            setSubmitted(true)
+            setError('This appointment form is not connected yet. Please call (555) 555-5555 to schedule your inspection.')
           }}>
             <div className="form-grid form-grid-two form-grid-contact">
               <label><span>Full Name <b>*</b></span><div className="input-wrap"><UserRound aria-hidden="true" /><input required name="name" placeholder="Your full name" autoComplete="name" /></div></label>
@@ -319,17 +143,14 @@ function AppointmentModal({ onClose, mobileDevice }: { onClose: () => void; mobi
             </div>
             <div className="form-grid form-grid-two form-grid-appointment">
               <label><span>Preferred Date <b>*</b></span><div className="input-wrap"><CalendarDays aria-hidden="true" /><input required name="date" type="date" /></div><small>Mon–Fri · 24hr advance notice</small></label>
-              <label><span>Time Preference <b>*</b></span>{mobileDevice ? <AppointmentSelect name="time" placeholder="Select a time" value={timePreference} options={appointmentTimes} invalid={validationAttempted && !timePreference} onChange={setTimePreference} /> : <select required name="time"><option value="">Select a time</option><option>Morning · 8am–12pm</option><option>Afternoon · 12pm–4pm</option><option>Late afternoon · 4pm–6pm</option></select>}<small>We’ll call when we’re on the way</small></label>
+              <label><span>Time Preference <b>*</b></span><select required name="time"><option value="">Select a time</option><option value="morning">Morning · 8am–12pm</option><option value="afternoon">Afternoon · 12pm–4pm</option><option value="late-afternoon">Late afternoon · 4pm–6pm</option></select><small>We’ll call when we’re on the way</small></label>
             </div>
-            <label><span>Service Type <b>*</b></span>{mobileDevice ? <AppointmentSelect name="service" placeholder="Select a service" value={serviceType} options={appointmentServices} invalid={validationAttempted && !serviceType} onChange={setServiceType} /> : <select required name="service"><option value="">Select a service</option><option>Residential roofing system</option><option>Commercial roofing system</option><option>Custom metal fabrication</option><option>Storm or weather damage inspection</option><option>Roof repair and maintenance</option></select>}</label>
-            <label><span>Additional Notes</span><div className="input-wrap textarea-wrap"><MessageSquare aria-hidden="true" /><textarea name="notes" placeholder="Tell us about your roof or project..." onFocus={(event) => {
-              const notesField = event.currentTarget
-              window.setTimeout(() => notesField.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)
-            }} /></div></label>
+            <label><span>Service Type <b>*</b></span><select required name="service"><option value="">Select a service</option><option value="residential">Residential roofing system</option><option value="commercial">Commercial roofing system</option><option value="custom-metal">Custom metal fabrication</option><option value="storm-inspection">Storm or weather damage inspection</option><option value="repair">Roof repair and maintenance</option></select></label>
+            <label><span>Additional Notes</span><div className="input-wrap textarea-wrap"><MessageSquare aria-hidden="true" /><textarea name="notes" placeholder="Tell us about your roof or project..." /></div></label>
+            {error && <p className="appointment-form-error" role="alert"><CheckCircle2 aria-hidden="true" />{error}</p>}
             <button className="appointment-submit" type="submit"><Send aria-hidden="true" /> <span>Book My Free Appointment</span></button>
             <p className="appointment-footnote">Mon–Fri, 8am–6pm · We’ll call to confirm · No obligation</p>
           </form>
-        )}
       </section>
     </div>
   )
@@ -360,10 +181,9 @@ const services = [
   { title: 'Repairs & Inspections', image: 'services/repairs-inspections.jpg', alt: 'In bright daylight under a cloud-dappled sky, a humanoid dragon and an alien construction worker inspect the steep roof of an old-fashioned building overlooking lush green mountains. The dragon has vivid cobalt-blue scales, pale-gold scales beneath his jaw, ram-like horns fitted through a yellow hard hat, and a dark-clawed hand resting on polished reddish-gold copper flashing. Beside him, a grey-purple alien with four glowing amber eyes reviews a clipboard. Weathered greenish-grey slate shingles, a tall roof spire, copper, and strong sunlight fill the scene.' , text: 'Clear assessments and dependable repairs before a small issue becomes a larger one.' },
 ]
 
-function Services({ mobileDevice }: { mobileDevice: boolean }) {
+function Services() {
   const sectionRef = useRef<HTMLElement>(null)
   const [visible, setVisible] = useState(false)
-  const [activeService, setActiveService] = useState<number | null>(null)
 
   useEffect(() => {
     const section = sectionRef.current
@@ -388,16 +208,10 @@ function Services({ mobileDevice }: { mobileDevice: boolean }) {
         <div className="services-slice-grid">
           {services.map((service, index) => (
             <a
-              className={`service-slice${activeService === index ? ' is-active' : ''}`}
+              className="service-slice"
               href="#contact"
               key={service.title}
-              aria-label={`${activeService === index ? 'Close' : 'Open'} ${service.title} service details`}
-              aria-expanded={mobileDevice ? activeService === index : undefined}
-              onClick={(event) => {
-                if (!mobileDevice) return
-                event.preventDefault()
-                setActiveService(activeService === index ? null : index)
-              }}
+              aria-label={`${service.title} service — contact Northline Roofing`}
               style={{ '--service-index': index } as React.CSSProperties}
             >
               <img src={`${asset}${service.image}`} alt={service.alt} />
@@ -672,6 +486,16 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   const [closePressed, setClosePressed] = useState(false)
   const activeImage = images[activeIndex]
 
+  useEffect(() => {
+    const neighborIndexes = [activeIndex, (activeIndex - 1 + images.length) % images.length, (activeIndex + 1) % images.length]
+    const preloads = neighborIndexes.map((index) => {
+      const image = new Image()
+      image.src = `${asset}gallery/${images[index].file}`
+      return image
+    })
+    return () => preloads.forEach((image) => { image.src = '' })
+  }, [activeIndex, images])
+
   const handleClose = () => {
     if (isClosing) return
     setCloseShockwave((current) => current + 1)
@@ -683,21 +507,13 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
     onSelect((activeIndex + direction + images.length) % images.length)
   }, [activeIndex, images.length, onSelect])
 
+  useBodyScrollLock(true)
+
   useEffect(() => {
-    const previousOverflow = document.body.style.overflow
-    const previousRootOverflow = document.documentElement.style.overflow
-    const previousPaddingRight = document.body.style.paddingRight
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-    document.body.style.overflow = 'hidden'
-    document.documentElement.style.overflow = 'hidden'
     document.body.classList.add('gallery-modal-open')
-    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`
     modalFrameRef.current?.focus()
     return () => {
-      document.body.style.overflow = previousOverflow
-      document.documentElement.style.overflow = previousRootOverflow
       document.body.classList.remove('gallery-modal-open')
-      document.body.style.paddingRight = previousPaddingRight
     }
   }, [])
 
@@ -747,7 +563,7 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
             <span>Roofscape</span>
             <strong>{String(activeIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}</strong>
           </div>
-          <img src={`${asset}gallery/${activeImage.file}`} alt={activeImage.alt} />
+          <img src={`${asset}gallery/${activeImage.file}`} alt={activeImage.alt} decoding="async" />
           <GalleryArrowButton direction="previous" keyboardActive={activeControl === 'previous'} pressCount={controlPressCount.previous} suppressHover={suppressArrowHover} onActivate={() => navigate(-1)} />
           <GalleryArrowButton direction="next" keyboardActive={activeControl === 'next'} pressCount={controlPressCount.next} suppressHover={suppressArrowHover} onActivate={() => navigate(1)} />
         </div>
@@ -755,7 +571,7 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
           <div className="gallery-sequence-list" ref={sequenceListRef}>
             {images.map((image, imageIndex) => (
               <button className={activeIndex === imageIndex ? 'is-active' : ''} type="button" onClick={() => onSelect(imageIndex)} key={image.file} aria-label={`View image ${imageIndex + 1}: ${image.alt}`} aria-current={activeIndex === imageIndex ? 'true' : undefined}>
-                <img src={`${asset}gallery/${image.file}`} alt="" loading="eager" />
+                <img src={`${asset}gallery/${image.file}`} alt="" loading="lazy" decoding="async" />
                 <span>{String(imageIndex + 1).padStart(2, '0')}</span>
               </button>
             ))}
@@ -870,18 +686,7 @@ function Gallery() {
   const [visible, setVisible] = useState(false)
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [previewIndices, setPreviewIndices] = useState<number[]>([])
-  const [galleryRenderedHeight, setGalleryRenderedHeight] = useState(0)
   const hoveredSlotRef = useRef<number | null>(null)
-
-  useLayoutEffect(() => {
-    const showcase = showcaseRef.current
-    if (!showcase) return
-    const updateHeight = () => setGalleryRenderedHeight(showcase.getBoundingClientRect().height)
-    updateHeight()
-    const observer = new ResizeObserver(updateHeight)
-    observer.observe(showcase)
-    return () => observer.disconnect()
-  }, [visible, previewIndices.length])
 
   useEffect(() => {
     setImages(galleryImages)
@@ -903,12 +708,14 @@ function Gallery() {
     const lastFired = Array(galleryPreviewIndices.length).fill(-Infinity)
     const dueTimes = galleryPreviewIndices.map(() => performance.now() + 2000 + Math.random() * 4000)
     let lastGlobalFire = -Infinity
-    let cancelled = false
+    let scheduler = 0
 
-    const scheduler = window.setInterval(() => {
-      if (cancelled) return
+    const scheduleNext = () => {
       const now = performance.now()
-      if (now - lastGlobalFire < globalBuffer) return
+      if (now - lastGlobalFire < globalBuffer) {
+        scheduler = window.setTimeout(scheduleNext, globalBuffer)
+        return
+      }
 
       const eligibleSlots = dueTimes
         .map((dueTime, slot) => ({ dueTime, slot }))
@@ -920,7 +727,10 @@ function Gallery() {
         .sort((a, b) => a.dueTime - b.dueTime)
 
       const nextSlot = eligibleSlots[0]?.slot
-      if (nextSlot === undefined) return
+      if (nextSlot === undefined) {
+        scheduler = window.setTimeout(scheduleNext, 500)
+        return
+      }
 
       lastFired[nextSlot] = now
       lastGlobalFire = now
@@ -939,11 +749,13 @@ function Gallery() {
         swapCursorRef.current += 1
         return next
       })
-    }, 120)
+      const nextDue = Math.min(...dueTimes)
+      scheduler = window.setTimeout(scheduleNext, Math.max(250, nextDue - performance.now()))
+    }
+    scheduler = window.setTimeout(scheduleNext, Math.max(250, Math.min(...dueTimes) - performance.now()))
 
     return () => {
-      cancelled = true
-      window.clearInterval(scheduler)
+      window.clearTimeout(scheduler)
     }
   }, [activeIndex, images.length, previewIndices.length, visible])
 
@@ -972,14 +784,14 @@ function Gallery() {
   return (
     <section className={`gallery-section${visible ? ' is-visible' : ''}`} id="work" aria-labelledby="gallery-title" ref={sectionRef}>
       <div className="gallery-layout">
-        <div className="gallery-brutalist-heading" style={{ '--gallery-rendered-height': `${galleryRenderedHeight}px` } as React.CSSProperties}>
+        <div className="gallery-brutalist-heading">
           <p className="section-kicker" id="gallery-title">Gallery</p>
         </div>
-        <div className="gallery-content" style={{ height: galleryRenderedHeight ? `${galleryRenderedHeight}px` : undefined }}>
+        <div className="gallery-content">
           <div className="gallery-showcase" ref={showcaseRef}>
             {visibleImages.map(renderGalleryCard)}
           </div>
-          <aside className="gallery-material-library" aria-labelledby="materials-title" style={{ height: galleryRenderedHeight ? `${galleryRenderedHeight}px` : undefined }}>
+          <aside className="gallery-material-library" aria-labelledby="materials-title">
             <div className="gallery-material-heading">
               <span className="gallery-material-kicker">Northline / Roof systems</span>
               <h2 id="materials-title">Material library</h2>
@@ -1006,11 +818,10 @@ function Gallery() {
 }
 
 function App() {
-  const mobileDevice = isMobileDevice()
   const [appointmentOpen, setAppointmentOpen] = useState(false)
-  useStableViewportOnResize(appointmentOpen)
-  const openAppointment = () => setAppointmentOpen(true)
-  return <div className={mobileDevice ? 'app is-mobile-device' : 'app'}><Header onBookAppointment={openAppointment} /><main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services mobileDevice={mobileDevice} /><Gallery /><span className="copper-edge-seam" aria-hidden="true" /><PremiumSections onBook={openAppointment} /></main><PremiumFooter onBook={openAppointment} /><CustomerServiceHologram onBook={openAppointment} hidden={appointmentOpen} />{appointmentOpen && <AppointmentModal mobileDevice={mobileDevice} onClose={() => setAppointmentOpen(false)} />}</div>
+  const openAppointment = useCallback(() => setAppointmentOpen(true), [])
+  const closeAppointment = useCallback(() => setAppointmentOpen(false), [])
+  return <div className="app"><Header onBookAppointment={openAppointment} /><main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services /><Gallery /><span className="copper-edge-seam" aria-hidden="true" /><PremiumSections onBook={openAppointment} /></main><PremiumFooter onBook={openAppointment} /><CustomerServiceHologram onBook={openAppointment} hidden={appointmentOpen} />{appointmentOpen && <AppointmentModal onClose={closeAppointment} />}</div>
 }
 
 createRoot(document.getElementById('root')!).render(<App />)
