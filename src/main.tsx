@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { createRoot } from 'react-dom/client'
-import { ArrowRight, ArrowUpRight, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
+import { AlertCircle, ArrowRight, ArrowUpRight, CalendarDays, ChevronLeft, ChevronRight, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
 import './styles.css'
 import './premium-sections.css'
 import { CustomerServiceHologram, PremiumFooter, PremiumSections } from './PremiumSections'
@@ -8,6 +9,8 @@ import { useBodyScrollLock } from './hooks/useBodyScrollLock'
 import { useDocumentVisibility } from './hooks/useDocumentVisibility'
 import { useInView } from './hooks/useInView'
 import { useDialogFocus } from './hooks/useDialogFocus'
+import { ScaledArtboard } from './components/ScaledArtboard'
+import { siteConfig } from './config/site'
 
 const asset = '/assets/'
 
@@ -16,8 +19,6 @@ function AnimatedHeroLine({ text, accent = false }: { text: string; accent?: boo
 }
 
 function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
-  const [menuOpen, setMenuOpen] = useState(false)
-
   return (
     <header className="site-header" aria-describedby="site-header-background-description">
       <span id="site-header-background-description" className="visually-hidden">Background image: A wide, light beige background featuring a subtle, fine-grained texture resembling paper or smooth stone.</span>
@@ -30,15 +31,8 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
         <a href="#about">About</a>
         <a href="#contact">Contact</a>
       </nav>
-      <a className="header-phone" href="tel:+15555555555"><Phone size={17} strokeWidth={2.4} /> (555) 555-5555</a>
+      <a className="header-phone" href={siteConfig.phoneHref}><Phone size={17} strokeWidth={2.4} /> {siteConfig.phoneDisplay}</a>
       <button className="header-quote" type="button" onClick={onBookAppointment}><CalendarDays aria-hidden="true" /> <span>Book an Appointment</span> <ArrowRight aria-hidden="true" /></button>
-      <button className="menu-button" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}><span /><span /></button>
-      {menuOpen && <nav className="mobile-nav" aria-label="Mobile navigation">
-        <a href="#services" onClick={() => setMenuOpen(false)}>Services</a>
-        <a href="#work" onClick={() => setMenuOpen(false)}>Gallery</a>
-        <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
-        <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
-      </nav>}
     </header>
   )
 }
@@ -123,14 +117,14 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
           <div>
             <p className="appointment-kicker">Northline Roofing</p>
             <h2 id="appointment-title">Book an Appointment</h2>
-            <p>Free roof inspection — Mon–Fri, 8am–6pm</p>
+        <p>{siteConfig.appointmentSummary}</p>
           </div>
           <button className="modal-close" type="button" aria-label="Close appointment form" onClick={onClose}><X aria-hidden="true" /></button>
         </header>
         <div className="appointment-modal-scroll">
         <form className="appointment-form" onSubmit={(event) => {
             event.preventDefault()
-            setError('This appointment form is not connected yet. Please call (555) 555-5555 to schedule your inspection.')
+            setError(`This appointment form is not connected yet. Please call ${siteConfig.phoneDisplay} to schedule your inspection.`)
           }}>
             <div className="form-grid form-grid-two form-grid-contact">
               <label><span>Full Name <b>*</b></span><div className="input-wrap"><UserRound aria-hidden="true" /><input required name="name" placeholder="Your full name" autoComplete="name" /></div></label>
@@ -148,7 +142,7 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
             </div>
             <label><span>Service Type <b>*</b></span><select required name="service"><option value="">Select a service</option><option value="residential">Residential roofing system</option><option value="commercial">Commercial roofing system</option><option value="custom-metal">Custom metal fabrication</option><option value="storm-inspection">Storm or weather damage inspection</option><option value="repair">Roof repair and maintenance</option></select></label>
             <label><span>Additional Notes</span><div className="input-wrap textarea-wrap"><MessageSquare aria-hidden="true" /><textarea name="notes" placeholder="Tell us about your roof or project..." /></div></label>
-            {error && <p className="appointment-form-error" role="alert"><CheckCircle2 aria-hidden="true" />{error}</p>}
+            {error && <p className="appointment-form-error" role="alert"><AlertCircle aria-hidden="true" />{error}</p>}
             <button className="appointment-submit" type="submit"><Send aria-hidden="true" /> <span>Book My Free Appointment</span></button>
             <p className="appointment-footnote">Mon–Fri, 8am–6pm · We’ll call to confirm · No obligation</p>
           </form>
@@ -296,7 +290,6 @@ function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHov
   const arrowRef = useRef<HTMLSpanElement>(null)
   const animationRef = useRef<Animation | null>(null)
   const chargeFrameRef = useRef<number | null>(null)
-  const hoveringRef = useRef(false)
   const pressedRef = useRef(false)
   const pressStartedRef = useRef(0)
   const keyboardStartedRef = useRef(0)
@@ -433,11 +426,9 @@ function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHov
       type="button"
       aria-label={direction === 'previous' ? 'Previous image' : 'Next image'}
       onPointerEnter={() => {
-        hoveringRef.current = true
         if (!pressedRef.current && !keyboardActive) springArrowTo(0)
       }}
       onPointerLeave={() => {
-        hoveringRef.current = false
         if (!pressedRef.current && !keyboardActive) springArrowTo(0)
       }}
       onPointerDown={(event) => {
@@ -561,7 +552,7 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
     sequenceListRef.current?.querySelector<HTMLElement>('[aria-current="true"]')?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
   }, [activeIndex])
 
-  return (
+  const modal = (
     <div className={`gallery-modal-backdrop${isClosing ? ' is-closing' : ''}`} role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) handleClose() }}>
       <section className={`gallery-modal-frame${isClosing ? ' is-closing' : ''}`} role="dialog" aria-modal="true" aria-label="Roofscape gallery viewer" tabIndex={-1} ref={modalFrameRef}>
         <div className="gallery-modal-stage" onPointerMove={() => setSuppressArrowHover(false)}>
@@ -590,6 +581,8 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
       </section>
     </div>
   )
+
+  return createPortal(modal, document.body)
 }
 
 type GalleryCardProps = {
@@ -810,7 +803,17 @@ function App() {
   const [appointmentOpen, setAppointmentOpen] = useState(false)
   const openAppointment = useCallback(() => setAppointmentOpen(true), [])
   const closeAppointment = useCallback(() => setAppointmentOpen(false), [])
-  return <div className="app"><Header onBookAppointment={openAppointment} /><main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services /><Gallery /><span className="copper-edge-seam" aria-hidden="true" /><PremiumSections /></main><PremiumFooter onBook={openAppointment} /><CustomerServiceHologram onBook={openAppointment} hidden={appointmentOpen} />{appointmentOpen && <AppointmentModal onClose={closeAppointment} />}</div>
+  return (
+    <div className="app">
+      <ScaledArtboard>
+        <Header onBookAppointment={openAppointment} />
+        <main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services /><Gallery /><span className="copper-edge-seam" aria-hidden="true" /><PremiumSections /></main>
+        <PremiumFooter onBook={openAppointment} />
+      </ScaledArtboard>
+      <CustomerServiceHologram onBook={openAppointment} hidden={appointmentOpen} />
+      {appointmentOpen && <AppointmentModal onClose={closeAppointment} />}
+    </div>
+  )
 }
 
 createRoot(document.getElementById('root')!).render(<App />)

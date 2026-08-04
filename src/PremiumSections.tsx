@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent as ReactFormEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import { ArrowRight, CalendarDays } from 'lucide-react'
 import { useDocumentVisibility } from './hooks/useDocumentVisibility'
+import { siteConfig } from './config/site'
 
 type BookHandler = { onBook: () => void }
 
@@ -38,12 +39,6 @@ const reviews = [
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=The%20Shire%27s%20Rest%2C%20501%20Buckland%20Road%2C%20Hinuera%2C%20Matamata%203472%2C%20New%20Zealand',
   },
 ] as const
-
-const serviceLocation = {
-  name: 'The Garden',
-  embedUrl: 'https://www.google.com/maps?q=The%20Garden%2C%2026%20Gandalf%27s%20Cutting%2C%20Waikato%203472%2C%20New%20Zealand&t=k&z=18&output=embed',
-  mapsUrl: 'https://www.google.com/maps/search/?api=1&query=The%20Garden%2C%2026%20Gandalf%27s%20Cutting%2C%20Waikato%203472%2C%20New%20Zealand',
-}
 
 function usePremiumReveal() {
   useEffect(() => {
@@ -194,11 +189,11 @@ export function PremiumFooter({ onBook }: BookHandler) {
           <section className="premium-footer-map" id="location" aria-labelledby="premium-footer-map-title" data-premium-reveal>
             <div className="premium-footer-map-heading">
               <span id="premium-footer-map-title">Service area</span>
-              <a href={serviceLocation.mapsUrl} target="_blank" rel="noreferrer">Open in Google Maps ↗</a>
+              <a href={siteConfig.location.mapsUrl} target="_blank" rel="noreferrer">Open in Google Maps ↗</a>
             </div>
             <div className="premium-footer-map-frame">
               <img src="/assets/footer/map-frame.png" alt="" aria-hidden="true" />
-              <iframe src={serviceLocation.embedUrl} title={`Google Map showing ${serviceLocation.name}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+              <iframe src={siteConfig.location.embedUrl} title={`Google Map showing ${siteConfig.location.name}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
             </div>
           </section>
         </div>
