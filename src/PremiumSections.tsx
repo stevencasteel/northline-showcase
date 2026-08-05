@@ -315,6 +315,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
 }
 
 export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidden: boolean }) {
+  const hologramRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(false)
   const [hovered, setHovered] = useState(false)
   const documentVisible = useDocumentVisibility()
@@ -332,6 +333,26 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
   const rippleOffsetBRef = useRef<SVGFEOffsetElement>(null)
   const rippleAlphaARef = useRef<SVGFEFuncAElement>(null)
   const rippleAlphaBRef = useRef<SVGFEFuncAElement>(null)
+  const hologramAlphaRef = useRef<Uint8ClampedArray | null>(null)
+
+  useEffect(() => {
+    const image = new Image()
+    image.src = '/assets/customer%20service/customer_service_hologram_full.png'
+    const canvas = document.createElement('canvas')
+    canvas.width = 720
+    canvas.height = 1626
+    const context = canvas.getContext('2d', { willReadFrequently: true })
+    if (!context) return
+
+    const loadAlpha = () => {
+      context.clearRect(0, 0, canvas.width, canvas.height)
+      context.drawImage(image, 0, 0, canvas.width, canvas.height)
+      hologramAlphaRef.current = context.getImageData(0, 0, canvas.width, canvas.height).data
+    }
+    image.addEventListener('load', loadAlpha)
+    if (image.complete) loadAlpha()
+    return () => image.removeEventListener('load', loadAlpha)
+  }, [])
 
   useEffect(() => {
     const reviews = document.getElementById('reviews')
@@ -382,8 +403,22 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
     return () => window.cancelAnimationFrame(frame)
   }, [documentVisible, showEffect])
 
+  const updateHoverFromCoordinates = (clientX: number, clientY: number) => {
+    const alpha = hologramAlphaRef.current
+    const bounds = hologramRef.current?.getBoundingClientRect()
+    if (!alpha || !bounds) return
+    const x = Math.min(719, Math.max(0, Math.floor(((clientX - bounds.left) / bounds.width) * 720)))
+    const y = Math.min(1625, Math.max(0, Math.floor(((clientY - bounds.top) / bounds.height) * 1626)))
+    setHovered(alpha[(y * 720 + x) * 4 + 3] > 12)
+  }
+
+  const updateHoverFromPointer = (event: ReactPointerEvent<SVGSVGElement | HTMLButtonElement>) => {
+    updateHoverFromCoordinates(event.clientX, event.clientY)
+  }
+
   return (
     <div
+      ref={hologramRef}
       className={`customer-service-hologram${showEffect ? ' is-active' : ''}${hidden ? ' is-obscured' : ''}${hovered ? ' is-hovered' : ''}`}
       aria-hidden={!showEffect}
     >
@@ -457,13 +492,28 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
           <g className="customer-service-hologram-distortion customer-service-hologram-distortion-b" filter={`url(#${rippleBId})`} mask={`url(#${rippleMaskId})`}><image x="0" y="0" width="720" height="1626" href="/assets/customer%20service/customer_service_hologram_full.png" xlinkHref="/assets/customer%20service/customer_service_hologram_full.png" preserveAspectRatio="xMidYMid meet" /></g>
         </svg>
       </span>
+      <svg
+        className="customer-service-hologram-hover-target"
+        viewBox="0 0 720 1626"
+        preserveAspectRatio="xMidYMid meet"
+        xmlnsXlink="http://www.w3.org/1999/xlink"
+        pointerEvents="auto"
+        aria-hidden="true"
+        onPointerEnter={updateHoverFromPointer}
+        onPointerMove={updateHoverFromPointer}
+        onPointerLeave={() => setHovered(false)}
+        onPointerCancel={() => setHovered(false)}
+      >
+        <rect width="720" height="1626" fill="transparent" />
+      </svg>
       <button
         className="customer-service-hologram-hit"
         type="button"
         onClick={onBook}
         aria-label="Talk to customer service"
         tabIndex={showEffect ? 0 : -1}
-        onPointerEnter={() => setHovered(true)}
+        onPointerEnter={updateHoverFromPointer}
+        onPointerMove={updateHoverFromPointer}
         onPointerLeave={() => setHovered(false)}
         onPointerCancel={() => setHovered(false)}
       />
