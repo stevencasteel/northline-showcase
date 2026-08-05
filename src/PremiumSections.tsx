@@ -64,6 +64,7 @@ function usePremiumReveal() {
 function HowWeProtectSection() {
   const [split, setSplit] = useState(54)
   const [dragDirection, setDragDirection] = useState<ProtectionDragDirection>(null)
+  const [dragIndicatorVisible, setDragIndicatorVisible] = useState(false)
   const isDragging = useRef(false)
   const previousSplit = useRef(split)
   const releaseTimeout = useRef<number | null>(null)
@@ -86,6 +87,7 @@ function HowWeProtectSection() {
     }
     isDragging.current = true
     previousSplit.current = Number(event.currentTarget.value)
+    setDragIndicatorVisible(false)
     setSplitFromPointer(event)
   }
 
@@ -93,6 +95,7 @@ function HowWeProtectSection() {
     const nextSplit = Number(event.currentTarget.value)
     if (isDragging.current && nextSplit !== previousSplit.current) {
       setDragDirection(nextSplit > previousSplit.current ? 'right' : 'left')
+      setDragIndicatorVisible(true)
     }
     previousSplit.current = nextSplit
     setSplit(nextSplit)
@@ -101,6 +104,7 @@ function HowWeProtectSection() {
   const endSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
     isDragging.current = false
+    setDragIndicatorVisible(false)
     if (releaseTimeout.current !== null) window.clearTimeout(releaseTimeout.current)
     releaseTimeout.current = window.setTimeout(() => {
       setDragDirection(null)
@@ -111,7 +115,12 @@ function HowWeProtectSection() {
   return (
     <section className="premium-protection premium-shell" id="protection">
       <div className="premium-protection-console" data-premium-reveal>
-        <div className="premium-protection-stage" data-drag-direction={dragDirection ?? undefined} style={{ '--premium-split': `${split}%` } as CSSProperties}>
+        <div
+          className="premium-protection-stage"
+          data-drag-direction={dragDirection ?? undefined}
+          data-drag-indicator={dragIndicatorVisible && dragDirection ? 'visible' : undefined}
+          style={{ '--premium-split': `${split}%` } as CSSProperties}
+        >
           <img className="premium-protection-image" src="/assets/source/protection-finished-roof.jpg" alt="A completed premium slate and copper roof" />
           <img className="premium-protection-image premium-protection-layer" src={underlaymentImage} alt="The same roof with its underlayment construction exposed" />
           <div className="premium-protection-divider" aria-hidden="true">

@@ -113,11 +113,13 @@
 
 .premium-protection-stage[data-drag-direction='left'] .premium-protection-thumb::after {
   clip-path: inset(0 50% 0 0);
-  opacity: 1;
 }
 
 .premium-protection-stage[data-drag-direction='right'] .premium-protection-thumb::after {
   clip-path: inset(0 0 0 50%);
+}
+
+.premium-protection-stage[data-drag-indicator='visible'] .premium-protection-thumb::after {
   opacity: 1;
 }
 
@@ -154,8 +156,8 @@
   user-select: none;
 }
 .premium-protection-sphere-default { opacity: 1; }
-.premium-protection-stage[data-drag-direction='left'] .premium-protection-sphere-left,
-.premium-protection-stage[data-drag-direction='right'] .premium-protection-sphere-right {
+.premium-protection-stage[data-drag-indicator='visible'][data-drag-direction='left'] .premium-protection-sphere-left,
+.premium-protection-stage[data-drag-indicator='visible'][data-drag-direction='right'] .premium-protection-sphere-right {
   z-index: 1;
   opacity: 1;
 }
