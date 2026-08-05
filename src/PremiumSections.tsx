@@ -12,8 +12,10 @@ const protectionSphereRightImage = '/assets/ui/copper-sphere-etched-large-hover-
 const protectionHoverTransitionMs = 240
 
 type ProtectionDragDirection = 'left' | 'right' | null
+type ProtectionPointerMode = 'idle' | 'pending' | 'dragging'
 
 const clampProtectionSplit = (value: number) => Math.min(100, Math.max(0, Number(value.toFixed(1))))
+const protectionIntentThreshold = 10
 
 const reviews = [
   {
@@ -49,6 +51,10 @@ function usePremiumReveal() {
       elements.forEach((element) => element.classList.add('is-visible'))
       return
     }
+    if (!('IntersectionObserver' in window)) {
+      elements.forEach((element) => element.classList.add('is-visible'))
+      return
+    }
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -71,6 +77,9 @@ function HowWeProtectSection() {
   const isDragging = useRef(false)
   const previousSplit = useRef(split)
   const releaseTimeout = useRef<number | null>(null)
+  const pointerMode = useRef<ProtectionPointerMode>('idle')
+  const activePointerId = useRef<number | null>(null)
+  const pointerStart = useRef({ x: 0, y: 0, split })
 
   useEffect(() => () => {
     if (releaseTimeout.current !== null) window.clearTimeout(releaseTimeout.current)
@@ -100,20 +109,26 @@ function HowWeProtectSection() {
       releaseTimeout.current = null
     }
 
-    isDragging.current = true
-    previousSplit.current = split
+    pointerStart.current = { x: event.clientX, y: event.clientY, split }
+    activePointerId.current = event.pointerId
     setDragIndicatorVisible(false)
     setPointerFocusActive(true)
-
     event.currentTarget.focus({ preventScroll: true })
 
-    try {
-      event.currentTarget.setPointerCapture(event.pointerId)
-    } catch {
-      // Pointer capture is a robustness enhancement, not a reason to abort.
+    if (event.pointerType === 'mouse') {
+      pointerMode.current = 'dragging'
+      isDragging.current = true
+      previousSplit.current = split
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId)
+      } catch {
+        // Pointer capture is a robustness enhancement, not a reason to abort.
+      }
+      updateSplitFromClientX(event.currentTarget, event.clientX)
+    } else {
+      pointerMode.current = 'pending'
+      isDragging.current = false
     }
-
-    updateSplitFromClientX(event.currentTarget, event.clientX)
   }
 
   const handleSplitInput = (event: ReactFormEvent<HTMLInputElement>) => {
@@ -125,14 +140,38 @@ function HowWeProtectSection() {
   }
 
   const moveSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
+    if (activePointerId.current !== event.pointerId) return
+
+    if (pointerMode.current === 'pending') {
+      const dx = event.clientX - pointerStart.current.x
+      const dy = event.clientY - pointerStart.current.y
+      if (Math.abs(dx) < protectionIntentThreshold && Math.abs(dy) < protectionIntentThreshold) return
+      if (Math.abs(dy) > Math.abs(dx)) {
+        pointerMode.current = 'idle'
+        activePointerId.current = null
+        return
+      }
+
+      pointerMode.current = 'dragging'
+      isDragging.current = true
+      previousSplit.current = pointerStart.current.split
+      try {
+        event.currentTarget.setPointerCapture(event.pointerId)
+      } catch {
+        // Pointer capture is a robustness enhancement, not a reason to abort.
+      }
+    }
+
     if (!isDragging.current) return
     updateSplitFromClientX(event.currentTarget, event.clientX)
   }
 
   const finishSplitDrag = () => {
-    if (!isDragging.current) return
+    if (pointerMode.current === 'idle' && !isDragging.current && activePointerId.current === null) return
 
     isDragging.current = false
+    pointerMode.current = 'idle'
+    activePointerId.current = null
     setDragIndicatorVisible(false)
 
     if (releaseTimeout.current !== null) window.clearTimeout(releaseTimeout.current)
@@ -143,12 +182,30 @@ function HowWeProtectSection() {
   }
 
   const endSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
-    if (!isDragging.current) return
+    if (activePointerId.current !== event.pointerId) return
 
-    updateSplitFromClientX(event.currentTarget, event.clientX)
+    const pointerId = event.pointerId
+    const hasCapture = event.currentTarget.hasPointerCapture(pointerId)
+
+    if (pointerMode.current === 'pending') {
+      previousSplit.current = pointerStart.current.split
+      updateSplitFromClientX(event.currentTarget, event.clientX)
+      finishSplitDrag()
+    } else if (isDragging.current) {
+      updateSplitFromClientX(event.currentTarget, event.clientX)
+      finishSplitDrag()
+    } else {
+      finishSplitDrag()
+    }
+
+    if (hasCapture) event.currentTarget.releasePointerCapture(pointerId)
+  }
+
+  const cancelSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
+    if (activePointerId.current !== event.pointerId) return
+    const hasCapture = event.currentTarget.hasPointerCapture(event.pointerId)
     finishSplitDrag()
-
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+    if (hasCapture) event.currentTarget.releasePointerCapture(event.pointerId)
   }
 
   return (
@@ -158,11 +215,30 @@ function HowWeProtectSection() {
           className="premium-protection-stage"
           data-drag-direction={dragDirection ?? undefined}
           data-drag-indicator={dragIndicatorVisible && dragDirection ? 'visible' : undefined}
-          data-pointer-focus={pointerFocusActive ? 'true' : undefined}
           style={{ '--premium-split': `${split}%` } as CSSProperties}
         >
           <img className="premium-protection-image" src="/assets/source/protection-finished-roof.jpg" alt="A completed premium slate and copper roof" />
           <img className="premium-protection-image premium-protection-layer" src={underlaymentImage} alt="The same roof with its underlayment construction exposed" />
+          <input
+            className="premium-protection-range"
+            type="range"
+            min="0"
+            max="100"
+            step="0.1"
+            value={split}
+            data-pointer-focus={pointerFocusActive ? 'true' : undefined}
+            onInput={handleSplitInput}
+            onPointerDown={startSplitDrag}
+            onPointerMove={moveSplitDrag}
+            onPointerUp={endSplitDrag}
+            onPointerCancel={cancelSplitDrag}
+            onLostPointerCapture={finishSplitDrag}
+            onBlur={() => {
+              if (document.hasFocus()) setPointerFocusActive(false)
+            }}
+            aria-label="Reveal underlayment"
+            aria-valuetext={`${split}% finished roof, ${100 - split}% underlayment`}
+          />
           <div className="premium-protection-divider" aria-hidden="true">
             <span className="premium-protection-thumb">
               <span className="premium-protection-thumb-surface">
@@ -172,25 +248,6 @@ function HowWeProtectSection() {
               </span>
             </span>
           </div>
-          <input
-            className="premium-protection-range"
-            type="range"
-            min="0"
-            max="100"
-            step="0.1"
-            value={split}
-            onInput={handleSplitInput}
-            onPointerDown={startSplitDrag}
-            onPointerMove={moveSplitDrag}
-            onPointerUp={endSplitDrag}
-            onPointerCancel={endSplitDrag}
-            onLostPointerCapture={finishSplitDrag}
-            onBlur={() => {
-              if (document.hasFocus()) setPointerFocusActive(false)
-            }}
-            aria-label="Reveal underlayment"
-            aria-valuetext={`${split}% finished roof, ${100 - split}% underlayment`}
-          />
         </div>
       </div>
     </section>
@@ -269,6 +326,10 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
     const reviews = document.getElementById('reviews')
     const gallery = document.getElementById('work')
     if (!reviews && !gallery) return
+    if (!('IntersectionObserver' in window)) {
+      setActive(true)
+      return
+    }
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return

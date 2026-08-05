@@ -36,12 +36,25 @@ export function useDialogFocus(ref: RefObject<HTMLElement | null>, onClose: () =
     }
     dialog.addEventListener('keydown', handleKeyDown)
     document.addEventListener('focusin', handleFocusIn)
-    initialFocusFrame = requestAnimationFrame(() => (focusable()[0] ?? dialog).focus())
+    initialFocusFrame = requestAnimationFrame(() => {
+      const target = focusable()[0] ?? dialog
+      try {
+        target.focus({ preventScroll: true })
+      } catch {
+        target.focus()
+      }
+    })
     return () => {
       cancelAnimationFrame(initialFocusFrame)
       dialog.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('focusin', handleFocusIn)
-      previous?.focus()
+      if (previous) {
+        try {
+          previous.focus({ preventScroll: true })
+        } catch {
+          previous.focus()
+        }
+      }
     }
   }, [onClose, ref])
 }

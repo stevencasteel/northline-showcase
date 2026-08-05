@@ -74,12 +74,17 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
     let previousTime = performance.now()
     measure()
     image.addEventListener('load', measure)
-    const resizeObserver = new ResizeObserver(measure)
-    resizeObserver.observe(track.parentElement ?? track)
+    let resizeObserver: ResizeObserver | null = null
+    if ('ResizeObserver' in window) {
+      resizeObserver = new ResizeObserver(measure)
+      resizeObserver.observe(track.parentElement ?? track)
+    }
+    window.addEventListener('resize', measure)
     frame = window.requestAnimationFrame(animate)
     return () => {
       window.cancelAnimationFrame(frame)
-      resizeObserver.disconnect()
+      resizeObserver?.disconnect()
+      window.removeEventListener('resize', measure)
       image.removeEventListener('load', measure)
     }
   }, [documentVisible, inView])
@@ -184,6 +189,10 @@ function Services() {
   useEffect(() => {
     const section = sectionRef.current
     if (!section) return
+    if (!('IntersectionObserver' in window)) {
+      setVisible(true)
+      return
+    }
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         setVisible(true)
@@ -324,6 +333,19 @@ function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHov
     if (arrowRef.current) arrowRef.current.style.transform = `translate3d(${shift}px, 0, 0)`
   }, [])
 
+  const runArrowAnimation = useCallback((arrow: HTMLElement, keyframes: Keyframe[], options: KeyframeAnimationOptions, finalShift: number) => {
+    if (typeof arrow.animate !== 'function') {
+      setArrowShift(finalShift)
+      return null
+    }
+    const animation = arrow.animate(keyframes, options)
+    animation.onfinish = () => {
+      setArrowShift(finalShift)
+      animationRef.current = null
+    }
+    return animation
+  }, [setArrowShift])
+
   const springArrowTo = useCallback((target: number) => {
     const arrow = arrowRef.current
     if (!arrow) return
@@ -333,17 +355,13 @@ function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHov
       setArrowShift(target)
       return
     }
-    animationRef.current = arrow.animate([
+    animationRef.current = runArrowAnimation(arrow, [
       { transform: `translate3d(${start}px, 0, 0)`, offset: 0 },
       { transform: `translate3d(${target * 1.42}px, 0, 0)`, offset: .58 },
       { transform: `translate3d(${target * .88}px, 0, 0)`, offset: .82 },
       { transform: `translate3d(${target}px, 0, 0)`, offset: 1 },
-    ], { duration: 360, easing: 'cubic-bezier(.2,.82,.25,1)' })
-    animationRef.current.onfinish = () => {
-      setArrowShift(target)
-      animationRef.current = null
-    }
-  }, [readArrowShift, setArrowShift, stopArrowMotion])
+    ], { duration: 360, easing: 'cubic-bezier(.2,.82,.25,1)' }, target)
+  }, [readArrowShift, runArrowAnimation, setArrowShift, stopArrowMotion])
 
   const releaseArrow = useCallback((held: boolean, keyboardHold = false) => {
     const arrow = arrowRef.current
@@ -376,19 +394,16 @@ function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHov
           { transform: `translate3d(${pullbackOffset * .08}px, 0, 0)`, offset: .76 },
           { transform: 'translate3d(0, 0, 0)', offset: 1 },
         ]
-    animationRef.current = arrow.animate(keyframes, { duration: keyboardHold && held ? 360 : held ? 510 : 270, easing: keyboardHold && held ? 'cubic-bezier(.22,.8,.3,1)' : 'cubic-bezier(.2,.76,.22,1)' })
-    animationRef.current.onfinish = () => {
-      setArrowShift(0)
-      animationRef.current = null
-    }
-  }, [pullbackOffset, readArrowShift, setArrowShift, stopArrowMotion, travelOffset])
+    animationRef.current = runArrowAnimation(arrow, keyframes, { duration: keyboardHold && held ? 360 : held ? 510 : 270, easing: keyboardHold && held ? 'cubic-bezier(.22,.8,.3,1)' : 'cubic-bezier(.2,.76,.22,1)' }, 0)
+  }, [pullbackOffset, readArrowShift, runArrowAnimation, setArrowShift, stopArrowMotion, travelOffset])
 
-  const releasePointer = useCallback(() => {
+  const releasePointer = useCallback((event?: React.PointerEvent<HTMLButtonElement>) => {
     if (!pressedRef.current) return
     const held = performance.now() - pressStartedRef.current >= 150
     pressedRef.current = false
     setPointerPressed(false)
     releaseArrow(held)
+    if (event && event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
   }, [releaseArrow])
 
   useEffect(() => {
@@ -418,7 +433,11 @@ function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHov
     if (pressCount > 0 && keyboardActive) setShockwave((current) => current + 1)
   }, [keyboardActive, pressCount])
 
-  useEffect(() => () => stopArrowMotion(), [stopArrowMotion])
+  useEffect(() => () => {
+    pressedRef.current = false
+    setPointerPressed(false)
+    stopArrowMotion()
+  }, [stopArrowMotion])
 
   return (
     <button
@@ -432,8 +451,13 @@ function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHov
         if (!pressedRef.current && !keyboardActive) springArrowTo(0)
       }}
       onPointerDown={(event) => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return
         if (pressedRef.current) return
-        event.currentTarget.setPointerCapture(event.pointerId)
+        try {
+          event.currentTarget.setPointerCapture(event.pointerId)
+        } catch {
+          // Pointer capture is a robustness enhancement, not a reason to abort.
+        }
         pressedRef.current = true
         setPointerPressed(true)
         const currentShift = readArrowShift()
@@ -450,6 +474,7 @@ function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHov
       }}
       onPointerUp={releasePointer}
       onPointerCancel={releasePointer}
+      onLostPointerCapture={releasePointer}
       onClick={(event) => {
         if (event.detail !== 0) event.currentTarget.blur()
         setShockwave((current) => current + 1)

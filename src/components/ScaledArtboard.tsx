@@ -25,12 +25,26 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
     }
 
     update()
-    const resizeObserver = new ResizeObserver(update)
-    resizeObserver.observe(inner)
+    let resizeObserver: ResizeObserver | null = null
+    if ('ResizeObserver' in window) {
+      resizeObserver = new ResizeObserver(update)
+      resizeObserver.observe(inner)
+    }
     window.addEventListener('resize', update)
+    const imageListeners: HTMLImageElement[] = []
+    inner.querySelectorAll<HTMLImageElement>('img').forEach((image) => {
+      if (image.complete) return
+      image.addEventListener('load', update)
+      imageListeners.push(image)
+    })
+    const fontReady = document.fonts?.ready.then(update)
+    const initialFrame = window.requestAnimationFrame(update)
     return () => {
-      resizeObserver.disconnect()
+      resizeObserver?.disconnect()
       window.removeEventListener('resize', update)
+      imageListeners.forEach((image) => image.removeEventListener('load', update))
+      window.cancelAnimationFrame(initialFrame)
+      void fontReady
     }
   }, [])
 

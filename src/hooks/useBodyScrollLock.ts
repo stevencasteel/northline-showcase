@@ -3,17 +3,41 @@ import { useEffect } from 'react'
 export function useBodyScrollLock(locked: boolean) {
   useEffect(() => {
     if (!locked) return
-    const bodyOverflow = document.body.style.overflow
-    const rootOverflow = document.documentElement.style.overflow
-    const bodyPadding = document.body.style.paddingRight
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-    document.body.style.overflow = 'hidden'
-    document.documentElement.style.overflow = 'hidden'
-    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`
+    const scrollX = window.scrollX
+    const scrollY = window.scrollY
+    const body = document.body
+    const root = document.documentElement
+    const previous = {
+      bodyOverflow: body.style.overflow,
+      rootOverflow: root.style.overflow,
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyLeft: body.style.left,
+      bodyRight: body.style.right,
+      bodyWidth: body.style.width,
+      bodyPaddingRight: body.style.paddingRight,
+    }
+    const scrollbarWidth = window.innerWidth - root.clientWidth
+
+    root.style.overflow = 'hidden'
+    body.style.overflow = 'hidden'
+    body.style.position = 'fixed'
+    body.style.top = `${-scrollY}px`
+    body.style.left = `${-scrollX}px`
+    body.style.right = '0'
+    body.style.width = '100%'
+    if (scrollbarWidth > 0) body.style.paddingRight = `${scrollbarWidth}px`
+
     return () => {
-      document.body.style.overflow = bodyOverflow
-      document.documentElement.style.overflow = rootOverflow
-      document.body.style.paddingRight = bodyPadding
+      root.style.overflow = previous.rootOverflow
+      body.style.overflow = previous.bodyOverflow
+      body.style.position = previous.bodyPosition
+      body.style.top = previous.bodyTop
+      body.style.left = previous.bodyLeft
+      body.style.right = previous.bodyRight
+      body.style.width = previous.bodyWidth
+      body.style.paddingRight = previous.bodyPaddingRight
+      window.scrollTo(scrollX, scrollY)
     }
   }, [locked])
 }
