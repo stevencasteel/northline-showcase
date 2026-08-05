@@ -20,6 +20,7 @@ type AssociationBadge = {
   height: number
   kind: AssociationBadgeKind
   scale?: number
+  hoverScale?: number
 }
 
 const associationRows: AssociationBadge[][] = [
@@ -50,18 +51,18 @@ const associationRows: AssociationBadge[][] = [
   ],
   [
     { file: 'badge_row-2_01_ironmere.png', width: 1347, height: 880, kind: 'landscape' },
-    { file: 'badge_row-2_02_stormglass.png', width: 1523, height: 846, kind: 'landscape' },
-    { file: 'badge_row-2_03_stonewake.png', width: 2035, height: 660, kind: 'wide' },
+    { file: 'badge_row-2_02_stormglass.png', width: 1523, height: 846, kind: 'landscape', hoverScale: 1.10 },
+    { file: 'badge_row-2_03_stonewake.png', width: 2035, height: 660, kind: 'wide', hoverScale: 1.10 },
     { file: 'badge_row-2_04_ironpeak.png', width: 1226, height: 1205, kind: 'standard' },
     { file: 'badge_row-2_05_skyforge.png', width: 1331, height: 1032, kind: 'standard' },
-    { file: 'badge_row-2_06_northreach.png', width: 1751, height: 431, kind: 'ultrawide' },
+    { file: 'badge_row-2_06_northreach.png', width: 1751, height: 431, kind: 'ultrawide', hoverScale: 1.10 },
     { file: 'badge_row-2_07_celestial_canopy_co-op.png', width: 1194, height: 1199, kind: 'standard' },
     { file: 'badge_row-2_08_wyverns_nest.png', width: 1075, height: 1188, kind: 'standard' },
-    { file: 'badge_row-2_09_aegis.png', width: 1429, height: 611, kind: 'wide' },
+    { file: 'badge_row-2_09_aegis.png', width: 1429, height: 611, kind: 'wide', hoverScale: 1.10 },
     { file: 'badge_row-2_10_stoneweather.png', width: 1153, height: 1098, kind: 'standard' },
     { file: 'badge_row-2_11_skyreach.png', width: 1448, height: 1032, kind: 'landscape' },
     { file: 'badge_row-2_12_thornwall.png', width: 1277, height: 928, kind: 'landscape' },
-    { file: 'badge_row-2_13_aurelian.png', width: 1966, height: 629, kind: 'wide' },
+    { file: 'badge_row-2_13_aurelian.png', width: 1966, height: 629, kind: 'wide', hoverScale: 1.10 },
     { file: 'badge_row-2_14_eldercape.png', width: 1046, height: 1194, kind: 'standard' },
     { file: 'badge_row-2_15_gryphon.png', width: 1284, height: 1021, kind: 'standard' },
     { file: 'badge_row-2_16_moonkeep.png', width: 1213, height: 1215, kind: 'standard' },
@@ -342,7 +343,11 @@ export function PremiumSections() {
 
 export function AssociationsMarquee() {
   const sectionRef = useRef<HTMLElement>(null)
+  const trackRefs = useRef<Array<HTMLDivElement | null>>([])
+  const marqueeProgress = useRef([.27, .61])
+  const marqueeVelocity = useRef([0, 0])
   const [loadedAssociationFiles, setLoadedAssociationFiles] = useState<Set<string>>(() => new Set())
+  const [hoveredRow, setHoveredRow] = useState<number | null>(null)
   const inView = useInView(sectionRef, { rootMargin: '200px 0px' })
   const documentVisible = useDocumentVisibility()
   const isRunning = inView && documentVisible && loadedAssociationFiles.size >= associationBadgeCount
@@ -355,6 +360,35 @@ export function AssociationsMarquee() {
       return next
     })
   }
+
+  useEffect(() => {
+    if (!isRunning) {
+      marqueeVelocity.current = [0, 0]
+      return
+    }
+
+    let frame = 0
+    let previousTime = performance.now()
+    const speeds = [1 / 145, 1 / 155]
+
+    const animate = (time: number) => {
+      const delta = Math.min(time - previousTime, 48)
+      previousTime = time
+      marqueeProgress.current.forEach((progress, rowIndex) => {
+        const targetVelocity = hoveredRow === rowIndex ? 0 : 1
+        const easing = 1 - Math.exp(-delta / 260)
+        marqueeVelocity.current[rowIndex] += (targetVelocity - marqueeVelocity.current[rowIndex]) * easing
+        const nextProgress = (progress + speeds[rowIndex] * marqueeVelocity.current[rowIndex] * delta / 1000) % 1
+        marqueeProgress.current[rowIndex] = nextProgress
+        const translate = rowIndex === 0 ? -nextProgress * 50 : -50 + nextProgress * 50
+        trackRefs.current[rowIndex]?.style.setProperty('transform', `translate3d(${translate}%,0,0)`)
+      })
+      frame = requestAnimationFrame(animate)
+    }
+
+    frame = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(frame)
+  }, [hoveredRow, isRunning])
 
   const renderGroup = (row: AssociationBadge[], clone: boolean) => (
     <div className="associations-marquee-group" aria-hidden={clone || undefined}>
@@ -370,7 +404,7 @@ export function AssociationsMarquee() {
             loading="eager"
             onLoad={() => markAssociationFileReady(badge.file)}
             onError={() => markAssociationFileReady(badge.file)}
-            style={{ '--association-scale': badge.scale ?? 1 } as CSSProperties}
+            style={{ '--association-scale': badge.scale ?? 1, '--association-hover-scale': badge.hoverScale ?? (badge.scale ?? 1) * 1.14 } as CSSProperties}
           />
         </div>
       ))}
@@ -382,8 +416,8 @@ export function AssociationsMarquee() {
       <div className="associations-marquee-viewport">
         <div className="associations-marquee-rows">
         {associationRows.map((row, rowIndex) => (
-          <div className={`associations-marquee-row associations-marquee-row-${rowIndex + 1}`} key={rowIndex}>
-            <div className="associations-marquee-track">
+          <div className={`associations-marquee-row associations-marquee-row-${rowIndex + 1}`} key={rowIndex} onMouseEnter={() => setHoveredRow(rowIndex)} onMouseLeave={() => setHoveredRow((current) => current === rowIndex ? null : current)}>
+            <div className="associations-marquee-track" ref={(element) => { trackRefs.current[rowIndex] = element }}>
               {renderGroup(row, false)}
               {renderGroup(row, true)}
             </div>
