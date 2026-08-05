@@ -48,8 +48,6 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
     const track = skyTrackRef.current
     const image = skyImageRef.current
     if (!track || !image || !inView || !documentVisible) return
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduceMotion) return
 
     let frame = 0
     let offset = 0
@@ -351,27 +349,19 @@ function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHov
     if (!arrow) return
     const start = readArrowShift()
     stopArrowMotion()
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setArrowShift(target)
-      return
-    }
     animationRef.current = runArrowAnimation(arrow, [
       { transform: `translate3d(${start}px, 0, 0)`, offset: 0 },
       { transform: `translate3d(${target * 1.42}px, 0, 0)`, offset: .58 },
       { transform: `translate3d(${target * .88}px, 0, 0)`, offset: .82 },
       { transform: `translate3d(${target}px, 0, 0)`, offset: 1 },
     ], { duration: 360, easing: 'cubic-bezier(.2,.82,.25,1)' }, target)
-  }, [readArrowShift, runArrowAnimation, setArrowShift, stopArrowMotion])
+  }, [readArrowShift, runArrowAnimation, stopArrowMotion])
 
   const releaseArrow = useCallback((held: boolean, keyboardHold = false) => {
     const arrow = arrowRef.current
     if (!arrow) return
     const start = readArrowShift()
     stopArrowMotion()
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setArrowShift(0)
-      return
-    }
     const keyframes = keyboardHold && held
       ? [
           { transform: `translate3d(${start}px, 0, 0)`, offset: 0 },
@@ -395,7 +385,7 @@ function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHov
           { transform: 'translate3d(0, 0, 0)', offset: 1 },
         ]
     animationRef.current = runArrowAnimation(arrow, keyframes, { duration: keyboardHold && held ? 360 : held ? 510 : 270, easing: keyboardHold && held ? 'cubic-bezier(.22,.8,.3,1)' : 'cubic-bezier(.2,.76,.22,1)' }, 0)
-  }, [pullbackOffset, readArrowShift, runArrowAnimation, setArrowShift, stopArrowMotion, travelOffset])
+  }, [pullbackOffset, readArrowShift, runArrowAnimation, stopArrowMotion, travelOffset])
 
   const releasePointer = useCallback((event?: React.PointerEvent<HTMLButtonElement>) => {
     if (!pressedRef.current) return
@@ -714,7 +704,7 @@ function Gallery() {
   const closeGallery = useCallback(() => setActiveIndex(null), [])
 
   useEffect(() => {
-    if (!inView || !documentVisible || activeIndex !== null || images.length <= previewIndices.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (!inView || !documentVisible || activeIndex !== null || images.length <= previewIndices.length) return
     const globalBuffer = 850
     const adjacencyBuffer = 1700
     const neighbors: number[][] = [

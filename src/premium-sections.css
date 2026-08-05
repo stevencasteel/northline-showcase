@@ -291,10 +291,3 @@
 .customer-service-hologram-filter { position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
 @keyframes customer-service-skew-a { 0%,42%,100% { opacity: 0; transform: translateX(-2.1px) skewX(-.27deg); } 50% { opacity: .32; transform: translateX(2.1px) skewX(.27deg); } 92% { opacity: .32; transform: translateX(-2.1px) skewX(-.27deg); } }
 @keyframes customer-service-skew-b { 0%,42%,100% { opacity: .32; transform: translateX(2.1px) skewX(.27deg); } 50% { opacity: 0; transform: translateX(-2.1px) skewX(-.27deg); } 92% { opacity: 0; transform: translateX(2.1px) skewX(.27deg); } }
-
-
-@media (prefers-reduced-motion: reduce) {
-  [data-premium-reveal] { opacity: 1; transform: none; }
-  .premium-sections *, .premium-sections *::before, .premium-sections *::after, .premium-footer *, .premium-footer *::before, .premium-footer *::after, .customer-service-hologram, .customer-service-hologram * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; transition-delay: 0s !important; scroll-behavior: auto !important; }
-  .customer-service-hologram-distortion { display: none; }
-}

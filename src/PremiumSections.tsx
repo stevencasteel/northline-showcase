@@ -47,10 +47,6 @@ const reviews = [
 function usePremiumReveal() {
   useEffect(() => {
     const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-premium-reveal]'))
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      elements.forEach((element) => element.classList.add('is-visible'))
-      return
-    }
     if (!('IntersectionObserver' in window)) {
       elements.forEach((element) => element.classList.add('is-visible'))
       return
@@ -348,15 +344,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
       className={`customer-service-hologram${showEffect ? ' is-active' : ''}${hidden ? ' is-obscured' : ''}`}
       aria-hidden={!showEffect}
     >
-      <img className="customer-service-hologram-puck" src="/assets/customer service/customer_service_hologram_puck.png" alt="" aria-hidden="true" />
-      <span className="customer-service-hologram-reveal" aria-hidden="true">
-        <img src="/assets/customer service/customer_service_hologram_full.png" alt="" />
-        <img className="customer-service-hologram-skew customer-service-hologram-skew-a" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
-        <img className="customer-service-hologram-skew customer-service-hologram-skew-b" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
-        <img className="customer-service-hologram-distortion customer-service-hologram-distortion-a" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
-        <img className="customer-service-hologram-distortion customer-service-hologram-distortion-b" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
-      </span>
-      {showEffect && documentVisible && <svg className="customer-service-hologram-filter" aria-hidden="true">
+      {documentVisible && <svg className="customer-service-hologram-filter" aria-hidden="true">
         <defs>
           <filter id="customer-service-hologram-ripple-a" x="-8%" y="-4%" width="116%" height="108%" colorInterpolationFilters="sRGB">
             <feTurbulence type="fractalNoise" baseFrequency=".012 .055" numOctaves="1" seed="7" result="ripple-noise" />
@@ -418,6 +406,14 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
           </filter>
         </defs>
       </svg>}
+      <img className="customer-service-hologram-puck" src="/assets/customer service/customer_service_hologram_puck.png" alt="" aria-hidden="true" />
+      <span className="customer-service-hologram-reveal" aria-hidden="true">
+        <img src="/assets/customer service/customer_service_hologram_full.png" alt="" />
+        <img className="customer-service-hologram-skew customer-service-hologram-skew-a" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
+        <img className="customer-service-hologram-skew customer-service-hologram-skew-b" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
+        <img className="customer-service-hologram-distortion customer-service-hologram-distortion-a" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
+        <img className="customer-service-hologram-distortion customer-service-hologram-distortion-b" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
+      </span>
       <button
         className="customer-service-hologram-hit"
         type="button"

@@ -14,8 +14,10 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
     const inner = innerRef.current
     if (!inner) return
 
+    let resizeFrame = 0
+
     const update = () => {
-      const viewportWidth = Math.max(document.documentElement.clientWidth, 320)
+      const viewportWidth = Math.max(window.innerWidth, 320)
       const scale = Math.min(1, viewportWidth / referenceWidth)
       const inverseZoom = scale < 1 ? 1 / scale : 1
       const height = inner.getBoundingClientRect().height * scale
@@ -24,33 +26,38 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
       inner.style.setProperty('--artboard-vw', `${viewportWidth / 100 / scale}px`)
     }
 
-    update()
+    const scheduleUpdate = () => {
+      window.cancelAnimationFrame(resizeFrame)
+      resizeFrame = window.requestAnimationFrame(update)
+    }
+
+    scheduleUpdate()
     let resizeObserver: ResizeObserver | null = null
     if ('ResizeObserver' in window) {
-      resizeObserver = new ResizeObserver(update)
+      resizeObserver = new ResizeObserver(scheduleUpdate)
       resizeObserver.observe(inner)
     }
-    window.addEventListener('resize', update)
+    window.addEventListener('resize', scheduleUpdate)
     const imageListeners: HTMLImageElement[] = []
     inner.querySelectorAll<HTMLImageElement>('img').forEach((image) => {
       if (image.complete) return
-      image.addEventListener('load', update)
+      image.addEventListener('load', scheduleUpdate)
       imageListeners.push(image)
     })
-    const fontReady = document.fonts?.ready.then(update)
-    const initialFrame = window.requestAnimationFrame(update)
+    const fontReady = document.fonts?.ready.then(scheduleUpdate)
     return () => {
       resizeObserver?.disconnect()
-      window.removeEventListener('resize', update)
-      imageListeners.forEach((image) => image.removeEventListener('load', update))
-      window.cancelAnimationFrame(initialFrame)
+      window.removeEventListener('resize', scheduleUpdate)
+      imageListeners.forEach((image) => image.removeEventListener('load', scheduleUpdate))
+      window.cancelAnimationFrame(resizeFrame)
       void fontReady
     }
   }, [])
 
   const innerStyle = {
     '--artboard-scale': layout.scale,
-    width: '100%',
+    width: '100vw',
+    maxWidth: 'none',
     zoom: 'var(--artboard-zoom, 1)',
     transform: `scale(${layout.scale})`,
     transformOrigin: 'top left',
