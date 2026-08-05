@@ -13,6 +13,8 @@ const protectionHoverTransitionMs = 240
 
 type ProtectionDragDirection = 'left' | 'right' | null
 
+const clampProtectionSplit = (value: number) => Math.min(100, Math.max(0, Number(value.toFixed(1))))
+
 const reviews = [
   {
     name: 'Seris Rhuke',
@@ -73,43 +75,78 @@ function HowWeProtectSection() {
     if (releaseTimeout.current !== null) window.clearTimeout(releaseTimeout.current)
   }, [])
 
-  const setSplitFromPointer = (event: ReactPointerEvent<HTMLInputElement>) => {
-    const bounds = event.currentTarget.getBoundingClientRect()
-    const nextSplit = ((event.clientX - bounds.left) / bounds.width) * 100
-    setSplit(Math.min(100, Math.max(0, Number(nextSplit.toFixed(1)))))
-  }
+  const updateSplitFromClientX = (input: HTMLInputElement, clientX: number) => {
+    const bounds = input.getBoundingClientRect()
+    if (bounds.width <= 0) return
 
-  const startSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
-    event.currentTarget.setPointerCapture(event.pointerId)
-    if (releaseTimeout.current !== null) {
-      window.clearTimeout(releaseTimeout.current)
-      releaseTimeout.current = null
-    }
-    isDragging.current = true
-    previousSplit.current = Number(event.currentTarget.value)
-    setDragIndicatorVisible(false)
-    setSplitFromPointer(event)
-  }
+    const nextSplit = clampProtectionSplit(((clientX - bounds.left) / bounds.width) * 100)
+    const previous = previousSplit.current
 
-  const handleSplitInput = (event: ReactFormEvent<HTMLInputElement>) => {
-    const nextSplit = Number(event.currentTarget.value)
-    if (isDragging.current && nextSplit !== previousSplit.current) {
-      setDragDirection(nextSplit > previousSplit.current ? 'right' : 'left')
+    if (nextSplit !== previous) {
+      setDragDirection(nextSplit > previous ? 'right' : 'left')
       setDragIndicatorVisible(true)
     }
+
     previousSplit.current = nextSplit
     setSplit(nextSplit)
   }
 
-  const endSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+  const startSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
+    if (event.pointerType === 'mouse' && event.button !== 0) return
+
+    if (releaseTimeout.current !== null) {
+      window.clearTimeout(releaseTimeout.current)
+      releaseTimeout.current = null
+    }
+
+    isDragging.current = true
+    previousSplit.current = split
+    setDragIndicatorVisible(false)
+
+    event.currentTarget.focus({ preventScroll: true })
+
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    } catch {
+      // Pointer capture is a robustness enhancement, not a reason to abort.
+    }
+
+    updateSplitFromClientX(event.currentTarget, event.clientX)
+  }
+
+  const handleSplitInput = (event: ReactFormEvent<HTMLInputElement>) => {
+    if (isDragging.current) return
+
+    const nextSplit = clampProtectionSplit(Number(event.currentTarget.value))
+    previousSplit.current = nextSplit
+    setSplit(nextSplit)
+  }
+
+  const moveSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
+    if (!isDragging.current) return
+    updateSplitFromClientX(event.currentTarget, event.clientX)
+  }
+
+  const finishSplitDrag = () => {
+    if (!isDragging.current) return
+
     isDragging.current = false
     setDragIndicatorVisible(false)
+
     if (releaseTimeout.current !== null) window.clearTimeout(releaseTimeout.current)
     releaseTimeout.current = window.setTimeout(() => {
       setDragDirection(null)
       releaseTimeout.current = null
     }, protectionHoverTransitionMs)
+  }
+
+  const endSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
+    if (!isDragging.current) return
+
+    updateSplitFromClientX(event.currentTarget, event.clientX)
+    finishSplitDrag()
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
   }
 
   return (
@@ -141,8 +178,10 @@ function HowWeProtectSection() {
             value={split}
             onInput={handleSplitInput}
             onPointerDown={startSplitDrag}
+            onPointerMove={moveSplitDrag}
             onPointerUp={endSplitDrag}
             onPointerCancel={endSplitDrag}
+            onLostPointerCapture={finishSplitDrag}
             aria-label="Reveal underlayment"
             aria-valuetext={`${split}% finished roof, ${100 - split}% underlayment`}
           />
