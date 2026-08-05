@@ -1,4 +1,4 @@
-:where(.premium-sections, .premium-footer, .customer-service-hologram) {
+:where(.premium-sections, .premium-footer, .associations-marquee, .customer-service-hologram) {
   --premium-ink: #041421;
   --premium-ink-2: #102b3d;
   --premium-cream: #e5dcd2;
@@ -225,6 +225,24 @@
 .premium-review-google-link:hover,
 .premium-review-google-link:focus-visible { color: var(--premium-orange); }
 .premium-review-google-link img { width: min(1.2rem,1.33cqw); height: min(1.2rem,1.33cqw); }
+
+.associations-marquee { position: relative; isolation: isolate; overflow: visible; padding: 3.1cqw 0 3.5cqw; color: #fff; background: var(--premium-ink); }
+.associations-marquee::before { position: absolute; inset: 0; z-index: -1; content: ''; background: url('/assets/associations/associations_bg_texture.jpg') center / cover; }
+.associations-marquee-viewport { overflow: hidden; padding-block: 1.6cqw; margin-block: -1.6cqw; -webkit-mask-image: linear-gradient(90deg,transparent 0,#000 4.5cqw,#000 calc(100% - 4.5cqw),transparent 100%); mask-image: linear-gradient(90deg,transparent 0,#000 4.5cqw,#000 calc(100% - 4.5cqw),transparent 100%); }
+.associations-marquee-rows { display: grid; gap: 1.15cqw; }
+.associations-marquee-row { min-height: 13.8cqw; display: flex; align-items: center; }
+.associations-marquee-track { display: flex; width: max-content; flex: none; transform: translate3d(0,0,0); animation: associations-marquee-scroll 116s linear -31s infinite paused; will-change: transform; backface-visibility: hidden; }
+.associations-marquee-row-2 .associations-marquee-track { animation-duration: 124s; animation-delay: -53s; animation-direction: reverse; }
+.associations-marquee.is-marquee-running .associations-marquee-track { animation-play-state: running; }
+.associations-marquee-group { display: flex; flex: none; gap: 1.15cqw; padding-right: 1.15cqw; }
+.association-badge-cell { flex: 0 0 auto; min-height: 13.8cqw; display: flex; align-items: center; }
+.association-badge-cell img { display: block; width: auto; max-width: none; max-height: none; transform: scale(var(--association-scale,1)); filter: drop-shadow(0 .42cqw .38cqw rgba(0,0,0,.42)); }
+.association-badge-cell[data-kind='standard'] img { height: 10.4cqw; }
+.association-badge-cell[data-kind='landscape'] img { height: 8.8cqw; }
+.association-badge-cell[data-kind='wide'] img { height: 7.3cqw; }
+.association-badge-cell[data-kind='ultrawide'] img { height: 6.8cqw; }
+@keyframes associations-marquee-scroll { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
+@media (prefers-reduced-motion: reduce) { .associations-marquee-track { animation-play-state: paused; } }
 
 .premium-footer { --copper-edge-height: clamp(5px, .55cqw, 9px); --copper-edge-shadow-height: clamp(6px, .6cqw, 10px); position: relative; height: 72cqw; min-height: 0; overflow: hidden; color: #fff; background: var(--premium-ink); }
 .premium-footer::before { position: absolute; top: 0; right: -32px; left: -32px; z-index: 4; height: calc(var(--copper-edge-height) + var(--copper-edge-shadow-height)); content: ''; background-image: linear-gradient(to bottom, transparent 0 calc(var(--copper-edge-height) - 2px), rgba(4,20,33,.34) calc(var(--copper-edge-height) - 1px), rgba(4,20,33,.56) var(--copper-edge-height), rgba(4,20,33,0) 100%), url('/assets/ui/copper-edge.png'); background-position: 0 0, center top; background-size: 100% 100%, 100% var(--copper-edge-height); background-repeat: no-repeat; filter: drop-shadow(0 3.5px 6px rgba(4,20,33,.52)); pointer-events: none; }

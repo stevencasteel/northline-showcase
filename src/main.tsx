@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { AlertCircle, ArrowRight, ArrowUpRight, CalendarDays, ChevronLeft, ChevronRight, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
 import './styles.css'
 import './premium-sections.css'
-import { CustomerServiceHologram, PremiumFooter, PremiumSections } from './PremiumSections'
+import { AssociationsMarquee, CustomerServiceHologram, PremiumFooter, PremiumSections } from './PremiumSections'
 import { useBodyScrollLock } from './hooks/useBodyScrollLock'
 import { useDocumentVisibility } from './hooks/useDocumentVisibility'
 import { useInView } from './hooks/useInView'
@@ -822,7 +822,7 @@ function App() {
     <div className="app">
       <ScaledArtboard>
         <Header onBookAppointment={openAppointment} />
-        <main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services /><Gallery /><span className="copper-edge-seam" aria-hidden="true" /><PremiumSections /></main>
+        <main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services /><Gallery /><span className="copper-edge-seam" aria-hidden="true" /><AssociationsMarquee /><span className="copper-edge-seam" aria-hidden="true" /><PremiumSections /></main>
         <PremiumFooter onBook={openAppointment} />
       </ScaledArtboard>
       <CustomerServiceHologram onBook={openAppointment} hidden={appointmentOpen} />

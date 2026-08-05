@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type FormEvent as ReactFormEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import { ArrowRight, CalendarDays } from 'lucide-react'
 import { useDocumentVisibility } from './hooks/useDocumentVisibility'
+import { useInView } from './hooks/useInView'
 import { siteConfig } from './config/site'
 
 type BookHandler = { onBook: () => void }
@@ -10,6 +11,70 @@ const protectionSphereImage = '/assets/ui/copper-sphere-etched-large-generated.p
 const protectionSphereLeftImage = '/assets/ui/copper-sphere-etched-large-hover-left.png'
 const protectionSphereRightImage = '/assets/ui/copper-sphere-etched-large-hover-right.png'
 const protectionHoverTransitionMs = 240
+
+type AssociationBadgeKind = 'standard' | 'landscape' | 'wide' | 'ultrawide'
+
+type AssociationBadge = {
+  file: string
+  width: number
+  height: number
+  kind: AssociationBadgeKind
+  scale?: number
+}
+
+const associationRows: AssociationBadge[][] = [
+  [
+    { file: 'badge_row-1_01_high_vale_roof_tile.png', width: 1179, height: 1150, kind: 'standard' },
+    { file: 'badge_row-1_02_century_seal_roof_assurance.png', width: 1210, height: 1206, kind: 'standard' },
+    { file: 'badge_row-1_03_united_roofwrights.png', width: 1123, height: 1196, kind: 'standard' },
+    { file: 'badge_row-1_04_aurelian_slate_council.png', width: 985, height: 1187, kind: 'standard' },
+    { file: 'badge_row-1_05_royal_sheet_and_slate.png', width: 943, height: 1303, kind: 'standard' },
+    { file: 'badge_row-1_06_crownwatch.png', width: 1127, height: 1247, kind: 'standard' },
+    { file: 'badge_row-1_07_skyseer.png', width: 1181, height: 1439, kind: 'standard' },
+    { file: 'badge_row-1_08_tempest.png', width: 1133, height: 1249, kind: 'standard' },
+    { file: 'badge_row-1_09_emberward.png', width: 1136, height: 1316, kind: 'standard' },
+    { file: 'badge_row-1_10_windmark.png', width: 1113, height: 1316, kind: 'standard' },
+    { file: 'badge_row-1_11_hammerfall.png', width: 1254, height: 1310, kind: 'standard' },
+    { file: 'badge_row-1_12_evergreen.png', width: 1159, height: 1226, kind: 'standard' },
+    { file: 'badge_row-1_13_oldstone.png', width: 1137, height: 1237, kind: 'standard' },
+    { file: 'badge_row-1_14_sunscale.png', width: 1063, height: 1254, kind: 'standard' },
+    { file: 'badge_row-1_15_ironclad.png', width: 1254, height: 1198, kind: 'standard' },
+    { file: 'badge_row-1_16_valeward.png', width: 1079, height: 1185, kind: 'standard' },
+    { file: 'badge_row-1_17_verdant_peak.png', width: 1168, height: 1195, kind: 'standard' },
+    { file: 'badge_row-1_18_everlight.png', width: 1098, height: 1303, kind: 'standard' },
+    { file: 'badge_row-1_19_gildharbor.png', width: 1306, height: 961, kind: 'landscape' },
+    { file: 'badge_row-1_20_cinderpeak.png', width: 1197, height: 1192, kind: 'standard' },
+    { file: 'badge_row-1_21_highspire.png', width: 1133, height: 1172, kind: 'standard' },
+    { file: 'badge_row-1_22_highmere.png', width: 1168, height: 1163, kind: 'standard' },
+    { file: 'badge_row-1_23_embercrest.png', width: 1196, height: 1197, kind: 'standard' },
+  ],
+  [
+    { file: 'badge_row-2_01_ironmere.png', width: 1347, height: 880, kind: 'landscape' },
+    { file: 'badge_row-2_02_stormglass.png', width: 1523, height: 846, kind: 'landscape' },
+    { file: 'badge_row-2_03_stonewake.png', width: 2035, height: 660, kind: 'wide' },
+    { file: 'badge_row-2_04_ironpeak.png', width: 1226, height: 1205, kind: 'standard' },
+    { file: 'badge_row-2_05_skyforge.png', width: 1331, height: 1032, kind: 'standard' },
+    { file: 'badge_row-2_06_northreach.png', width: 1751, height: 431, kind: 'ultrawide' },
+    { file: 'badge_row-2_07_celestial_canopy_co-op.png', width: 1194, height: 1199, kind: 'standard' },
+    { file: 'badge_row-2_08_wyverns_nest.png', width: 1075, height: 1188, kind: 'standard' },
+    { file: 'badge_row-2_09_aegis.png', width: 1429, height: 611, kind: 'wide' },
+    { file: 'badge_row-2_10_stoneweather.png', width: 1153, height: 1098, kind: 'standard' },
+    { file: 'badge_row-2_11_skyreach.png', width: 1448, height: 1032, kind: 'landscape' },
+    { file: 'badge_row-2_12_thornwall.png', width: 1277, height: 928, kind: 'landscape' },
+    { file: 'badge_row-2_13_aurelian.png', width: 1966, height: 629, kind: 'wide' },
+    { file: 'badge_row-2_14_eldercape.png', width: 1046, height: 1194, kind: 'standard' },
+    { file: 'badge_row-2_15_gryphon.png', width: 1284, height: 1021, kind: 'standard' },
+    { file: 'badge_row-2_16_moonkeep.png', width: 1213, height: 1215, kind: 'standard' },
+  ],
+]
+
+const associationLabel = (filename: string) => filename
+  .replace(/^badge_row-[12]_\d+_/, '')
+  .replace(/\.png$/, '')
+  .replace(/[-_]/g, ' ')
+  .replace(/\b\w/g, (character) => character.toUpperCase())
+
+const associationBadgeCount = associationRows.reduce((count, row) => count + row.length, 0)
 
 type ProtectionDragDirection = 'left' | 'right' | null
 type ProtectionPointerMode = 'idle' | 'pending' | 'dragging'
@@ -273,6 +338,61 @@ function GoogleReviewsSection() {
 export function PremiumSections() {
   usePremiumReveal()
   return <div className="premium-sections"><HowWeProtectSection /><GoogleReviewsSection /></div>
+}
+
+export function AssociationsMarquee() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const [loadedAssociationFiles, setLoadedAssociationFiles] = useState<Set<string>>(() => new Set())
+  const inView = useInView(sectionRef, { rootMargin: '200px 0px' })
+  const documentVisible = useDocumentVisibility()
+  const isRunning = inView && documentVisible && loadedAssociationFiles.size >= associationBadgeCount
+
+  const markAssociationFileReady = (file: string) => {
+    setLoadedAssociationFiles((current) => {
+      if (current.has(file)) return current
+      const next = new Set(current)
+      next.add(file)
+      return next
+    })
+  }
+
+  const renderGroup = (row: AssociationBadge[], clone: boolean) => (
+    <div className="associations-marquee-group" aria-hidden={clone || undefined}>
+      {row.map((badge) => (
+        <div className="association-badge-cell" data-kind={badge.kind} key={`${badge.file}-${clone ? 'clone' : 'original'}`}>
+          <img
+            src={`/assets/associations/${badge.file}`}
+            alt={clone ? '' : associationLabel(badge.file)}
+            aria-hidden={clone || undefined}
+            width={badge.width}
+            height={badge.height}
+            decoding="async"
+            loading="eager"
+            onLoad={() => markAssociationFileReady(badge.file)}
+            onError={() => markAssociationFileReady(badge.file)}
+            style={{ '--association-scale': badge.scale ?? 1 } as CSSProperties}
+          />
+        </div>
+      ))}
+    </div>
+  )
+
+  return (
+    <section className={`associations-marquee${isRunning ? ' is-marquee-running' : ''}`} ref={sectionRef} aria-label="Northline Roofing associations and certifications">
+      <div className="associations-marquee-viewport">
+        <div className="associations-marquee-rows">
+        {associationRows.map((row, rowIndex) => (
+          <div className={`associations-marquee-row associations-marquee-row-${rowIndex + 1}`} key={rowIndex}>
+            <div className="associations-marquee-track">
+              {renderGroup(row, false)}
+              {renderGroup(row, true)}
+            </div>
+          </div>
+        ))}
+        </div>
+      </div>
+    </section>
+  )
 }
 
 export function PremiumFooter({ onBook }: BookHandler) {
