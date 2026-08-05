@@ -272,7 +272,7 @@ function HowWeProtectSection() {
   }
 
   return (
-    <section className="premium-protection premium-shell" id="protection">
+    <section className="premium-protection premium-shell" id="protection" aria-label="Roof layers: finished roof and exposed underlayment">
       <div className="premium-protection-console" data-premium-reveal>
         <div
           className="premium-protection-stage"
@@ -412,7 +412,7 @@ export function AssociationsMarquee() {
   )
 
   return (
-    <section className="associations-marquee" ref={sectionRef} aria-label="Northline Roofing associations and certifications">
+    <section className="associations-marquee" id="associations" ref={sectionRef} aria-label="Northline Roofing associations and certifications">
       <div className="associations-marquee-viewport">
         <div className="associations-marquee-rows">
         {associationRows.map((row, rowIndex) => (

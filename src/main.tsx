@@ -32,7 +32,9 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
       <nav className="primary-nav" aria-label="Primary navigation">
         <a href="#services">Services</a>
         <a href="#work">Gallery</a>
-        <a href="#about">About</a>
+        <a href="#associations">Associations</a>
+        <a href="#protection">Protection</a>
+        <a href="#reviews">Reviews</a>
         <a href="#contact">Contact</a>
       </nav>
       <a className="header-phone" href={siteConfig.phoneHref}><Phone size={17} strokeWidth={2.4} /> {siteConfig.phoneDisplay}</a>
