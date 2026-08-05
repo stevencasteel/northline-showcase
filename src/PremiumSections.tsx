@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type FormEvent as ReactFormEvent, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useId, useRef, useState, type CSSProperties, type FormEvent as ReactFormEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import { ArrowRight, CalendarDays } from 'lucide-react'
 import { useDocumentVisibility } from './hooks/useDocumentVisibility'
 import { siteConfig } from './config/site'
@@ -316,7 +316,22 @@ export function PremiumFooter({ onBook }: BookHandler) {
 
 export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidden: boolean }) {
   const [active, setActive] = useState(false)
+  const [hovered, setHovered] = useState(false)
   const documentVisible = useDocumentVisibility()
+  const rawId = useId()
+  const id = rawId.replace(/:/g, '')
+  const rippleAId = `${id}-ripple-a`
+  const rippleBId = `${id}-ripple-b`
+  const skewAId = `${id}-skew-a`
+  const skewBId = `${id}-skew-b`
+  const skewMaskId = `${id}-skew-mask`
+  const rippleMaskId = `${id}-ripple-mask`
+  const skewGradientId = `${id}-skew-gradient`
+  const rippleGradientId = `${id}-ripple-gradient`
+  const rippleOffsetARef = useRef<SVGFEOffsetElement>(null)
+  const rippleOffsetBRef = useRef<SVGFEOffsetElement>(null)
+  const rippleAlphaARef = useRef<SVGFEFuncAElement>(null)
+  const rippleAlphaBRef = useRef<SVGFEFuncAElement>(null)
 
   useEffect(() => {
     const reviews = document.getElementById('reviews')
@@ -339,80 +354,108 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
 
   const showEffect = active && !hidden
 
+  useEffect(() => {
+    if (!showEffect || !documentVisible) return
+
+    const period = 4200
+    const startTime = performance.now()
+    let frame = 0
+
+    const rippleAlpha = (phase: number) => {
+      if (phase < .42) return 0
+      if (phase < .5) return (phase - .42) / .08
+      if (phase < .92) return 1
+      return 1 - (phase - .92) / .08
+    }
+
+    const tick = (timestamp: number) => {
+      const phaseA = ((timestamp - startTime) % period) / period
+      const phaseB = (phaseA + .5) % 1
+      rippleOffsetARef.current?.setAttribute('dy', String(-180 + 360 * phaseA))
+      rippleOffsetBRef.current?.setAttribute('dy', String(-180 + 360 * phaseB))
+      rippleAlphaARef.current?.setAttribute('slope', String(rippleAlpha(phaseA)))
+      rippleAlphaBRef.current?.setAttribute('slope', String(rippleAlpha(phaseB)))
+      frame = window.requestAnimationFrame(tick)
+    }
+
+    frame = window.requestAnimationFrame(tick)
+    return () => window.cancelAnimationFrame(frame)
+  }, [documentVisible, showEffect])
+
   return (
     <div
-      className={`customer-service-hologram${showEffect ? ' is-active' : ''}${hidden ? ' is-obscured' : ''}`}
+      className={`customer-service-hologram${showEffect ? ' is-active' : ''}${hidden ? ' is-obscured' : ''}${hovered ? ' is-hovered' : ''}`}
       aria-hidden={!showEffect}
     >
-      {documentVisible && <svg className="customer-service-hologram-filter" aria-hidden="true">
-        <defs>
-          <filter id="customer-service-hologram-ripple-a" x="-8%" y="-4%" width="116%" height="108%" colorInterpolationFilters="sRGB">
-            <feTurbulence type="fractalNoise" baseFrequency=".012 .055" numOctaves="1" seed="7" result="ripple-noise" />
-            <feTile in="ripple-noise" result="tiled-ripple" />
-            <feOffset in="tiled-ripple" dy="-180" result="moving-ripple">
-              <animate attributeName="dy" from="-180" to="180" dur="4.2s" calcMode="linear" repeatCount="indefinite" />
-            </feOffset>
-            <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="outer-edge" />
-            <feMorphology in="SourceAlpha" operator="erode" radius="9" result="inner-edge" />
-            <feComposite in="outer-edge" in2="inner-edge" operator="out" result="edge-band" />
-            <feFlood x="17%" y="49%" width="11%" height="7%" floodColor="#fff" result="armpit-exclusion" />
-            <feComposite in="edge-band" in2="armpit-exclusion" operator="out" result="clean-edge-band" />
-            <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="12" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
-            <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" result="ripple-output" />
-            <feComponentTransfer in="ripple-output">
-              <feFuncA type="linear" slope="0">
-                <animate attributeName="slope" values="0;0;1;1;0" keyTimes="0;.42;.5;.92;1" dur="4.2s" calcMode="linear" repeatCount="indefinite" />
-              </feFuncA>
-            </feComponentTransfer>
-          </filter>
-          <filter id="customer-service-hologram-ripple-b" x="-8%" y="-4%" width="116%" height="108%" colorInterpolationFilters="sRGB">
-            <feTurbulence type="fractalNoise" baseFrequency=".012 .055" numOctaves="1" seed="7" result="ripple-noise" />
-            <feTile in="ripple-noise" result="tiled-ripple" />
-            <feOffset in="tiled-ripple" dy="-180" result="moving-ripple">
-              <animate attributeName="dy" from="-180" to="180" dur="4.2s" begin="-2.1s" calcMode="linear" repeatCount="indefinite" />
-            </feOffset>
-            <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="outer-edge" />
-            <feMorphology in="SourceAlpha" operator="erode" radius="9" result="inner-edge" />
-            <feComposite in="outer-edge" in2="inner-edge" operator="out" result="edge-band" />
-            <feFlood x="17%" y="49%" width="11%" height="7%" floodColor="#fff" result="armpit-exclusion" />
-            <feComposite in="edge-band" in2="armpit-exclusion" operator="out" result="clean-edge-band" />
-            <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="12" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
-            <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" result="ripple-output" />
-            <feComponentTransfer in="ripple-output">
-              <feFuncA type="linear" slope="0">
-                <animate attributeName="slope" values="0;0;1;1;0" keyTimes="0;.42;.5;.92;1" dur="4.2s" begin="-2.1s" calcMode="linear" repeatCount="indefinite" />
-              </feFuncA>
-            </feComponentTransfer>
-          </filter>
-          <filter id="customer-service-hologram-skew-a" x="-8%" y="-4%" width="116%" height="108%" colorInterpolationFilters="sRGB">
-            <feTurbulence type="fractalNoise" baseFrequency=".045 .012" numOctaves="1" seed="11" result="skew-noise" />
-            <feTile in="skew-noise" result="tiled-skew" />
-            <feOffset in="tiled-skew" dy="0" result="moving-skew" />
-            <feDisplacementMap in="SourceGraphic" in2="moving-skew" scale="13" xChannelSelector="R" yChannelSelector="G" result="skewed-hologram" />
-            <feFlood x="17%" y="49%" width="11%" height="7%" floodColor="#fff" result="armpit-exclusion" />
-            <feComposite in="skewed-hologram" in2="armpit-exclusion" operator="out" result="clean-skew" />
-            <feFlood x="29%" y="7%" width="43%" height="25%" floodColor="#fff" result="face-exclusion" />
-            <feComposite in="clean-skew" in2="face-exclusion" operator="out" />
-          </filter>
-          <filter id="customer-service-hologram-skew-b" x="-8%" y="-4%" width="116%" height="108%" colorInterpolationFilters="sRGB">
-            <feTurbulence type="fractalNoise" baseFrequency=".045 .012" numOctaves="1" seed="11" result="skew-noise" />
-            <feTile in="skew-noise" result="tiled-skew" />
-            <feOffset in="tiled-skew" dy="0" result="moving-skew" />
-            <feDisplacementMap in="SourceGraphic" in2="moving-skew" scale="13" xChannelSelector="R" yChannelSelector="G" result="skewed-hologram" />
-            <feFlood x="17%" y="49%" width="11%" height="7%" floodColor="#fff" result="armpit-exclusion" />
-            <feComposite in="skewed-hologram" in2="armpit-exclusion" operator="out" result="clean-skew" />
-            <feFlood x="29%" y="7%" width="43%" height="25%" floodColor="#fff" result="face-exclusion" />
-            <feComposite in="clean-skew" in2="face-exclusion" operator="out" />
-          </filter>
-        </defs>
-      </svg>}
       <img className="customer-service-hologram-puck" src="/assets/customer service/customer_service_hologram_puck.png" alt="" aria-hidden="true" />
       <span className="customer-service-hologram-reveal" aria-hidden="true">
         <img src="/assets/customer service/customer_service_hologram_full.png" alt="" />
-        <img className="customer-service-hologram-skew customer-service-hologram-skew-a" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
-        <img className="customer-service-hologram-skew customer-service-hologram-skew-b" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
-        <img className="customer-service-hologram-distortion customer-service-hologram-distortion-a" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
-        <img className="customer-service-hologram-distortion customer-service-hologram-distortion-b" src="/assets/customer service/customer_service_hologram_full.png" alt="" />
+        <svg className="customer-service-hologram-effects" viewBox="0 0 720 1626" preserveAspectRatio="xMidYMid meet" xmlnsXlink="http://www.w3.org/1999/xlink" aria-hidden="true">
+        <defs>
+          <linearGradient id={skewGradientId} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1626">
+            <stop offset="0%" stopColor="#fff" stopOpacity=".12" /><stop offset="15%" stopColor="#fff" stopOpacity=".12" /><stop offset="27%" stopColor="#fff" stopOpacity=".24" /><stop offset="35%" stopColor="#fff" stopOpacity=".52" /><stop offset="43%" stopColor="#fff" /><stop offset="72%" stopColor="#fff" /><stop offset="82%" stopColor="#fff" stopOpacity=".62" /><stop offset="90%" stopColor="#fff" stopOpacity="0" /><stop offset="100%" stopColor="#fff" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id={rippleGradientId} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1626">
+            <stop offset="0%" stopColor="#fff" stopOpacity="0" /><stop offset="22%" stopColor="#fff" stopOpacity="0" /><stop offset="27%" stopColor="#fff" stopOpacity=".3" /><stop offset="34%" stopColor="#fff" /><stop offset="70%" stopColor="#fff" /><stop offset="79%" stopColor="#fff" stopOpacity=".68" /><stop offset="89%" stopColor="#fff" stopOpacity="0" /><stop offset="100%" stopColor="#fff" stopOpacity="0" />
+          </linearGradient>
+          <mask id={skewMaskId} maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="1626" mask-type="luminance"><rect width="720" height="1626" fill={`url(#${skewGradientId})`} /></mask>
+          <mask id={rippleMaskId} maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="1626" mask-type="luminance"><rect width="720" height="1626" fill={`url(#${rippleGradientId})`} /></mask>
+          <filter id={rippleAId} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="-58" y="-66" width="836" height="1758" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency=".012 .055" numOctaves="1" seed="7" result="ripple-noise" />
+            <feTile in="ripple-noise" result="tiled-ripple" />
+            <feOffset ref={rippleOffsetARef} in="tiled-ripple" dy="-180" result="moving-ripple"><animate attributeName="dy" from="-180" to="180" dur="4.2s" calcMode="linear" repeatCount="indefinite" /></feOffset>
+            <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="outer-edge" />
+            <feMorphology in="SourceAlpha" operator="erode" radius="9" result="inner-edge" />
+            <feComposite in="outer-edge" in2="inner-edge" operator="out" result="edge-band" />
+            <feFlood x="122" y="797" width="79" height="114" floodColor="#fff" result="armpit-exclusion" />
+            <feComposite in="edge-band" in2="armpit-exclusion" operator="out" result="clean-edge-band" />
+            <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="12" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
+            <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" result="ripple-output" />
+            <feComponentTransfer in="ripple-output">
+              <feFuncA ref={rippleAlphaARef} type="linear" slope="0"><animate attributeName="slope" values="0;0;1;1;0" keyTimes="0;.42;.5;.92;1" dur="4.2s" calcMode="linear" repeatCount="indefinite" /></feFuncA>
+            </feComponentTransfer>
+          </filter>
+          <filter id={rippleBId} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="-58" y="-66" width="836" height="1758" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency=".012 .055" numOctaves="1" seed="7" result="ripple-noise" />
+            <feTile in="ripple-noise" result="tiled-ripple" />
+            <feOffset ref={rippleOffsetBRef} in="tiled-ripple" dy="-180" result="moving-ripple"><animate attributeName="dy" from="-180" to="180" dur="4.2s" begin="-2.1s" calcMode="linear" repeatCount="indefinite" /></feOffset>
+            <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="outer-edge" />
+            <feMorphology in="SourceAlpha" operator="erode" radius="9" result="inner-edge" />
+            <feComposite in="outer-edge" in2="inner-edge" operator="out" result="edge-band" />
+            <feFlood x="122" y="797" width="79" height="114" floodColor="#fff" result="armpit-exclusion" />
+            <feComposite in="edge-band" in2="armpit-exclusion" operator="out" result="clean-edge-band" />
+            <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="12" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
+            <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" result="ripple-output" />
+            <feComponentTransfer in="ripple-output">
+              <feFuncA ref={rippleAlphaBRef} type="linear" slope="0"><animate attributeName="slope" values="0;0;1;1;0" keyTimes="0;.42;.5;.92;1" dur="4.2s" begin="-2.1s" calcMode="linear" repeatCount="indefinite" /></feFuncA>
+            </feComponentTransfer>
+          </filter>
+          <filter id={skewAId} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="-58" y="-66" width="836" height="1758" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency=".045 .012" numOctaves="1" seed="11" result="skew-noise" />
+            <feTile in="skew-noise" result="tiled-skew" />
+            <feOffset in="tiled-skew" dy="0" result="moving-skew" />
+            <feDisplacementMap in="SourceGraphic" in2="moving-skew" scale="13" xChannelSelector="R" yChannelSelector="G" result="skewed-hologram" />
+            <feFlood x="122" y="797" width="79" height="114" floodColor="#fff" result="armpit-exclusion" />
+            <feComposite in="skewed-hologram" in2="armpit-exclusion" operator="out" result="clean-skew" />
+            <feFlood x="209" y="114" width="310" height="407" floodColor="#fff" result="face-exclusion" />
+            <feComposite in="clean-skew" in2="face-exclusion" operator="out" />
+          </filter>
+          <filter id={skewBId} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="-58" y="-66" width="836" height="1758" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency=".045 .012" numOctaves="1" seed="11" result="skew-noise" />
+            <feTile in="skew-noise" result="tiled-skew" />
+            <feOffset in="tiled-skew" dy="0" result="moving-skew" />
+            <feDisplacementMap in="SourceGraphic" in2="moving-skew" scale="13" xChannelSelector="R" yChannelSelector="G" result="skewed-hologram" />
+            <feFlood x="122" y="797" width="79" height="114" floodColor="#fff" result="armpit-exclusion" />
+            <feComposite in="skewed-hologram" in2="armpit-exclusion" operator="out" result="clean-skew" />
+            <feFlood x="209" y="114" width="310" height="407" floodColor="#fff" result="face-exclusion" />
+            <feComposite in="clean-skew" in2="face-exclusion" operator="out" />
+          </filter>
+        </defs>
+          <g className="customer-service-hologram-skew customer-service-hologram-skew-a" filter={`url(#${skewAId})`} mask={`url(#${skewMaskId})`}><image x="0" y="0" width="720" height="1626" href="/assets/customer%20service/customer_service_hologram_full.png" xlinkHref="/assets/customer%20service/customer_service_hologram_full.png" preserveAspectRatio="xMidYMid meet" /></g>
+          <g className="customer-service-hologram-skew customer-service-hologram-skew-b" filter={`url(#${skewBId})`} mask={`url(#${skewMaskId})`}><image x="0" y="0" width="720" height="1626" href="/assets/customer%20service/customer_service_hologram_full.png" xlinkHref="/assets/customer%20service/customer_service_hologram_full.png" preserveAspectRatio="xMidYMid meet" /></g>
+          <g className="customer-service-hologram-distortion customer-service-hologram-distortion-a" filter={`url(#${rippleAId})`} mask={`url(#${rippleMaskId})`}><image x="0" y="0" width="720" height="1626" href="/assets/customer%20service/customer_service_hologram_full.png" xlinkHref="/assets/customer%20service/customer_service_hologram_full.png" preserveAspectRatio="xMidYMid meet" /></g>
+          <g className="customer-service-hologram-distortion customer-service-hologram-distortion-b" filter={`url(#${rippleBId})`} mask={`url(#${rippleMaskId})`}><image x="0" y="0" width="720" height="1626" href="/assets/customer%20service/customer_service_hologram_full.png" xlinkHref="/assets/customer%20service/customer_service_hologram_full.png" preserveAspectRatio="xMidYMid meet" /></g>
+        </svg>
       </span>
       <button
         className="customer-service-hologram-hit"
@@ -420,6 +463,9 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
         onClick={onBook}
         aria-label="Talk to customer service"
         tabIndex={showEffect ? 0 : -1}
+        onPointerEnter={() => setHovered(true)}
+        onPointerLeave={() => setHovered(false)}
+        onPointerCancel={() => setHovered(false)}
       />
     </div>
   )

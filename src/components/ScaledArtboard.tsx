@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 
 const referenceWidth = 1440
 
@@ -7,23 +7,23 @@ type ScaledArtboardProps = {
 }
 
 export function ScaledArtboard({ children }: ScaledArtboardProps) {
+  const hostRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
-  const [layout, setLayout] = useState({ scale: 1, height: 0 })
+  const [layout, setLayout] = useState({ artboardWidth: referenceWidth, scale: 1, height: 0 })
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    const host = hostRef.current
     const inner = innerRef.current
-    if (!inner) return
+    if (!host || !inner) return
 
     let resizeFrame = 0
 
     const update = () => {
-      const viewportWidth = Math.max(window.innerWidth, 320)
-      const scale = Math.min(1, viewportWidth / referenceWidth)
-      const inverseZoom = scale < 1 ? 1 / scale : 1
-      const height = inner.getBoundingClientRect().height * scale
-      setLayout((current) => current.scale === scale && Math.abs(current.height - height) < 0.5 ? current : { scale, height })
-      inner.style.setProperty('--artboard-zoom', `${inverseZoom}`)
-      inner.style.setProperty('--artboard-vw', `${viewportWidth / 100 / scale}px`)
+      const hostWidth = Math.max(host.getBoundingClientRect().width, 1)
+      const artboardWidth = Math.max(referenceWidth, hostWidth)
+      const scale = hostWidth / artboardWidth
+      const height = inner.scrollHeight * scale
+      setLayout((current) => current.artboardWidth === artboardWidth && Math.abs(current.scale - scale) < 0.0001 && Math.abs(current.height - height) < 0.5 ? current : { artboardWidth, scale, height })
     }
 
     const scheduleUpdate = () => {
@@ -35,6 +35,7 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
     let resizeObserver: ResizeObserver | null = null
     if ('ResizeObserver' in window) {
       resizeObserver = new ResizeObserver(scheduleUpdate)
+      resizeObserver.observe(host)
       resizeObserver.observe(inner)
     }
     window.addEventListener('resize', scheduleUpdate)
@@ -55,16 +56,14 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
   }, [])
 
   const innerStyle = {
-    '--artboard-scale': layout.scale,
-    width: '100vw',
+    width: `${layout.artboardWidth}px`,
     maxWidth: 'none',
-    zoom: 'var(--artboard-zoom, 1)',
     transform: `scale(${layout.scale})`,
     transformOrigin: 'top left',
   } as CSSProperties
 
   return (
-    <div className="scaled-artboard" style={{ height: layout.height || undefined }}>
+    <div className="scaled-artboard" ref={hostRef} style={{ height: layout.height || undefined }}>
       <div className="scaled-artboard-inner" ref={innerRef} style={innerStyle}>
         {children}
       </div>
