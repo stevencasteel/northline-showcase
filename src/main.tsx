@@ -14,6 +14,10 @@ import { siteConfig } from './config/site'
 
 const asset = '/assets/'
 
+function CopperEdgeSeam() {
+  return <span className="copper-edge-seam" aria-hidden="true" />
+}
+
 function AnimatedHeroLine({ text, accent = false }: { text: string; accent?: boolean }) {
   return <span className={`hero-line${accent ? ' hero-accent' : ''}`} style={{ '--line-delay': '.14s' } as React.CSSProperties} aria-hidden="true">{Array.from(text).map((character, index) => <span className="hero-char" style={{ '--char-index': index } as React.CSSProperties} key={`${character}-${index}`}>{character === ' ' ? '\u00a0' : character}</span>)}</span>
 }
@@ -822,7 +826,16 @@ function App() {
     <div className="app">
       <ScaledArtboard>
         <Header onBookAppointment={openAppointment} />
-        <main><Hero onBookAppointment={openAppointment} /><BadgeStrip /><Services /><Gallery /><span className="copper-edge-seam" aria-hidden="true" /><AssociationsMarquee /><span className="copper-edge-seam" aria-hidden="true" /><PremiumSections /></main>
+        <main>
+          <Hero onBookAppointment={openAppointment} />
+          <BadgeStrip />
+          <Services />
+          <Gallery />
+          <CopperEdgeSeam />
+          <AssociationsMarquee />
+          <CopperEdgeSeam />
+          <PremiumSections />
+        </main>
         <PremiumFooter onBook={openAppointment} />
       </ScaledArtboard>
       <CustomerServiceHologram onBook={openAppointment} hidden={appointmentOpen} />

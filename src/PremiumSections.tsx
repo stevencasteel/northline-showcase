@@ -76,6 +76,7 @@ const associationLabel = (filename: string) => filename
   .replace(/\b\w/g, (character) => character.toUpperCase())
 
 const associationBadgeCount = associationRows.reduce((count, row) => count + row.length, 0)
+const associationInitialProgress = [.27, .61] as const
 
 type ProtectionDragDirection = 'left' | 'right' | null
 type ProtectionPointerMode = 'idle' | 'pending' | 'dragging'
@@ -344,21 +345,20 @@ export function PremiumSections() {
 export function AssociationsMarquee() {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRefs = useRef<Array<HTMLDivElement | null>>([])
-  const marqueeProgress = useRef([.27, .61])
+  const marqueeProgress = useRef<number[]>([...associationInitialProgress])
   const marqueeVelocity = useRef([0, 0])
-  const [loadedAssociationFiles, setLoadedAssociationFiles] = useState<Set<string>>(() => new Set())
+  const loadedAssociationFiles = useRef(new Set<string>())
+  const [associationAssetsReady, setAssociationAssetsReady] = useState(false)
   const [hoveredRow, setHoveredRow] = useState<number | null>(null)
   const inView = useInView(sectionRef, { rootMargin: '200px 0px' })
   const documentVisible = useDocumentVisibility()
-  const isRunning = inView && documentVisible && loadedAssociationFiles.size >= associationBadgeCount
+  const isRunning = inView && documentVisible && associationAssetsReady
 
   const markAssociationFileReady = (file: string) => {
-    setLoadedAssociationFiles((current) => {
-      if (current.has(file)) return current
-      const next = new Set(current)
-      next.add(file)
-      return next
-    })
+    const loaded = loadedAssociationFiles.current
+    if (loaded.has(file)) return
+    loaded.add(file)
+    if (loaded.size === associationBadgeCount) setAssociationAssetsReady(true)
   }
 
   useEffect(() => {
@@ -412,12 +412,12 @@ export function AssociationsMarquee() {
   )
 
   return (
-    <section className={`associations-marquee${isRunning ? ' is-marquee-running' : ''}`} ref={sectionRef} aria-label="Northline Roofing associations and certifications">
+    <section className="associations-marquee" ref={sectionRef} aria-label="Northline Roofing associations and certifications">
       <div className="associations-marquee-viewport">
         <div className="associations-marquee-rows">
         {associationRows.map((row, rowIndex) => (
           <div className={`associations-marquee-row associations-marquee-row-${rowIndex + 1}`} key={rowIndex} onMouseEnter={() => setHoveredRow(rowIndex)} onMouseLeave={() => setHoveredRow((current) => current === rowIndex ? null : current)}>
-            <div className="associations-marquee-track" ref={(element) => { trackRefs.current[rowIndex] = element }}>
+            <div className="associations-marquee-track" ref={(element) => { trackRefs.current[rowIndex] = element }} style={{ transform: `translate3d(${rowIndex === 0 ? -associationInitialProgress[rowIndex] * 50 : -50 + associationInitialProgress[rowIndex] * 50}%,0,0)` }}>
               {renderGroup(row, false)}
               {renderGroup(row, true)}
             </div>
