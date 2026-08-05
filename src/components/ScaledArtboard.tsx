@@ -36,7 +36,7 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
 
   const innerStyle = {
     '--artboard-scale': layout.scale,
-    width: '100vw',
+    width: '100%',
     zoom: 'var(--artboard-zoom, 1)',
     transform: `scale(${layout.scale})`,
     transformOrigin: 'top left',

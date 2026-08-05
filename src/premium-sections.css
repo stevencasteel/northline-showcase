@@ -170,7 +170,7 @@
   transform: scale(.96);
 }
 
-.premium-protection-stage:has(.premium-protection-range:focus-visible) .premium-protection-thumb-surface {
+.premium-protection-stage:has(.premium-protection-range:focus-visible):not([data-pointer-focus='true']) .premium-protection-thumb-surface {
   outline: 3px solid #fff;
   outline-offset: 8px;
 }
@@ -191,7 +191,7 @@
   opacity: 0;
   background: transparent;
   cursor: ew-resize;
-  touch-action: none;
+  touch-action: pan-y;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
 }
@@ -269,11 +269,13 @@
 .premium-footer-utility a:hover,.premium-footer-utility a:focus-visible { color: #fff; border-bottom-color: var(--premium-orange); }
 .premium-footer-utility > div { justify-content: flex-end; color: rgba(255,255,255,.6); font-family: 'IBM Plex Mono',monospace; font-size: .62vw; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 
-.customer-service-hologram { position: fixed; right: clamp(.65rem,2vw,1.6rem); bottom: max(.4rem,env(safe-area-inset-bottom)); z-index: 18; width: clamp(12rem,19vw,18rem); aspect-ratio: 720 / 1626; padding: 0; border: 0; opacity: 0; overflow: visible; background: transparent; filter: drop-shadow(0 1.1rem 1.5rem rgba(2,12,19,.38)); transform: translateX(calc(100% + 2rem)); pointer-events: none; cursor: pointer; transition: opacity .35s ease .62s,transform .55s cubic-bezier(.3,.75,.2,1) .62s,filter .25s ease; }
-.customer-service-hologram.is-active { opacity: 1; transform: translateX(0); pointer-events: auto; transition-delay: 0s; }
+.customer-service-hologram { position: fixed; right: clamp(.65rem,2vw,1.6rem); bottom: max(.4rem,env(safe-area-inset-bottom, 0px)); z-index: 18; width: clamp(12rem,19vw,18rem); aspect-ratio: 720 / 1626; opacity: 0; overflow: visible; background: transparent; filter: drop-shadow(0 1.1rem 1.5rem rgba(2,12,19,.38)); transform: translateX(calc(100% + 2rem)); pointer-events: none; transition: opacity .35s ease .62s,transform .55s cubic-bezier(.3,.75,.2,1) .62s,filter .25s ease; }
+.customer-service-hologram.is-active { opacity: 1; transform: translateX(0); transition-delay: 0s; }
 .customer-service-hologram.is-obscured { opacity: 0; pointer-events: none; transition: opacity .2s ease; }
-.customer-service-hologram:hover { filter: drop-shadow(0 1.2rem 1.85rem rgba(2,12,19,.59)) brightness(1.06); }
-.customer-service-hologram:focus-visible { outline: 2px solid #fff; outline-offset: .2rem; }
+.customer-service-hologram:has(.customer-service-hologram-hit:hover) { filter: drop-shadow(0 1.2rem 1.85rem rgba(2,12,19,.59)) brightness(1.06); }
+.customer-service-hologram-hit { position: absolute; right: 0; bottom: 0; z-index: 3; width: 100%; height: 32%; padding: 0; border: 0; border-radius: 0; background: transparent; pointer-events: none; cursor: pointer; }
+.customer-service-hologram.is-active .customer-service-hologram-hit { pointer-events: auto; }
+.customer-service-hologram-hit:focus-visible { outline: 2px solid #fff; outline-offset: .2rem; }
 .customer-service-hologram-puck,.customer-service-hologram-reveal,.customer-service-hologram-reveal > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .customer-service-hologram-puck { display: block; }
 .customer-service-hologram-reveal { clip-path: inset(100% 0 0); transition: clip-path .58s cubic-bezier(.55,.05,.35,1); }

@@ -111,7 +111,7 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
   useDialogFocus(modalRef, onClose)
 
   return (
-    <div className="appointment-backdrop" role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) onClose() }}>
+    <div className="appointment-backdrop" role="presentation" onPointerDown={(event) => { if (event.currentTarget === event.target) onClose() }}>
       <section className="appointment-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-title" ref={modalRef}>
         <header className="appointment-modal-header">
           <div>
@@ -553,7 +553,7 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   }, [activeIndex])
 
   const modal = (
-    <div className={`gallery-modal-backdrop${isClosing ? ' is-closing' : ''}`} role="presentation" onMouseDown={(event) => { if (event.currentTarget === event.target) handleClose() }}>
+    <div className={`gallery-modal-backdrop${isClosing ? ' is-closing' : ''}`} role="presentation" onPointerDown={(event) => { if (event.currentTarget === event.target) handleClose() }}>
       <section className={`gallery-modal-frame${isClosing ? ' is-closing' : ''}`} role="dialog" aria-modal="true" aria-label="Roofscape gallery viewer" tabIndex={-1} ref={modalFrameRef}>
         <div className="gallery-modal-stage" onPointerMove={() => setSuppressArrowHover(false)}>
           <div className="gallery-modal-meta">

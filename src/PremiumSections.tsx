@@ -67,6 +67,7 @@ function HowWeProtectSection() {
   const [split, setSplit] = useState(54)
   const [dragDirection, setDragDirection] = useState<ProtectionDragDirection>(null)
   const [dragIndicatorVisible, setDragIndicatorVisible] = useState(false)
+  const [pointerFocusActive, setPointerFocusActive] = useState(false)
   const isDragging = useRef(false)
   const previousSplit = useRef(split)
   const releaseTimeout = useRef<number | null>(null)
@@ -102,6 +103,7 @@ function HowWeProtectSection() {
     isDragging.current = true
     previousSplit.current = split
     setDragIndicatorVisible(false)
+    setPointerFocusActive(true)
 
     event.currentTarget.focus({ preventScroll: true })
 
@@ -156,6 +158,7 @@ function HowWeProtectSection() {
           className="premium-protection-stage"
           data-drag-direction={dragDirection ?? undefined}
           data-drag-indicator={dragIndicatorVisible && dragDirection ? 'visible' : undefined}
+          data-pointer-focus={pointerFocusActive ? 'true' : undefined}
           style={{ '--premium-split': `${split}%` } as CSSProperties}
         >
           <img className="premium-protection-image" src="/assets/source/protection-finished-roof.jpg" alt="A completed premium slate and copper roof" />
@@ -182,6 +185,9 @@ function HowWeProtectSection() {
             onPointerUp={endSplitDrag}
             onPointerCancel={endSplitDrag}
             onLostPointerCapture={finishSplitDrag}
+            onBlur={() => {
+              if (document.hasFocus()) setPointerFocusActive(false)
+            }}
             aria-label="Reveal underlayment"
             aria-valuetext={`${split}% finished roof, ${100 - split}% underlayment`}
           />
@@ -277,13 +283,9 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
   const showEffect = active && !hidden
 
   return (
-    <button
-      type="button"
+    <div
       className={`customer-service-hologram${showEffect ? ' is-active' : ''}${hidden ? ' is-obscured' : ''}`}
-      onClick={onBook}
-      aria-label="Talk to customer service"
       aria-hidden={!showEffect}
-      tabIndex={showEffect ? 0 : -1}
     >
       <img className="customer-service-hologram-puck" src="/assets/customer service/customer_service_hologram_puck.png" alt="" aria-hidden="true" />
       <span className="customer-service-hologram-reveal" aria-hidden="true">
@@ -355,6 +357,13 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
           </filter>
         </defs>
       </svg>}
-    </button>
+      <button
+        className="customer-service-hologram-hit"
+        type="button"
+        onClick={onBook}
+        aria-label="Talk to customer service"
+        tabIndex={showEffect ? 0 : -1}
+      />
+    </div>
   )
 }
