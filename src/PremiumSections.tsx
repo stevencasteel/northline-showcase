@@ -295,7 +295,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
 
           <section className="premium-footer-map" id="location" aria-labelledby="premium-footer-map-title" data-premium-reveal>
             <div className="premium-footer-map-heading">
-              <span id="premium-footer-map-title">Service area</span>
+              <span id="premium-footer-map-title">Main Office</span>
               <a href={siteConfig.location.mapsUrl} target="_blank" rel="noreferrer">Open in Google Maps ↗</a>
             </div>
             <div className="premium-footer-map-frame">
