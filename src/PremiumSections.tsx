@@ -3,6 +3,7 @@ import { ArrowRight, CalendarDays } from 'lucide-react'
 import { useDocumentVisibility } from './hooks/useDocumentVisibility'
 import { useInView } from './hooks/useInView'
 import { siteConfig } from './config/site'
+import { HOLOGRAM } from './config/hologram'
 
 type BookHandler = { onBook: () => void }
 
@@ -70,13 +71,16 @@ const associationRows: AssociationBadge[][] = [
 ]
 
 const associationLabel = (filename: string) => filename
-  .replace(/^badge_row-[12]_\d+_/, '')
+  .replace(/^badge_row-\d+_\d+_/, '')
   .replace(/\.png$/, '')
   .replace(/[-_]/g, ' ')
   .replace(/\b\w/g, (character) => character.toUpperCase())
 
 const associationBadgeCount = associationRows.reduce((count, row) => count + row.length, 0)
-const associationInitialProgress = [.27, .61] as const
+const associationRowsConfig = [
+  { direction: -1, durationSeconds: 145, initialProgress: .27 },
+  { direction: 1, durationSeconds: 155, initialProgress: .61 },
+] as const
 
 type ProtectionDragDirection = 'left' | 'right' | null
 type ProtectionPointerMode = 'idle' | 'pending' | 'dragging'
@@ -345,8 +349,8 @@ export function PremiumSections() {
 export function AssociationsMarquee() {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRefs = useRef<Array<HTMLDivElement | null>>([])
-  const marqueeProgress = useRef<number[]>([...associationInitialProgress])
-  const marqueeVelocity = useRef([0, 0])
+  const marqueeProgress = useRef<number[]>(associationRowsConfig.map(({ initialProgress }) => initialProgress))
+  const marqueeVelocity = useRef<number[]>(associationRowsConfig.map(() => 0))
   const loadedAssociationFiles = useRef(new Set<string>())
   const [associationAssetsReady, setAssociationAssetsReady] = useState(false)
   const [hoveredRow, setHoveredRow] = useState<number | null>(null)
@@ -363,14 +367,12 @@ export function AssociationsMarquee() {
 
   useEffect(() => {
     if (!isRunning) {
-      marqueeVelocity.current = [0, 0]
+      marqueeVelocity.current = associationRowsConfig.map(() => 0)
       return
     }
 
     let frame = 0
     let previousTime = performance.now()
-    const speeds = [1 / 145, 1 / 155]
-
     const animate = (time: number) => {
       const delta = Math.min(time - previousTime, 48)
       previousTime = time
@@ -378,9 +380,10 @@ export function AssociationsMarquee() {
         const targetVelocity = hoveredRow === rowIndex ? 0 : 1
         const easing = 1 - Math.exp(-delta / 260)
         marqueeVelocity.current[rowIndex] += (targetVelocity - marqueeVelocity.current[rowIndex]) * easing
-        const nextProgress = (progress + speeds[rowIndex] * marqueeVelocity.current[rowIndex] * delta / 1000) % 1
+        const rowConfig = associationRowsConfig[rowIndex]
+        const nextProgress = (progress + rowConfig.direction * marqueeVelocity.current[rowIndex] * delta / rowConfig.durationSeconds / 1000 + 1) % 1
         marqueeProgress.current[rowIndex] = nextProgress
-        const translate = rowIndex === 0 ? -nextProgress * 50 : -50 + nextProgress * 50
+        const translate = rowConfig.direction < 0 ? -nextProgress * 50 : -50 + nextProgress * 50
         trackRefs.current[rowIndex]?.style.setProperty('transform', `translate3d(${translate}%,0,0)`)
       })
       frame = requestAnimationFrame(animate)
@@ -417,7 +420,7 @@ export function AssociationsMarquee() {
         <div className="associations-marquee-rows">
         {associationRows.map((row, rowIndex) => (
           <div className={`associations-marquee-row associations-marquee-row-${rowIndex + 1}`} key={rowIndex} onMouseEnter={() => setHoveredRow(rowIndex)} onMouseLeave={() => setHoveredRow((current) => current === rowIndex ? null : current)}>
-            <div className="associations-marquee-track" ref={(element) => { trackRefs.current[rowIndex] = element }} style={{ transform: `translate3d(${rowIndex === 0 ? -associationInitialProgress[rowIndex] * 50 : -50 + associationInitialProgress[rowIndex] * 50}%,0,0)` }}>
+            <div className="associations-marquee-track" ref={(element) => { trackRefs.current[rowIndex] = element }} style={{ transform: `translate3d(${-50 + associationRowsConfig[rowIndex].initialProgress * 50}%,0,0)` }}>
               {renderGroup(row, false)}
               {renderGroup(row, true)}
             </div>
@@ -441,8 +444,8 @@ export function PremiumFooter({ onBook }: BookHandler) {
               <div className="premium-footer-brand-surface"><img src="/assets/brand/combination-mark.svg" alt="Northline Roofing" /></div>
             </div>
             <div className="premium-footer-contact">
-              <a href="tel:+15555555555"><span>Call</span><strong>(555) 555-5555</strong><i aria-hidden="true">↗</i></a>
-              <a href="mailto:hello@northlineroofing.com"><span>Email</span><strong>hello@northlineroofing.com</strong><i aria-hidden="true">↗</i></a>
+              <a href={siteConfig.phoneHref}><span>Call</span><strong>{siteConfig.phoneDisplay}</strong><i aria-hidden="true">↗</i></a>
+              <a href={`mailto:${siteConfig.email}`}><span>Email</span><strong>{siteConfig.email}</strong><i aria-hidden="true">↗</i></a>
             </div>
             <button className="premium-footer-book" type="button" onClick={onBook}><CalendarDays aria-hidden="true" /><span>Book an Appointment</span><ArrowRight aria-hidden="true" /></button>
           </div>
@@ -461,7 +464,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
 
         <div className="premium-footer-utility">
           <nav aria-label="Footer navigation"><a href="#services">Services</a><a href="#work">Gallery</a><a href="#protection">Protection</a><a href="#reviews">Reviews</a></nav>
-          <div><span>Mon–Fri / 8am–6pm</span><a href="#top">Back to top ↑</a></div>
+          <div><span>{siteConfig.hours.replace(', ', ' / ')}</span><a href="#top">Back to top ↑</a></div>
         </div>
       </div>
     </footer>
@@ -491,10 +494,10 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
 
   useEffect(() => {
     const image = new Image()
-    image.src = '/assets/customer%20service/customer_service_hologram_full.png'
+    image.src = HOLOGRAM.image
     const canvas = document.createElement('canvas')
-    canvas.width = 720
-    canvas.height = 1626
+    canvas.width = HOLOGRAM.width
+    canvas.height = HOLOGRAM.height
     const context = canvas.getContext('2d', { willReadFrequently: true })
     if (!context) return
 
@@ -532,22 +535,22 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
   useEffect(() => {
     if (!showEffect || !documentVisible) return
 
-    const period = 4200
+    const period = HOLOGRAM.periodMs
     const startTime = performance.now()
     let frame = 0
 
     const rippleAlpha = (phase: number) => {
-      if (phase < .42) return 0
-      if (phase < .5) return (phase - .42) / .08
-      if (phase < .92) return 1
-      return 1 - (phase - .92) / .08
+      if (phase < HOLOGRAM.alphaFadeInStart) return 0
+      if (phase < HOLOGRAM.alphaFadeInEnd) return (phase - HOLOGRAM.alphaFadeInStart) / (HOLOGRAM.alphaFadeInEnd - HOLOGRAM.alphaFadeInStart)
+      if (phase < HOLOGRAM.alphaFadeOutStart) return 1
+      return 1 - (phase - HOLOGRAM.alphaFadeOutStart) / (1 - HOLOGRAM.alphaFadeOutStart)
     }
 
     const tick = (timestamp: number) => {
       const phaseA = ((timestamp - startTime) % period) / period
-      const phaseB = (phaseA + .5) % 1
-      rippleOffsetARef.current?.setAttribute('dy', String(-180 + 360 * phaseA))
-      rippleOffsetBRef.current?.setAttribute('dy', String(-180 + 360 * phaseB))
+      const phaseB = (phaseA + HOLOGRAM.phaseOffset) % 1
+      rippleOffsetARef.current?.setAttribute('dy', String(HOLOGRAM.rippleStartY + HOLOGRAM.rippleTravelY * phaseA))
+      rippleOffsetBRef.current?.setAttribute('dy', String(HOLOGRAM.rippleStartY + HOLOGRAM.rippleTravelY * phaseB))
       rippleAlphaARef.current?.setAttribute('slope', String(rippleAlpha(phaseA)))
       rippleAlphaBRef.current?.setAttribute('slope', String(rippleAlpha(phaseB)))
       frame = window.requestAnimationFrame(tick)
@@ -561,9 +564,9 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
     const alpha = hologramAlphaRef.current
     const bounds = hologramRef.current?.getBoundingClientRect()
     if (!alpha || !bounds) return
-    const x = Math.min(719, Math.max(0, Math.floor(((clientX - bounds.left) / bounds.width) * 720)))
-    const y = Math.min(1625, Math.max(0, Math.floor(((clientY - bounds.top) / bounds.height) * 1626)))
-    setHovered(alpha[(y * 720 + x) * 4 + 3] > 12)
+    const x = Math.min(HOLOGRAM.width - 1, Math.max(0, Math.floor(((clientX - bounds.left) / bounds.width) * HOLOGRAM.width)))
+    const y = Math.min(HOLOGRAM.height - 1, Math.max(0, Math.floor(((clientY - bounds.top) / bounds.height) * HOLOGRAM.height)))
+    setHovered(alpha[(y * HOLOGRAM.width + x) * 4 + 3] > HOLOGRAM.alphaHitThreshold)
   }
 
   const updateHoverFromPointer = (event: ReactPointerEvent<SVGSVGElement | HTMLButtonElement>) => {
@@ -578,21 +581,21 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
     >
       <img className="customer-service-hologram-puck" src="/assets/customer service/customer_service_hologram_puck.png" alt="" aria-hidden="true" />
       <span className="customer-service-hologram-reveal" aria-hidden="true">
-        <img src="/assets/customer service/customer_service_hologram_full.png" alt="" />
-        <svg className="customer-service-hologram-effects" viewBox="0 0 720 1626" preserveAspectRatio="xMidYMid meet" xmlnsXlink="http://www.w3.org/1999/xlink" aria-hidden="true">
+        <img src={HOLOGRAM.image.replace('%20', ' ')} alt="" />
+        <svg className="customer-service-hologram-effects" viewBox={`0 0 ${HOLOGRAM.width} ${HOLOGRAM.height}`} preserveAspectRatio="xMidYMid meet" xmlnsXlink="http://www.w3.org/1999/xlink" aria-hidden="true">
         <defs>
-          <linearGradient id={skewGradientId} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1626">
+          <linearGradient id={skewGradientId} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2={HOLOGRAM.height}>
             <stop offset="0%" stopColor="#fff" stopOpacity=".12" /><stop offset="15%" stopColor="#fff" stopOpacity=".12" /><stop offset="27%" stopColor="#fff" stopOpacity=".24" /><stop offset="35%" stopColor="#fff" stopOpacity=".52" /><stop offset="43%" stopColor="#fff" /><stop offset="72%" stopColor="#fff" /><stop offset="82%" stopColor="#fff" stopOpacity=".62" /><stop offset="90%" stopColor="#fff" stopOpacity="0" /><stop offset="100%" stopColor="#fff" stopOpacity="0" />
           </linearGradient>
-          <linearGradient id={rippleGradientId} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="1626">
+          <linearGradient id={rippleGradientId} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2={HOLOGRAM.height}>
             <stop offset="0%" stopColor="#fff" stopOpacity="0" /><stop offset="22%" stopColor="#fff" stopOpacity="0" /><stop offset="27%" stopColor="#fff" stopOpacity=".3" /><stop offset="34%" stopColor="#fff" /><stop offset="70%" stopColor="#fff" /><stop offset="79%" stopColor="#fff" stopOpacity=".68" /><stop offset="89%" stopColor="#fff" stopOpacity="0" /><stop offset="100%" stopColor="#fff" stopOpacity="0" />
           </linearGradient>
-          <mask id={skewMaskId} maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="1626" mask-type="luminance"><rect width="720" height="1626" fill={`url(#${skewGradientId})`} /></mask>
-          <mask id={rippleMaskId} maskUnits="userSpaceOnUse" x="0" y="0" width="720" height="1626" mask-type="luminance"><rect width="720" height="1626" fill={`url(#${rippleGradientId})`} /></mask>
+          <mask id={skewMaskId} maskUnits="userSpaceOnUse" x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} mask-type="luminance"><rect width={HOLOGRAM.width} height={HOLOGRAM.height} fill={`url(#${skewGradientId})`} /></mask>
+          <mask id={rippleMaskId} maskUnits="userSpaceOnUse" x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} mask-type="luminance"><rect width={HOLOGRAM.width} height={HOLOGRAM.height} fill={`url(#${rippleGradientId})`} /></mask>
           <filter id={rippleAId} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="-58" y="-66" width="836" height="1758" colorInterpolationFilters="sRGB">
             <feTurbulence type="fractalNoise" baseFrequency=".012 .055" numOctaves="1" seed="7" result="ripple-noise" />
             <feTile in="ripple-noise" result="tiled-ripple" />
-            <feOffset ref={rippleOffsetARef} in="tiled-ripple" dy="-180" result="moving-ripple"><animate attributeName="dy" from="-180" to="180" dur="4.2s" calcMode="linear" repeatCount="indefinite" /></feOffset>
+            <feOffset ref={rippleOffsetARef} in="tiled-ripple" dy={HOLOGRAM.rippleStartY} result="moving-ripple"><animate attributeName="dy" from={HOLOGRAM.rippleStartY} to={HOLOGRAM.rippleStartY + HOLOGRAM.rippleTravelY} dur={`${HOLOGRAM.periodMs / 1000}s`} calcMode="linear" repeatCount="indefinite" /></feOffset>
             <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="outer-edge" />
             <feMorphology in="SourceAlpha" operator="erode" radius="9" result="inner-edge" />
             <feComposite in="outer-edge" in2="inner-edge" operator="out" result="edge-band" />
@@ -601,13 +604,13 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
             <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="12" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
             <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" result="ripple-output" />
             <feComponentTransfer in="ripple-output">
-              <feFuncA ref={rippleAlphaARef} type="linear" slope="0"><animate attributeName="slope" values="0;0;1;1;0" keyTimes="0;.42;.5;.92;1" dur="4.2s" calcMode="linear" repeatCount="indefinite" /></feFuncA>
+              <feFuncA ref={rippleAlphaARef} type="linear" slope="0"><animate attributeName="slope" values="0;0;1;1;0" keyTimes={`0;${HOLOGRAM.alphaFadeInStart};${HOLOGRAM.alphaFadeInEnd};${HOLOGRAM.alphaFadeOutStart};1`} dur={`${HOLOGRAM.periodMs / 1000}s`} calcMode="linear" repeatCount="indefinite" /></feFuncA>
             </feComponentTransfer>
           </filter>
           <filter id={rippleBId} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="-58" y="-66" width="836" height="1758" colorInterpolationFilters="sRGB">
             <feTurbulence type="fractalNoise" baseFrequency=".012 .055" numOctaves="1" seed="7" result="ripple-noise" />
             <feTile in="ripple-noise" result="tiled-ripple" />
-            <feOffset ref={rippleOffsetBRef} in="tiled-ripple" dy="-180" result="moving-ripple"><animate attributeName="dy" from="-180" to="180" dur="4.2s" begin="-2.1s" calcMode="linear" repeatCount="indefinite" /></feOffset>
+            <feOffset ref={rippleOffsetBRef} in="tiled-ripple" dy={HOLOGRAM.rippleStartY} result="moving-ripple"><animate attributeName="dy" from={HOLOGRAM.rippleStartY} to={HOLOGRAM.rippleStartY + HOLOGRAM.rippleTravelY} dur={`${HOLOGRAM.periodMs / 1000}s`} begin={`-${HOLOGRAM.periodMs * HOLOGRAM.phaseOffset / 1000}s`} calcMode="linear" repeatCount="indefinite" /></feOffset>
             <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="outer-edge" />
             <feMorphology in="SourceAlpha" operator="erode" radius="9" result="inner-edge" />
             <feComposite in="outer-edge" in2="inner-edge" operator="out" result="edge-band" />
@@ -616,7 +619,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
             <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="12" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
             <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" result="ripple-output" />
             <feComponentTransfer in="ripple-output">
-              <feFuncA ref={rippleAlphaBRef} type="linear" slope="0"><animate attributeName="slope" values="0;0;1;1;0" keyTimes="0;.42;.5;.92;1" dur="4.2s" begin="-2.1s" calcMode="linear" repeatCount="indefinite" /></feFuncA>
+              <feFuncA ref={rippleAlphaBRef} type="linear" slope="0"><animate attributeName="slope" values="0;0;1;1;0" keyTimes={`0;${HOLOGRAM.alphaFadeInStart};${HOLOGRAM.alphaFadeInEnd};${HOLOGRAM.alphaFadeOutStart};1`} dur={`${HOLOGRAM.periodMs / 1000}s`} begin={`-${HOLOGRAM.periodMs * HOLOGRAM.phaseOffset / 1000}s`} calcMode="linear" repeatCount="indefinite" /></feFuncA>
             </feComponentTransfer>
           </filter>
           <filter id={skewAId} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="-58" y="-66" width="836" height="1758" colorInterpolationFilters="sRGB">
@@ -640,15 +643,15 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
             <feComposite in="clean-skew" in2="face-exclusion" operator="out" />
           </filter>
         </defs>
-          <g className="customer-service-hologram-skew customer-service-hologram-skew-a" filter={`url(#${skewAId})`} mask={`url(#${skewMaskId})`}><image x="0" y="0" width="720" height="1626" href="/assets/customer%20service/customer_service_hologram_full.png" xlinkHref="/assets/customer%20service/customer_service_hologram_full.png" preserveAspectRatio="xMidYMid meet" /></g>
-          <g className="customer-service-hologram-skew customer-service-hologram-skew-b" filter={`url(#${skewBId})`} mask={`url(#${skewMaskId})`}><image x="0" y="0" width="720" height="1626" href="/assets/customer%20service/customer_service_hologram_full.png" xlinkHref="/assets/customer%20service/customer_service_hologram_full.png" preserveAspectRatio="xMidYMid meet" /></g>
-          <g className="customer-service-hologram-distortion customer-service-hologram-distortion-a" filter={`url(#${rippleAId})`} mask={`url(#${rippleMaskId})`}><image x="0" y="0" width="720" height="1626" href="/assets/customer%20service/customer_service_hologram_full.png" xlinkHref="/assets/customer%20service/customer_service_hologram_full.png" preserveAspectRatio="xMidYMid meet" /></g>
-          <g className="customer-service-hologram-distortion customer-service-hologram-distortion-b" filter={`url(#${rippleBId})`} mask={`url(#${rippleMaskId})`}><image x="0" y="0" width="720" height="1626" href="/assets/customer%20service/customer_service_hologram_full.png" xlinkHref="/assets/customer%20service/customer_service_hologram_full.png" preserveAspectRatio="xMidYMid meet" /></g>
+          <g className="customer-service-hologram-skew customer-service-hologram-skew-a" filter={`url(#${skewAId})`} mask={`url(#${skewMaskId})`}><image x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} href={HOLOGRAM.image} xlinkHref={HOLOGRAM.image} preserveAspectRatio="xMidYMid meet" /></g>
+          <g className="customer-service-hologram-skew customer-service-hologram-skew-b" filter={`url(#${skewBId})`} mask={`url(#${skewMaskId})`}><image x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} href={HOLOGRAM.image} xlinkHref={HOLOGRAM.image} preserveAspectRatio="xMidYMid meet" /></g>
+          <g className="customer-service-hologram-distortion customer-service-hologram-distortion-a" filter={`url(#${rippleAId})`} mask={`url(#${rippleMaskId})`}><image x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} href={HOLOGRAM.image} xlinkHref={HOLOGRAM.image} preserveAspectRatio="xMidYMid meet" /></g>
+          <g className="customer-service-hologram-distortion customer-service-hologram-distortion-b" filter={`url(#${rippleBId})`} mask={`url(#${rippleMaskId})`}><image x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} href={HOLOGRAM.image} xlinkHref={HOLOGRAM.image} preserveAspectRatio="xMidYMid meet" /></g>
         </svg>
       </span>
       <svg
         className="customer-service-hologram-hover-target"
-        viewBox="0 0 720 1626"
+        viewBox={`0 0 ${HOLOGRAM.width} ${HOLOGRAM.height}`}
         preserveAspectRatio="xMidYMid meet"
         xmlnsXlink="http://www.w3.org/1999/xlink"
         pointerEvents="auto"
@@ -658,7 +661,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
         onPointerLeave={() => setHovered(false)}
         onPointerCancel={() => setHovered(false)}
       >
-        <rect width="720" height="1626" fill="transparent" />
+        <rect width={HOLOGRAM.width} height={HOLOGRAM.height} fill="transparent" />
       </svg>
       <button
         className="customer-service-hologram-hit"

@@ -1,6 +1,9 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 
-const referenceWidth = 1440
+const ARTBOARD_REFERENCE_WIDTH_PX = 1440
+const SCALE_CHANGE_EPSILON = 0.0001
+const HEIGHT_CHANGE_EPSILON_PX = 0.5
+const MIN_MEASURABLE_WIDTH_PX = 1
 
 type ScaledArtboardProps = {
   children: ReactNode
@@ -9,7 +12,7 @@ type ScaledArtboardProps = {
 export function ScaledArtboard({ children }: ScaledArtboardProps) {
   const hostRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
-  const [layout, setLayout] = useState({ artboardWidth: referenceWidth, scale: 1, height: 0 })
+  const [layout, setLayout] = useState({ artboardWidth: ARTBOARD_REFERENCE_WIDTH_PX, scale: 1, height: 0 })
 
   useLayoutEffect(() => {
     const host = hostRef.current
@@ -19,11 +22,11 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
     let resizeFrame = 0
 
     const update = () => {
-      const hostWidth = Math.max(host.getBoundingClientRect().width, 1)
-      const artboardWidth = Math.max(referenceWidth, hostWidth)
+      const hostWidth = Math.max(host.getBoundingClientRect().width, MIN_MEASURABLE_WIDTH_PX)
+      const artboardWidth = Math.max(ARTBOARD_REFERENCE_WIDTH_PX, hostWidth)
       const scale = hostWidth / artboardWidth
       const height = inner.scrollHeight * scale
-      setLayout((current) => current.artboardWidth === artboardWidth && Math.abs(current.scale - scale) < 0.0001 && Math.abs(current.height - height) < 0.5 ? current : { artboardWidth, scale, height })
+      setLayout((current) => current.artboardWidth === artboardWidth && Math.abs(current.scale - scale) < SCALE_CHANGE_EPSILON && Math.abs(current.height - height) < HEIGHT_CHANGE_EPSILON_PX ? current : { artboardWidth, scale, height })
     }
 
     const scheduleUpdate = () => {

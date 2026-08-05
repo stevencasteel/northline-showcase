@@ -11,6 +11,7 @@ import { useInView } from './hooks/useInView'
 import { useDialogFocus } from './hooks/useDialogFocus'
 import { ScaledArtboard } from './components/ScaledArtboard'
 import { siteConfig } from './config/site'
+import { GALLERY_PREVIEW_SLOTS, GALLERY_SWAP_CONFIG } from './config/gallery'
 
 const asset = '/assets/'
 
@@ -106,7 +107,7 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
         <p className="hero-description">Complete roofing systems, exterior protection, and water<span className="desktop-break"><br /></span>management—installed by a local crew that sweats every detail.<span className="desktop-break"><br /></span> Clear pricing, exacting standards, and zero shortcuts.</p>
         <div className="hero-actions">
           <button className="button button-primary" type="button" onClick={onBookAppointment}><CalendarDays aria-hidden="true" /> <span>Book an Appointment</span> <ArrowRight aria-hidden="true" /></button>
-          <a className="button button-call" href="tel:+15555555555"><Phone size={20} /> <span>(555) 555-5555</span></a>
+          <a className="button button-call" href={siteConfig.phoneHref}><Phone size={20} /> <span>{siteConfig.phoneDisplay}</span></a>
         </div>
       </div>
     </section>
@@ -290,7 +291,7 @@ const roofMaterials = [
 ] as const
 
 // Keep the preview curated while the modal remains the complete gallery.
-const galleryPreviewIndices = [0, 2, 7, 9, 13, 16]
+const galleryPreviewIndices = GALLERY_PREVIEW_SLOTS.map(({ initialImage }) => initialImage)
 const galleryObserverOptions: IntersectionObserverInit = { rootMargin: '20% 0px', threshold: 0.04 }
 
 function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHover, onActivate }: {
@@ -500,7 +501,6 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   const isClosingRef = useRef(false)
   const [closeShockwave, setCloseShockwave] = useState(0)
   const [closePressed, setClosePressed] = useState(false)
-  const closeTimerRef = useRef<number | null>(null)
   const activeImage = images[activeIndex]
 
   useEffect(() => {
@@ -518,8 +518,7 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
     isClosingRef.current = true
     setCloseShockwave((current) => current + 1)
     setIsClosing(true)
-    closeTimerRef.current = window.setTimeout(onClose, 360)
-  }, [onClose])
+  }, [])
 
   const navigate = useCallback((direction: -1 | 1) => {
     onSelect((activeIndex + direction + images.length) % images.length)
@@ -532,7 +531,6 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
     document.body.classList.add('gallery-modal-open')
     return () => {
       document.body.classList.remove('gallery-modal-open')
-      if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current)
     }
   }, [])
 
@@ -575,7 +573,9 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
 
   const modal = (
     <div className={`gallery-modal-backdrop${isClosing ? ' is-closing' : ''}`} role="presentation" onPointerDown={(event) => { if (event.currentTarget === event.target) handleClose() }}>
-      <section className={`gallery-modal-frame${isClosing ? ' is-closing' : ''}`} role="dialog" aria-modal="true" aria-label="Roofscape gallery viewer" tabIndex={-1} ref={modalFrameRef}>
+      <section className={`gallery-modal-frame${isClosing ? ' is-closing' : ''}`} role="dialog" aria-modal="true" aria-label="Roofscape gallery viewer" tabIndex={-1} ref={modalFrameRef} onAnimationEnd={(event) => {
+        if (isClosing && event.target === event.currentTarget && event.animationName === 'gallery-frame-out') onClose()
+      }}>
         <div className="gallery-modal-stage" onPointerMove={() => setSuppressArrowHover(false)}>
           <div className="gallery-modal-meta">
             <span>Roofscape</span>
@@ -711,25 +711,16 @@ function Gallery() {
 
   useEffect(() => {
     if (!inView || !documentVisible || activeIndex !== null || images.length <= previewIndices.length) return
-    const globalBuffer = 850
-    const adjacencyBuffer = 1700
-    const neighbors: number[][] = [
-      [1, 2, 3, 4],
-      [0, 2],
-      [0, 1, 4, 5],
-      [0, 4],
-      [0, 2, 3, 5],
-      [2, 4],
-    ]
-    const lastFired = Array(galleryPreviewIndices.length).fill(-Infinity)
-    const dueTimes = galleryPreviewIndices.map(() => performance.now() + 2000 + Math.random() * 4000)
+    const { minimumGlobalIntervalMs, neighboringCellCooldownMs, minimumDelayMs, randomDelayRangeMs, idleRetryMs, schedulerFloorMs } = GALLERY_SWAP_CONFIG
+    const lastFired = Array(GALLERY_PREVIEW_SLOTS.length).fill(-Infinity)
+    const dueTimes = GALLERY_PREVIEW_SLOTS.map(() => performance.now() + minimumDelayMs + Math.random() * randomDelayRangeMs)
     let lastGlobalFire = -Infinity
     let scheduler = 0
 
     const scheduleNext = () => {
       const now = performance.now()
-      if (now - lastGlobalFire < globalBuffer) {
-        scheduler = window.setTimeout(scheduleNext, globalBuffer)
+      if (now - lastGlobalFire < minimumGlobalIntervalMs) {
+        scheduler = window.setTimeout(scheduleNext, minimumGlobalIntervalMs)
         return
       }
 
@@ -737,20 +728,20 @@ function Gallery() {
         .map((dueTime, slot) => ({ dueTime, slot }))
         .filter(({ dueTime, slot }) => {
           if (slot === hoveredSlotRef.current) return false
-          if (dueTime > now || now - lastFired[slot] < adjacencyBuffer) return false
-          return neighbors[slot].every((neighbor) => now - lastFired[neighbor] >= adjacencyBuffer)
+          if (dueTime > now || now - lastFired[slot] < neighboringCellCooldownMs) return false
+          return GALLERY_PREVIEW_SLOTS[slot].neighbors.every((neighbor) => now - lastFired[neighbor] >= neighboringCellCooldownMs)
         })
         .sort((a, b) => a.dueTime - b.dueTime)
 
       const nextSlot = eligibleSlots[0]?.slot
       if (nextSlot === undefined) {
-        scheduler = window.setTimeout(scheduleNext, 500)
+        scheduler = window.setTimeout(scheduleNext, idleRetryMs)
         return
       }
 
       lastFired[nextSlot] = now
       lastGlobalFire = now
-      dueTimes[nextSlot] = now + 2000 + Math.random() * 4000
+      dueTimes[nextSlot] = now + minimumDelayMs + Math.random() * randomDelayRangeMs
       setPreviewIndices((current) => {
         if (current.length < galleryPreviewIndices.length) return current
         const next = [...current]
@@ -766,9 +757,9 @@ function Gallery() {
         return next
       })
       const nextDue = Math.min(...dueTimes)
-      scheduler = window.setTimeout(scheduleNext, Math.max(250, nextDue - performance.now()))
+      scheduler = window.setTimeout(scheduleNext, Math.max(schedulerFloorMs, nextDue - performance.now()))
     }
-    scheduler = window.setTimeout(scheduleNext, Math.max(250, Math.min(...dueTimes) - performance.now()))
+    scheduler = window.setTimeout(scheduleNext, Math.max(schedulerFloorMs, Math.min(...dueTimes) - performance.now()))
 
     return () => {
       window.clearTimeout(scheduler)
