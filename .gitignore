@@ -10,4 +10,7 @@ dist/
 # Affinity lock files
 *.afpub~lock~
 *.afdesign~lock~
+
+# Generated source snapshot
+docs/northline-roofing_source_code.txt
 *.afphoto~lock~

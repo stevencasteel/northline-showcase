@@ -258,22 +258,22 @@ const galleryImages: GalleryImage[] = [
 ]
 
 const roofMaterials = [
-  ['01', 'Basalt fireclay', 'Charcoal / shadow line'],
-  ['02', 'Copperwood', 'Amber / russet fleck'],
-  ['03', 'Dragon-metal seam', 'Cobalt / vertical panel'],
-  ['04', 'Patinated copper', 'Emerald / living metal'],
-  ['05', 'Moon slate', 'Violet / irregular edge'],
-  ['06', 'Storm slate', 'Blue-black / mineral'],
-  ['07', 'Cedar shakes', 'Silver wood / honey grain'],
-  ['08', 'Frost membrane', 'Pearl / silver seam'],
-  ['09', 'Kiln barrel tile', 'Burnt sienna / clay'],
-  ['10', 'Indigo glaze', 'Plum blue / fired gloss'],
-  ['11', 'Tideglass tile', 'Teal / copper scale'],
-  ['12', 'Sun-baked tile', 'Ochre / warm terracotta'],
-  ['13', 'Graphite composite', 'Slate black / blue variation'],
-  ['14', 'Obsidian slate', 'Matte black / uniform edge'],
-  ['15', 'Pearl membrane', 'White / silver seam'],
-  ['16', 'Cool-roof membrane', 'Pale blue / reflective'],
+  ['01', 'Terracotta barrel tile', 'Burnt orange / rounded profile'],
+  ['02', 'Patinated copper seam', 'Blue-green / vertical panel'],
+  ['03', 'Riven slate tile', 'Blue-gray / rugged split face'],
+  ['04', 'Iridescent scale tile', 'Silver blue / fish-scale profile'],
+  ['05', 'Translucent polycarbonate', 'Clear / corrugated panel'],
+  ['06', 'Gilded hex tile', 'Amber gold / geometric relief'],
+  ['07', 'Blue scallop tile', 'Deep teal / glazed scale'],
+  ['08', 'Thatch roofing', 'Natural straw / layered fiber'],
+  ['09', 'Indigo barrel tile', 'Cobalt violet / fired gloss'],
+  ['10', 'Silver standing seam', 'Cool gray / vertical rib'],
+  ['11', 'Copper diamond shingle', 'Warm copper / geometric scale'],
+  ['12', 'Verdigris scallop tile', 'Emerald teal / aged copper'],
+  ['13', 'Ivory barrel tile', 'Cream / embossed pattern'],
+  ['14', 'Cedar shakes', 'Weathered wood / natural grain'],
+  ['15', 'Solar slate panel', 'Blue-gray / photovoltaic grid'],
+  ['16', 'Living roof membrane', 'Moss green / planted system'],
 ] as const
 
 // Keep the preview curated while the modal remains the complete gallery.
@@ -780,7 +780,7 @@ function Gallery() {
               <span className="gallery-material-rule" />
             </div>
             <div className="gallery-material-art">
-              <img src={`${asset}gallery/material-library.png`} alt="A front-facing display of sixteen fantasy roofing material samples arranged in two columns like a premium architectural showroom library." />
+              <img src={`${asset}gallery/material-library.jpg`} alt="A front-facing display of sixteen fantasy roofing material samples arranged in two columns like a premium architectural showroom library." />
               <div className="gallery-material-labels">
                 {roofMaterials.map(([number, name, detail]) => (
                   <div className="gallery-material-label" key={number}>
