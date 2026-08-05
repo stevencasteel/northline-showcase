@@ -791,8 +791,10 @@ function Gallery() {
           <p className="section-kicker" id="gallery-title">Gallery</p>
         </div>
         <div className="gallery-content">
-          <div className="gallery-showcase">
-            {visibleImages.map(renderGalleryCard)}
+          <div className="gallery-showcase-shell">
+            <div className="gallery-showcase">
+              {visibleImages.map(renderGalleryCard)}
+            </div>
           </div>
           <aside className="gallery-material-library" aria-labelledby="materials-title">
             <div className="gallery-material-heading">
@@ -801,15 +803,17 @@ function Gallery() {
               <span className="gallery-material-rule" />
             </div>
             <div className="gallery-material-art">
-              <img src={`${asset}gallery/material-library.jpg`} alt="A front-facing display of sixteen fantasy roofing material samples arranged in two columns like a premium architectural showroom library." />
-              <div className="gallery-material-labels">
-                {roofMaterials.map(([number, name, detail]) => (
-                  <div className="gallery-material-label" key={number}>
-                    <span>{number}</span>
-                    <strong>{name}</strong>
-                    <small>{detail}</small>
-                  </div>
-                ))}
+              <div className="gallery-material-clip">
+                <img src={`${asset}gallery/material-library.jpg`} alt="A front-facing display of sixteen fantasy roofing material samples arranged in two columns like a premium architectural showroom library." />
+                <div className="gallery-material-labels">
+                  {roofMaterials.map(([number, name, detail]) => (
+                    <div className="gallery-material-label" key={number}>
+                      <span>{number}</span>
+                      <strong>{name}</strong>
+                      <small>{detail}</small>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </aside>
