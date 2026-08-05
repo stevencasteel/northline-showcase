@@ -16,6 +16,7 @@ export function useBodyScrollLock(locked: boolean) {
       bodyRight: body.style.right,
       bodyWidth: body.style.width,
       bodyPaddingRight: body.style.paddingRight,
+      rootScrollBehavior: root.style.scrollBehavior,
     }
     const scrollbarWidth = window.innerWidth - root.clientWidth
 
@@ -29,6 +30,7 @@ export function useBodyScrollLock(locked: boolean) {
     if (scrollbarWidth > 0) body.style.paddingRight = `${scrollbarWidth}px`
 
     return () => {
+      root.style.scrollBehavior = 'auto'
       root.style.overflow = previous.rootOverflow
       body.style.overflow = previous.bodyOverflow
       body.style.position = previous.bodyPosition
@@ -38,6 +40,7 @@ export function useBodyScrollLock(locked: boolean) {
       body.style.width = previous.bodyWidth
       body.style.paddingRight = previous.bodyPaddingRight
       window.scrollTo(scrollX, scrollY)
+      root.style.scrollBehavior = previous.rootScrollBehavior
     }
   }, [locked])
 }
