@@ -392,17 +392,24 @@ function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHov
     return currentShiftRef.current
   }, [])
 
-  const stopArrowMotion = useCallback(() => {
-    animationRef.current?.cancel()
-    animationRef.current = null
-    if (chargeFrameRef.current) cancelAnimationFrame(chargeFrameRef.current)
-    chargeFrameRef.current = null
-  }, [])
-
   const setArrowShift = useCallback((shift: number) => {
     currentShiftRef.current = shift
     if (arrowRef.current) arrowRef.current.style.transform = `translate3d(${shift}px, 0, 0)`
   }, [])
+
+  const stopArrowMotion = useCallback(() => {
+    const arrow = arrowRef.current
+    if (animationRef.current && arrow) {
+      const currentShift = readArrowShift()
+      animationRef.current.cancel()
+      setArrowShift(currentShift)
+    } else {
+      animationRef.current?.cancel()
+    }
+    animationRef.current = null
+    if (chargeFrameRef.current) cancelAnimationFrame(chargeFrameRef.current)
+    chargeFrameRef.current = null
+  }, [readArrowShift, setArrowShift])
 
   const runArrowAnimation = useCallback((arrow: HTMLElement, keyframes: Keyframe[], options: KeyframeAnimationOptions, finalShift: number) => {
     if (typeof arrow.animate !== 'function') {
