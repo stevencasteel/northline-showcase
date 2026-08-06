@@ -169,15 +169,15 @@ function BadgeStrip() {
   return (
     <section className="badge-strip" id="about" aria-label="Northline Roofing qualifications">
       <div className="badge-sprite-canvas" aria-hidden="true">
-        <div className="badge-slice badge-slice-one"><img src={`${asset}badges/banner.png`} alt="" /></div>
-        <div className="badge-slice badge-divider-one"><img src={`${asset}badges/banner.png`} alt="" /></div>
-        <div className="badge-slice badge-slice-two"><img src={`${asset}badges/banner.png`} alt="" /></div>
-        <div className="badge-slice badge-divider-two"><img src={`${asset}badges/banner.png`} alt="" /></div>
-        <div className="badge-slice badge-slice-three"><img src={`${asset}badges/banner.png`} alt="" /></div>
-        <div className="badge-slice badge-divider-three"><img src={`${asset}badges/banner.png`} alt="" /></div>
-        <div className="badge-slice badge-slice-four"><img src={`${asset}badges/banner.png`} alt="" /></div>
+        <div className="badge-slice badge-slice-one"><img src={`${asset}badges/banner.avif`} alt="" /></div>
+        <div className="badge-slice badge-divider-one"><img src={`${asset}badges/banner.avif`} alt="" /></div>
+        <div className="badge-slice badge-slice-two"><img src={`${asset}badges/banner.avif`} alt="" /></div>
+        <div className="badge-slice badge-divider-two"><img src={`${asset}badges/banner.avif`} alt="" /></div>
+        <div className="badge-slice badge-slice-three"><img src={`${asset}badges/banner.avif`} alt="" /></div>
+        <div className="badge-slice badge-divider-three"><img src={`${asset}badges/banner.avif`} alt="" /></div>
+        <div className="badge-slice badge-slice-four"><img src={`${asset}badges/banner.avif`} alt="" /></div>
       </div>
-      <img className="badge-banner visually-hidden" src={`${asset}badges/banner.png`} alt="Northline Roofing promotional banner divided into four sections by copper divider bars: a copper award medal with 300 YEARS EXPERIENCE; a copper palm tree with TROPICS LICENSED; a copper cityscape with RESIDENTIAL & COMMERCIAL; and a copper anvil and hammer with CUSTOM METAL FABRICATION." />
+      <img className="badge-banner visually-hidden" src={`${asset}badges/banner.avif`} alt="Northline Roofing promotional banner divided into four sections by copper divider bars: a copper award medal with 300 YEARS EXPERIENCE; a copper palm tree with TROPICS LICENSED; a copper cityscape with RESIDENTIAL & COMMERCIAL; and a copper anvil and hammer with CUSTOM METAL FABRICATION." />
       <p className="visually-hidden">Northline Roofing qualifications: 300 years experience. Tropics licensed. Residential and commercial roofing. Custom metal fabrication.</p>
     </section>
   )
