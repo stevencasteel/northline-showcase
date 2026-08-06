@@ -31,6 +31,8 @@
   transition: opacity .7s ease, transform .85s cubic-bezier(.2,.78,.2,1);
 }
 [data-premium-reveal].is-visible { opacity: 1; transform: none; }
+.premium-reviews.is-visible [data-premium-reveal],
+.premium-footer.is-visible [data-premium-reveal] { opacity: 1; transform: none; }
 
 .premium-protection {
   padding-top: min(5.5cqw, 5.5rem);
@@ -206,7 +208,7 @@
 .premium-google-mark img { width: min(1.75rem,1.95cqw); height: min(1.75rem,1.95cqw); }
 .premium-review-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: min(1.1rem,1.2cqw); perspective: 1400px; }
 .premium-review-card { position: relative; min-height: min(30.5rem,34cqw); padding: min(2.6rem,2.9cqw); border: 1px solid rgba(107,60,31,.36); display: flex; flex-direction: column; overflow: hidden; background: linear-gradient(145deg,rgba(255,255,255,.86),rgba(237,225,208,.62)),url('/assets/textures/roofing-felt-fiber.png') center / 560px,#f2eadf; box-shadow: 0 1.1rem 3.4rem rgba(4,20,33,.12),inset 0 0 0 8px rgba(185,110,66,.12); transform: rotate(calc((var(--premium-review-index) - 1) * .65deg)); transition: opacity .7s ease, transform .85s cubic-bezier(.2,.78,.2,1), box-shadow .3s ease; transition-delay: calc(var(--premium-review-index) * .1s); }
-.premium-review-card.is-visible:hover { z-index: 2; transform: translateY(-.6rem) rotate(0); box-shadow: 0 2rem 5rem rgba(4,20,33,.22),inset 0 0 0 8px rgba(185,110,66,.16); }
+.premium-reviews.is-visible .premium-review-card:hover { z-index: 2; transform: translateY(-.6rem) rotate(0); box-shadow: 0 2rem 5rem rgba(4,20,33,.22),inset 0 0 0 8px rgba(185,110,66,.16); }
 .premium-review-fasteners i { position: absolute; width: .7rem; height: .7rem; border: 1px solid #6b3b21; border-radius: 50%; background: radial-gradient(circle at 35% 30%,#f1b37c,#7d4323 70%); box-shadow: 0 1px 3px rgba(0,0,0,.4); }
 .premium-review-fasteners i:nth-child(1) { top: .75rem; left: .75rem; }.premium-review-fasteners i:nth-child(2) { top: .75rem; right: .75rem; }.premium-review-fasteners i:nth-child(3) { bottom: .75rem; left: .75rem; }.premium-review-fasteners i:nth-child(4) { right: .75rem; bottom: .75rem; }
 .premium-review-card header { padding-bottom: min(1.5rem,1.7cqw); border-bottom: 1px solid rgba(4,20,33,.14); display: grid; grid-template-columns: min(6.73rem,7.48cqw) 1fr auto; gap: min(1rem,1.1cqw); align-items: center; }

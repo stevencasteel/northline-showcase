@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import { AlertCircle, ArrowRight, ArrowUpRight, CalendarDays, ChevronLeft, ChevronRight, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
@@ -9,6 +9,9 @@ import { useBodyScrollLock } from './hooks/useBodyScrollLock'
 import { useDocumentVisibility } from './hooks/useDocumentVisibility'
 import { useInView } from './hooks/useInView'
 import { useDialogFocus } from './hooks/useDialogFocus'
+import { useGalleryKeyboardNavigation } from './hooks/useGalleryKeyboardNavigation'
+import { useActiveThumbnailScroll } from './hooks/useActiveThumbnailScroll'
+import { useGalleryPreviewRotation } from './hooks/useGalleryPreviewRotation'
 import { ScaledArtboard } from './components/ScaledArtboard'
 import { siteConfig } from './config/site'
 import { GALLERY_PREVIEW_SLOTS, GALLERY_SWAP_CONFIG } from './config/gallery'
@@ -357,24 +360,6 @@ const roofMaterials = [
 const galleryPreviewIndices = GALLERY_PREVIEW_SLOTS.map(({ initialImage }) => initialImage)
 const galleryObserverOptions: IntersectionObserverInit = { rootMargin: '20% 0px', threshold: 0.04 }
 
-const clampScrollPosition = (value: number, maximum: number) => Math.min(Math.max(value, 0), maximum)
-
-function centerGallerySequenceItem(list: HTMLElement, item: HTMLElement, behavior: ScrollBehavior) {
-  const listRect = list.getBoundingClientRect()
-  const itemRect = item.getBoundingClientRect()
-  const maximumScrollLeft = Math.max(0, list.scrollWidth - list.clientWidth)
-  const maximumScrollTop = Math.max(0, list.scrollHeight - list.clientHeight)
-
-  if (maximumScrollLeft > maximumScrollTop) {
-    const itemCenter = list.scrollLeft + itemRect.left - listRect.left + itemRect.width / 2
-    list.scrollTo({ left: clampScrollPosition(itemCenter - list.clientWidth / 2, maximumScrollLeft), behavior })
-    return
-  }
-
-  const itemCenter = list.scrollTop + itemRect.top - listRect.top + itemRect.height / 2
-  list.scrollTo({ top: clampScrollPosition(itemCenter - list.clientHeight / 2, maximumScrollTop), behavior })
-}
-
 function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHover, onActivate }: {
   direction: 'previous' | 'next'
   keyboardActive: boolean
@@ -582,23 +567,7 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   const isClosingRef = useRef(false)
   const [closeShockwave, setCloseShockwave] = useState(0)
   const [closePressed, setClosePressed] = useState(false)
-  const hasPositionedSequenceRef = useRef(false)
-  const sequenceFrameRef = useRef<number | null>(null)
-  const keyboardNavigationRef = useRef({ isHeld: false, isRepeating: false })
   const activeImage = images[activeIndex]
-
-  const scheduleSequenceSync = useCallback((behavior: ScrollBehavior) => {
-    if (sequenceFrameRef.current !== null) window.cancelAnimationFrame(sequenceFrameRef.current)
-    sequenceFrameRef.current = window.requestAnimationFrame(() => {
-      sequenceFrameRef.current = null
-      const sequenceList = sequenceListRef.current
-      const activeItem = sequenceList?.querySelector<HTMLElement>('[aria-current="true"]')
-      if (!sequenceList || !activeItem) return
-
-      const resolvedBehavior = keyboardNavigationRef.current.isRepeating ? 'auto' : behavior
-      centerGallerySequenceItem(sequenceList, activeItem, resolvedBehavior)
-    })
-  }, [])
 
   useEffect(() => {
     const neighborIndexes = [activeIndex, (activeIndex - 1 + images.length) % images.length, (activeIndex + 1) % images.length]
@@ -621,6 +590,19 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
     onSelect((activeIndex + direction + images.length) % images.length)
   }, [activeIndex, images.length, onSelect])
 
+  const keyboardRepeatingRef = useGalleryKeyboardNavigation((direction, repeating) => {
+    if (!repeating) {
+      setActiveControl(direction === 1 ? 'next' : 'previous')
+      setControlPressCount((current) => ({ ...current, [direction === 1 ? 'next' : 'previous']: current[direction === 1 ? 'next' : 'previous'] + 1 }))
+    }
+    setSuppressArrowHover(true)
+    navigate(direction)
+  }, () => {
+    setSuppressArrowHover(false)
+    setActiveControl(null)
+  })
+  useActiveThumbnailScroll(sequenceListRef, activeIndex, keyboardRepeatingRef.current)
+
   useBodyScrollLock(true)
   useDialogFocus(modalFrameRef, handleClose)
 
@@ -629,69 +611,6 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
     return () => {
       document.body.classList.remove('gallery-modal-open')
     }
-  }, [])
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-        event.preventDefault()
-        keyboardNavigationRef.current.isHeld = true
-        keyboardNavigationRef.current.isRepeating = event.repeat
-        setSuppressArrowHover(true)
-        if (!event.repeat) {
-          setActiveControl('next')
-          setControlPressCount((current) => ({ ...current, next: current.next + 1 }))
-        }
-        navigate(1)
-      }
-      if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-        event.preventDefault()
-        keyboardNavigationRef.current.isHeld = true
-        keyboardNavigationRef.current.isRepeating = event.repeat
-        setSuppressArrowHover(true)
-        if (!event.repeat) {
-          setActiveControl('previous')
-          setControlPressCount((current) => ({ ...current, previous: current.previous + 1 }))
-        }
-        navigate(-1)
-      }
-    }
-    const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-        keyboardNavigationRef.current.isHeld = false
-        keyboardNavigationRef.current.isRepeating = false
-        scheduleSequenceSync('smooth')
-      }
-      if ((event.key === 'ArrowRight' || event.key === 'ArrowDown') && activeControl === 'next') setActiveControl(null)
-      if ((event.key === 'ArrowLeft' || event.key === 'ArrowUp') && activeControl === 'previous') setActiveControl(null)
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('keyup', handleKeyUp)
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('keyup', handleKeyUp)
-    }
-  }, [activeControl, navigate, scheduleSequenceSync])
-
-  useLayoutEffect(() => {
-    scheduleSequenceSync(hasPositionedSequenceRef.current ? 'smooth' : 'auto')
-    hasPositionedSequenceRef.current = true
-  }, [activeIndex, scheduleSequenceSync])
-
-  useLayoutEffect(() => {
-    const sequenceList = sequenceListRef.current
-    if (!sequenceList || !('ResizeObserver' in window)) return
-
-    const observer = new ResizeObserver(() => {
-      scheduleSequenceSync('auto')
-    })
-    observer.observe(sequenceList)
-    return () => observer.disconnect()
-  }, [scheduleSequenceSync])
-
-  useEffect(() => () => {
-    if (sequenceFrameRef.current !== null) window.cancelAnimationFrame(sequenceFrameRef.current)
-    keyboardNavigationRef.current = { isHeld: false, isRepeating: false }
   }, [])
 
   const modal = (
@@ -823,71 +742,20 @@ function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen, onHover
 
 function Gallery() {
   const sectionRef = useRef<HTMLElement>(null)
-  const swapCursorRef = useRef(galleryPreviewIndices.length)
   const images = galleryImages
   const inView = useInView(sectionRef, galleryObserverOptions)
   const documentVisible = useDocumentVisibility()
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
-  const [previewIndices, setPreviewIndices] = useState<number[]>(() => galleryPreviewIndices.filter((imageIndex) => galleryImages[imageIndex]))
   const hoveredSlotRef = useRef<number | null>(null)
   const closeGallery = useCallback(() => setActiveIndex(null), [])
-
-  useEffect(() => {
-    if (!inView || !documentVisible || activeIndex !== null || images.length <= previewIndices.length) return
-    const { minimumGlobalIntervalMs, neighboringCellCooldownMs, minimumDelayMs, randomDelayRangeMs, idleRetryMs, schedulerFloorMs } = GALLERY_SWAP_CONFIG
-    const lastFired = Array(GALLERY_PREVIEW_SLOTS.length).fill(-Infinity)
-    const dueTimes = GALLERY_PREVIEW_SLOTS.map(() => performance.now() + minimumDelayMs + Math.random() * randomDelayRangeMs)
-    let lastGlobalFire = -Infinity
-    let scheduler = 0
-
-    const scheduleNext = () => {
-      const now = performance.now()
-      if (now - lastGlobalFire < minimumGlobalIntervalMs) {
-        scheduler = window.setTimeout(scheduleNext, minimumGlobalIntervalMs)
-        return
-      }
-
-      const eligibleSlots = dueTimes
-        .map((dueTime, slot) => ({ dueTime, slot }))
-        .filter(({ dueTime, slot }) => {
-          if (slot === hoveredSlotRef.current) return false
-          if (dueTime > now || now - lastFired[slot] < neighboringCellCooldownMs) return false
-          return GALLERY_PREVIEW_SLOTS[slot].neighbors.every((neighbor) => now - lastFired[neighbor] >= neighboringCellCooldownMs)
-        })
-        .sort((a, b) => a.dueTime - b.dueTime)
-
-      const nextSlot = eligibleSlots[0]?.slot
-      if (nextSlot === undefined) {
-        scheduler = window.setTimeout(scheduleNext, idleRetryMs)
-        return
-      }
-
-      lastFired[nextSlot] = now
-      lastGlobalFire = now
-      dueTimes[nextSlot] = now + minimumDelayMs + Math.random() * randomDelayRangeMs
-      setPreviewIndices((current) => {
-        if (current.length < galleryPreviewIndices.length) return current
-        const next = [...current]
-        let candidate = swapCursorRef.current % images.length
-        let attempts = 0
-        while (next.includes(candidate) && attempts < images.length) {
-          swapCursorRef.current += 1
-          candidate = swapCursorRef.current % images.length
-          attempts += 1
-        }
-        next[nextSlot] = candidate
-        swapCursorRef.current += 1
-        return next
-      })
-      const nextDue = Math.min(...dueTimes)
-      scheduler = window.setTimeout(scheduleNext, Math.max(schedulerFloorMs, nextDue - performance.now()))
-    }
-    scheduler = window.setTimeout(scheduleNext, Math.max(schedulerFloorMs, Math.min(...dueTimes) - performance.now()))
-
-    return () => {
-      window.clearTimeout(scheduler)
-    }
-  }, [activeIndex, documentVisible, images.length, inView, previewIndices.length])
+  const previewIndices = useGalleryPreviewRotation(
+    images.length,
+    galleryPreviewIndices.filter((imageIndex) => galleryImages[imageIndex]),
+    GALLERY_PREVIEW_SLOTS,
+    GALLERY_SWAP_CONFIG,
+    !inView || !documentVisible || activeIndex !== null,
+    hoveredSlotRef,
+  )
 
   const visibleImages = images.length
     ? previewIndices

@@ -1,7 +1,9 @@
-import { useEffect, useId, useRef, useState, type CSSProperties, type FormEvent as ReactFormEvent, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useId, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import { ArrowRight, CalendarDays } from 'lucide-react'
 import { useDocumentVisibility } from './hooks/useDocumentVisibility'
 import { useInView } from './hooks/useInView'
+import { useRevealOnce } from './hooks/useRevealOnce'
+import { useComparisonSlider } from './hooks/useComparisonSlider'
 import { siteConfig } from './config/site'
 import { HOLOGRAM } from './config/hologram'
 
@@ -82,10 +84,6 @@ const associationRowsConfig = [
   { direction: 1, durationSeconds: 155, initialProgress: .61 },
 ] as const
 
-type ProtectionDragDirection = 'left' | 'right' | null
-type ProtectionPointerMode = 'idle' | 'pending' | 'dragging'
-
-const clampProtectionSplit = (value: number) => Math.min(100, Math.max(0, Number(value.toFixed(1))))
 const protectionIntentThreshold = 10
 
 const reviews = [
@@ -115,174 +113,18 @@ const reviews = [
   },
 ] as const
 
-function usePremiumReveal() {
-  useEffect(() => {
-    const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-premium-reveal]'))
-    if (!('IntersectionObserver' in window)) {
-      elements.forEach((element) => element.classList.add('is-visible'))
-      return
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return
-        entry.target.classList.add('is-visible')
-        observer.unobserve(entry.target)
-      })
-    }, { threshold: .12 })
-
-    elements.forEach((element) => observer.observe(element))
-    return () => observer.disconnect()
-  }, [])
-}
-
 function HowWeProtectSection() {
-  const [split, setSplit] = useState(54)
-  const [dragDirection, setDragDirection] = useState<ProtectionDragDirection>(null)
-  const [dragIndicatorVisible, setDragIndicatorVisible] = useState(false)
-  const [pointerFocusActive, setPointerFocusActive] = useState(false)
-  const isDragging = useRef(false)
-  const previousSplit = useRef(split)
-  const releaseTimeout = useRef<number | null>(null)
-  const pointerMode = useRef<ProtectionPointerMode>('idle')
-  const activePointerId = useRef<number | null>(null)
-  const pointerStart = useRef({ x: 0, y: 0, split })
-
-  useEffect(() => () => {
-    if (releaseTimeout.current !== null) window.clearTimeout(releaseTimeout.current)
-  }, [])
-
-  const updateSplitFromClientX = (input: HTMLInputElement, clientX: number) => {
-    const bounds = input.getBoundingClientRect()
-    if (bounds.width <= 0) return
-
-    const nextSplit = clampProtectionSplit(((clientX - bounds.left) / bounds.width) * 100)
-    const previous = previousSplit.current
-
-    if (nextSplit !== previous) {
-      setDragDirection(nextSplit > previous ? 'right' : 'left')
-      setDragIndicatorVisible(true)
-    }
-
-    previousSplit.current = nextSplit
-    setSplit(nextSplit)
-  }
-
-  const startSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
-    if (event.pointerType === 'mouse' && event.button !== 0) return
-
-    if (releaseTimeout.current !== null) {
-      window.clearTimeout(releaseTimeout.current)
-      releaseTimeout.current = null
-    }
-
-    pointerStart.current = { x: event.clientX, y: event.clientY, split }
-    activePointerId.current = event.pointerId
-    setDragIndicatorVisible(false)
-    setPointerFocusActive(true)
-    event.currentTarget.focus({ preventScroll: true })
-
-    if (event.pointerType === 'mouse') {
-      pointerMode.current = 'dragging'
-      isDragging.current = true
-      previousSplit.current = split
-      try {
-        event.currentTarget.setPointerCapture(event.pointerId)
-      } catch {
-        // Pointer capture is a robustness enhancement, not a reason to abort.
-      }
-      updateSplitFromClientX(event.currentTarget, event.clientX)
-    } else {
-      pointerMode.current = 'pending'
-      isDragging.current = false
-    }
-  }
-
-  const handleSplitInput = (event: ReactFormEvent<HTMLInputElement>) => {
-    if (isDragging.current) return
-
-    const nextSplit = clampProtectionSplit(Number(event.currentTarget.value))
-    previousSplit.current = nextSplit
-    setSplit(nextSplit)
-  }
-
-  const moveSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
-    if (activePointerId.current !== event.pointerId) return
-
-    if (pointerMode.current === 'pending') {
-      const dx = event.clientX - pointerStart.current.x
-      const dy = event.clientY - pointerStart.current.y
-      if (Math.abs(dx) < protectionIntentThreshold && Math.abs(dy) < protectionIntentThreshold) return
-      if (Math.abs(dy) > Math.abs(dx)) {
-        pointerMode.current = 'idle'
-        activePointerId.current = null
-        return
-      }
-
-      pointerMode.current = 'dragging'
-      isDragging.current = true
-      previousSplit.current = pointerStart.current.split
-      try {
-        event.currentTarget.setPointerCapture(event.pointerId)
-      } catch {
-        // Pointer capture is a robustness enhancement, not a reason to abort.
-      }
-    }
-
-    if (!isDragging.current) return
-    updateSplitFromClientX(event.currentTarget, event.clientX)
-  }
-
-  const finishSplitDrag = () => {
-    if (pointerMode.current === 'idle' && !isDragging.current && activePointerId.current === null) return
-
-    isDragging.current = false
-    pointerMode.current = 'idle'
-    activePointerId.current = null
-    setDragIndicatorVisible(false)
-
-    if (releaseTimeout.current !== null) window.clearTimeout(releaseTimeout.current)
-    releaseTimeout.current = window.setTimeout(() => {
-      setDragDirection(null)
-      releaseTimeout.current = null
-    }, protectionHoverTransitionMs)
-  }
-
-  const endSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
-    if (activePointerId.current !== event.pointerId) return
-
-    const pointerId = event.pointerId
-    const hasCapture = event.currentTarget.hasPointerCapture(pointerId)
-
-    if (pointerMode.current === 'pending') {
-      previousSplit.current = pointerStart.current.split
-      updateSplitFromClientX(event.currentTarget, event.clientX)
-      finishSplitDrag()
-    } else if (isDragging.current) {
-      updateSplitFromClientX(event.currentTarget, event.clientX)
-      finishSplitDrag()
-    } else {
-      finishSplitDrag()
-    }
-
-    if (hasCapture) event.currentTarget.releasePointerCapture(pointerId)
-  }
-
-  const cancelSplitDrag = (event: ReactPointerEvent<HTMLInputElement>) => {
-    if (activePointerId.current !== event.pointerId) return
-    const hasCapture = event.currentTarget.hasPointerCapture(event.pointerId)
-    finishSplitDrag()
-    if (hasCapture) event.currentTarget.releasePointerCapture(event.pointerId)
-  }
+  const reveal = useRevealOnce<HTMLDivElement>({ threshold: .12 })
+  const comparison = useComparisonSlider({ initialValue: 54, intentThreshold: protectionIntentThreshold, releaseDelayMs: protectionHoverTransitionMs })
 
   return (
     <section className="premium-protection premium-shell" id="protection" aria-label="Roof layers: finished roof and exposed underlayment">
-      <div className="premium-protection-console" data-premium-reveal>
+      <div className={`premium-protection-console${reveal.revealed ? ' is-visible' : ''}`} data-premium-reveal ref={reveal.ref}>
         <div
           className="premium-protection-stage"
-          data-drag-direction={dragDirection ?? undefined}
-          data-drag-indicator={dragIndicatorVisible && dragDirection ? 'visible' : undefined}
-          style={{ '--premium-split': `${split}%` } as CSSProperties}
+          data-drag-direction={comparison.direction ?? undefined}
+          data-drag-indicator={comparison.indicatorVisible && comparison.direction ? 'visible' : undefined}
+          style={{ '--premium-split': `${comparison.value}%` } as CSSProperties}
         >
           <img className="premium-protection-image" src="/assets/source/protection-finished-roof.jpg" alt="A completed premium slate and copper roof" />
           <img className="premium-protection-image premium-protection-layer" src={underlaymentImage} alt="The same roof with its underlayment construction exposed" />
@@ -292,19 +134,17 @@ function HowWeProtectSection() {
             min="0"
             max="100"
             step="0.1"
-            value={split}
-            data-pointer-focus={pointerFocusActive ? 'true' : undefined}
-            onInput={handleSplitInput}
-            onPointerDown={startSplitDrag}
-            onPointerMove={moveSplitDrag}
-            onPointerUp={endSplitDrag}
-            onPointerCancel={cancelSplitDrag}
-            onLostPointerCapture={finishSplitDrag}
-            onBlur={() => {
-              if (document.hasFocus()) setPointerFocusActive(false)
-            }}
+            value={comparison.value}
+            data-pointer-focus={comparison.pointerFocusActive ? 'true' : undefined}
+            onInput={comparison.onInput}
+            onPointerDown={comparison.onPointerDown}
+            onPointerMove={comparison.onPointerMove}
+            onPointerUp={comparison.onPointerUp}
+            onPointerCancel={comparison.onPointerCancel}
+            onLostPointerCapture={comparison.onLostPointerCapture}
+            onBlur={comparison.onBlur}
             aria-label="Reveal underlayment"
-            aria-valuetext={`${split}% finished roof, ${100 - split}% underlayment`}
+            aria-valuetext={`${comparison.value}% finished roof, ${100 - comparison.value}% underlayment`}
           />
           <div className="premium-protection-divider" aria-hidden="true">
             <span className="premium-protection-thumb">
@@ -322,8 +162,9 @@ function HowWeProtectSection() {
 }
 
 function GoogleReviewsSection() {
+  const reveal = useRevealOnce<HTMLElement>({ threshold: .12 })
   return (
-    <section className="premium-reviews premium-shell" id="reviews">
+    <section className={`premium-reviews premium-shell${reveal.revealed ? ' is-visible' : ''}`} id="reviews" ref={reveal.ref}>
       <div className="premium-reviews-heading" data-premium-reveal>
         <div className="premium-google-mark" aria-label="Reviews on Google"><img src="/assets/brand/google-g-logo.svg" alt="Google G" /><span>Reviews on Google</span></div>
       </div>
@@ -342,7 +183,6 @@ function GoogleReviewsSection() {
 }
 
 export function PremiumSections() {
-  usePremiumReveal()
   return <div className="premium-sections"><HowWeProtectSection /><GoogleReviewsSection /></div>
 }
 
@@ -433,8 +273,9 @@ export function AssociationsMarquee() {
 }
 
 export function PremiumFooter({ onBook }: BookHandler) {
+  const reveal = useRevealOnce<HTMLElement>({ threshold: .12 })
   return (
-    <footer className="premium-footer" id="contact">
+    <footer className={`premium-footer${reveal.revealed ? ' is-visible' : ''}`} id="contact" ref={reveal.ref}>
       <div className="premium-footer-matte" aria-hidden="true"><img className="premium-footer-back" src="/assets/footer/footer-roofscape-backdrop.png" alt="" /><img className="premium-footer-front" src="/assets/footer/footer-eaves-foreground.png" alt="" /></div>
       <div className="premium-footer-content premium-shell">
         <div className="premium-footer-primary">
