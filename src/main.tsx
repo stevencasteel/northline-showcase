@@ -583,7 +583,22 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   const [closeShockwave, setCloseShockwave] = useState(0)
   const [closePressed, setClosePressed] = useState(false)
   const hasPositionedSequenceRef = useRef(false)
+  const sequenceFrameRef = useRef<number | null>(null)
+  const keyboardNavigationRef = useRef({ isHeld: false, isRepeating: false })
   const activeImage = images[activeIndex]
+
+  const scheduleSequenceSync = useCallback((behavior: ScrollBehavior) => {
+    if (sequenceFrameRef.current !== null) window.cancelAnimationFrame(sequenceFrameRef.current)
+    sequenceFrameRef.current = window.requestAnimationFrame(() => {
+      sequenceFrameRef.current = null
+      const sequenceList = sequenceListRef.current
+      const activeItem = sequenceList?.querySelector<HTMLElement>('[aria-current="true"]')
+      if (!sequenceList || !activeItem) return
+
+      const resolvedBehavior = keyboardNavigationRef.current.isRepeating ? 'auto' : behavior
+      centerGallerySequenceItem(sequenceList, activeItem, resolvedBehavior)
+    })
+  }, [])
 
   useEffect(() => {
     const neighborIndexes = [activeIndex, (activeIndex - 1 + images.length) % images.length, (activeIndex + 1) % images.length]
@@ -620,6 +635,8 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
         event.preventDefault()
+        keyboardNavigationRef.current.isHeld = true
+        keyboardNavigationRef.current.isRepeating = event.repeat
         setSuppressArrowHover(true)
         if (!event.repeat) {
           setActiveControl('next')
@@ -629,6 +646,8 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
       }
       if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
         event.preventDefault()
+        keyboardNavigationRef.current.isHeld = true
+        keyboardNavigationRef.current.isRepeating = event.repeat
         setSuppressArrowHover(true)
         if (!event.repeat) {
           setActiveControl('previous')
@@ -638,6 +657,11 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
       }
     }
     const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        keyboardNavigationRef.current.isHeld = false
+        keyboardNavigationRef.current.isRepeating = false
+        scheduleSequenceSync('smooth')
+      }
       if ((event.key === 'ArrowRight' || event.key === 'ArrowDown') && activeControl === 'next') setActiveControl(null)
       if ((event.key === 'ArrowLeft' || event.key === 'ArrowUp') && activeControl === 'previous') setActiveControl(null)
     }
@@ -647,27 +671,27 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
       document.removeEventListener('keydown', handleKeyDown)
       document.removeEventListener('keyup', handleKeyUp)
     }
-  }, [activeControl, navigate])
+  }, [activeControl, navigate, scheduleSequenceSync])
 
   useLayoutEffect(() => {
-    const sequenceList = sequenceListRef.current
-    const activeItem = sequenceList?.querySelector<HTMLElement>('[aria-current="true"]')
-    if (!sequenceList || !activeItem) return
-
-    centerGallerySequenceItem(sequenceList, activeItem, hasPositionedSequenceRef.current ? 'smooth' : 'auto')
+    scheduleSequenceSync(hasPositionedSequenceRef.current ? 'smooth' : 'auto')
     hasPositionedSequenceRef.current = true
-  }, [activeIndex])
+  }, [activeIndex, scheduleSequenceSync])
 
   useLayoutEffect(() => {
     const sequenceList = sequenceListRef.current
     if (!sequenceList || !('ResizeObserver' in window)) return
 
     const observer = new ResizeObserver(() => {
-      const activeItem = sequenceList.querySelector<HTMLElement>('[aria-current="true"]')
-      if (activeItem) centerGallerySequenceItem(sequenceList, activeItem, 'auto')
+      scheduleSequenceSync('auto')
     })
     observer.observe(sequenceList)
     return () => observer.disconnect()
+  }, [scheduleSequenceSync])
+
+  useEffect(() => () => {
+    if (sequenceFrameRef.current !== null) window.cancelAnimationFrame(sequenceFrameRef.current)
+    keyboardNavigationRef.current = { isHeld: false, isRepeating: false }
   }, [])
 
   const modal = (
