@@ -229,7 +229,7 @@
 .premium-review-google-link img { width: min(1.2rem,1.33cqw); height: min(1.2rem,1.33cqw); }
 
 .associations-marquee { position: relative; isolation: isolate; overflow: visible; padding: 3.1cqw 0 3.5cqw; color: #fff; background: var(--premium-ink); }
-.associations-marquee::before { position: absolute; inset: 0; z-index: -1; content: ''; background: url('/assets/associations/associations_bg_texture.jpg') center / cover; }
+.associations-marquee::before { position: absolute; inset: 0; z-index: -1; content: ''; background: url('/assets/associations/associations_bg_texture.avif') center / cover; }
 .associations-marquee-viewport { overflow: hidden; padding-block: 1.6cqw; margin-block: -1.6cqw; -webkit-mask-image: linear-gradient(90deg,transparent 0,#000 4.5cqw,#000 calc(100% - 4.5cqw),transparent 100%); mask-image: linear-gradient(90deg,transparent 0,#000 4.5cqw,#000 calc(100% - 4.5cqw),transparent 100%); }
 .associations-marquee-rows { display: grid; gap: .42cqw; }
 .associations-marquee-row { min-height: 15.9cqw; display: flex; align-items: center; overflow: visible; }
