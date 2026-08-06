@@ -241,83 +241,86 @@ function Services() {
 
 type GalleryImage = { file: string; alt: string }
 
+const galleryPreviewFile = (file: string) => file.replace(/\.avif$/, '_sm.avif')
+const galleryCardFile = (file: string, slot: number) => slot === 0 ? file : galleryPreviewFile(file)
+
 const galleryImageCatalog: GalleryImage[] = [
-  { file: '01-gothic-mountain-house-copper-trim.jpg', alt: 'Stone mountain house with steep slate roofs and copper trim.' },
-  { file: '02-curved-copper-coastal-roof.jpg', alt: 'Modern coastal house with a wide curved copper roof.' },
-  { file: '03-white-metal-roof-gold-trim.jpg', alt: 'White sculptural metal roof with polished gold trim.' },
-  { file: '04-butterfly-copper-roof-house.jpg', alt: 'Modern house with a butterfly-shaped copper and white roof.' },
-  { file: '05-patina-copper-fantasy-villa.jpg', alt: 'Ornate fantasy villa with sweeping green patina copper roofs.' },
-  { file: '06-tiered-dark-metal-roof-house.jpg', alt: 'Modern house with layered dark metal roofs and copper edging.' },
-  { file: '07-coastal-tile-and-patina-roof.jpg', alt: 'Coastal home with clay tiles and green patina roof accents.' },
-  { file: '08-iridescent-curved-slate-roof.jpg', alt: 'Curved fantasy house roof covered in iridescent slate tiles.' },
-  { file: '09-desert-mixed-metal-tile-roof.jpg', alt: 'Desert home with layered metal and tile roofing.' },
-  { file: '10-flared-copper-roof-house.jpg', alt: 'Contemporary house with a dramatic flared copper roof.' },
-  { file: '11-mountain-lodge-slate-copper-roof.jpg', alt: 'Mountain lodge with layered slate roofs and copper trim.' },
-  { file: '12-weathered-patina-copper-roof.jpg', alt: 'Stone house with a weathered green patina copper roof.' },
-  { file: '13-turquoise-tile-copper-trim-roof.jpg', alt: 'Curved turquoise tile roofs outlined with copper trim.' },
-  { file: '14-lakeside-multicolor-slate-roof.jpg', alt: 'Lakeside house with multicolor slate roofs and copper edging.' },
-  { file: '15-ornate-green-tile-copper-roof.jpg', alt: 'Ornate villa with green tile roofs and bright copper trim.' },
-  { file: '16-coastal-curved-shingle-roof.jpg', alt: 'Coastal house with curved gray shingles and copper details.' },
-  { file: '17-desert-standing-seam-copper-roof.jpg', alt: 'Desert house with sculpted standing-seam copper roofing.' },
-  { file: '18-curved-dark-shingle-lake-house.jpg', alt: 'Lake house with dark curved shingle roofs and copper trim.' },
-  { file: '19-sunset-coastal-curved-roof-home.jpg', alt: 'Coastal home at sunset with layered curved roofs.' },
-  { file: '20-ornate-copper-slate-arched-roof.jpg', alt: 'Ornate house with arched slate roofs and copper framing.' },
-  { file: '21-purple-curved-metal-coastal-roof.jpg', alt: 'Coastal home with a glossy purple curved metal roof.' },
-  { file: '22-desert-copper-tile-estate.jpg', alt: 'Large desert estate with layered copper-colored tile roofs.' },
-  { file: '23-purple-slate-copper-mansion.jpg', alt: 'Fantasy mansion with purple slate roofs and copper trim.' },
-  { file: '24-angular-white-metal-roof.jpg', alt: 'Modern white house with sharp angular metal roofs.' },
-  { file: '25-red-copper-slate-gothic-house.jpg', alt: 'Gothic house with steep slate roofs and red copper accents.' },
-  { file: '26-copper-turret-gothic-mansion.jpg', alt: 'Gothic mansion with copper roofs and tall pointed turrets.' },
-  { file: '27-white-metal-gold-trim-coastal-roof.jpg', alt: 'Coastal building with layered white metal roofs and gold trim.' },
-  { file: '28-cobalt-blue-tile-coastal-estate.png', alt: 'Coastal estate with cobalt blue tile roofs and layered gables.' },
-  { file: '29-terracotta-tile-desert-estate.png', alt: 'Desert estate with warm terracotta tile roofs and courtyards.' },
-  { file: '30-sunset-lakeside-standing-seam-lodge.png', alt: 'Lakeside lodge at sunset with clean standing-seam metal roofs.' },
-  { file: '31-tiered-dark-standing-seam-roof.png', alt: 'Large home with tiered dark standing-seam roofs.' },
-  { file: '32-sunset-lakeside-copper-shingle-estate.png', alt: 'Lakeside estate at sunset with layered copper shingle roofs.' },
-  { file: '33-dark-slate-lakeside-estate.png', alt: 'Lakeside estate with steep dark slate roofs.' },
-  { file: '34-iridescent-teal-tile-coastal-hotel.png', alt: 'Coastal hotel with iridescent teal tile roofs.' },
-  { file: '35-green-tile-copper-trim-lakeside-mansion.png', alt: 'Lakeside mansion with green tile roofs and copper trim.' },
-  { file: '36-tan-tile-vineyard-estate.png', alt: 'Vineyard estate with broad tan tile roofs.' },
-  { file: '37-silver-metal-tile-coastal-home.png', alt: 'Coastal home with sculpted silver metal tile roofs.' },
-  { file: '38-gold-hexagonal-tile-coastal-resort.png', alt: 'Coastal resort with geometric gold hexagonal tile roofs.' },
-  { file: '39-cedar-shake-mountain-lodge.png', alt: 'Mountain lodge with layered cedar shake roofs.' },
-  { file: '40-modern-solar-panel-roof-building.png', alt: 'Modern building with an integrated solar panel roof.' },
-  { file: '41-dark-slate-turret-coastal-estate.png', alt: 'Coastal estate with dark slate roofs and pointed turrets.' },
-  { file: '42-tropical-thatch-oceanfront-villa.png', alt: 'Oceanfront villa with layered tropical thatch roofs.' },
-  { file: '43-modern-green-living-roof-building.png', alt: 'Modern building with a lush green living roof.' },
-  { file: '44-curved-green-living-roof-building.png', alt: 'Contemporary building with curved green living roofs.' },
-  { file: '45-cobalt-blue-tile-coastal-villa.png', alt: 'Coastal villa with vivid cobalt blue tile roofs.' },
-  { file: '46-indigo-tile-coastal-estate.png', alt: 'Coastal estate with layered indigo tile roofs.' },
-  { file: '47-red-terracotta-tile-coastal-estate.png', alt: 'Coastal estate with red terracotta tile roofs.' },
-  { file: '48-terracotta-tile-mountain-estate.png', alt: 'Mountain estate with sweeping terracotta tile roofs.' },
-  { file: '49-grey-metal-standing-seam-lakeside-estate.png', alt: 'Lakeside estate with cool grey standing-seam metal roofs.' },
-  { file: '50-patina-metal-standing-seam-coastal-lodge.png', alt: 'Coastal lodge with patina metal standing-seam roofs.' },
-  { file: '51-charcoal-standing-seam-lakeside-home.png', alt: 'Lakeside home with charcoal standing-seam roofing.' },
-  { file: '52-dark-metal-standing-seam-mountain-home.png', alt: 'Mountain home with dark metal standing-seam roofs.' },
-  { file: '53-copper-shingle-turret-coastal-estate.png', alt: 'Coastal estate with copper shingle roofs and a turret.' },
-  { file: '54-copper-shingle-oceanfront-estate.png', alt: 'Oceanfront estate with layered copper shingle roofs.' },
-  { file: '55-charcoal-slate-lakeside-mansion.png', alt: 'Lakeside mansion with charcoal slate roofs.' },
-  { file: '56-dark-slate-coastal-stone-estate.png', alt: 'Coastal stone estate with broad dark slate roofs.' },
-  { file: '57-patina-scalloped-tile-lakeside-mansion.png', alt: 'Lakeside mansion with patina scalloped tile roofs.' },
-  { file: '58-iridescent-teal-diamond-tile-coastal-mansion.png', alt: 'Coastal mansion with iridescent teal diamond tile roofs.' },
-  { file: '59-patina-scalloped-tile-coastal-chateau.png', alt: 'Coastal chateau with layered patina scalloped tile roofs.' },
-  { file: '60-green-scalloped-tile-copper-trim-mansion.png', alt: 'Mansion with green scalloped tile roofs and copper trim.' },
-  { file: '61-sand-tile-coastal-estate.png', alt: 'Coastal estate with softly colored sand tile roofs.' },
-  { file: '62-cream-tile-waterfront-mansion.png', alt: 'Waterfront mansion with elegant cream tile roofs.' },
-  { file: '63-slate-grey-tile-coastal-home.png', alt: 'Coastal home with slate grey tile roofs.' },
-  { file: '64-light-grey-tile-coastal-villa.png', alt: 'Coastal villa with layered light grey tile roofs.' },
-  { file: '65-gold-hexagonal-tile-waterfront-mansion.png', alt: 'Waterfront mansion with ornate gold hexagonal tile roofs.' },
-  { file: '66-gold-scalloped-tile-tropical-estate.png', alt: 'Tropical estate with gleaming gold scalloped tile roofs.' },
-  { file: '67-cedar-shake-lakeside-lodge.png', alt: 'Lakeside lodge with warm cedar shake roofs.' },
-  { file: '68-cedar-shake-lakeside-estate.png', alt: 'Lakeside estate with expansive cedar shake roofs.' },
-  { file: '69-dark-solar-tile-lakeside-villa.png', alt: 'Lakeside villa with integrated dark solar tile roofs.' },
-  { file: '70-solar-tile-lakeside-stone-home.png', alt: 'Stone lakeside home with solar tile roofing.' },
-  { file: '71-slate-blue-scalloped-tile-coastal-mansion.png', alt: 'Coastal mansion with slate blue scalloped tile roofs.' },
-  { file: '72-slate-blue-scalloped-tile-coastal-mansion.png', alt: 'Coastal mansion with layered slate blue scalloped tile roofs.' },
-  { file: '73-tropical-thatch-cliffside-villa.png', alt: 'Cliffside villa with sweeping tropical thatch roofs.' },
-  { file: '74-thatch-roof-tropical-pool-villa.png', alt: 'Tropical pool villa with layered thatch roofs.' },
-  { file: '75-living-green-roof-coastal-retreat.png', alt: 'Coastal retreat with a lush living green roof.' },
-  { file: '76-angular-green-living-roof-coastal-villa.png', alt: 'Coastal villa with angular green living roofs.' },
+  { file: '01-gothic-mountain-house-copper-trim.avif', alt: 'Stone mountain house with steep slate roofs and copper trim.' },
+  { file: '02-curved-copper-coastal-roof.avif', alt: 'Modern coastal house with a wide curved copper roof.' },
+  { file: '03-white-metal-roof-gold-trim.avif', alt: 'White sculptural metal roof with polished gold trim.' },
+  { file: '04-butterfly-copper-roof-house.avif', alt: 'Modern house with a butterfly-shaped copper and white roof.' },
+  { file: '05-patina-copper-fantasy-villa.avif', alt: 'Ornate fantasy villa with sweeping green patina copper roofs.' },
+  { file: '06-tiered-dark-metal-roof-house.avif', alt: 'Modern house with layered dark metal roofs and copper edging.' },
+  { file: '07-coastal-tile-and-patina-roof.avif', alt: 'Coastal home with clay tiles and green patina roof accents.' },
+  { file: '08-iridescent-curved-slate-roof.avif', alt: 'Curved fantasy house roof covered in iridescent slate tiles.' },
+  { file: '09-desert-mixed-metal-tile-roof.avif', alt: 'Desert home with layered metal and tile roofing.' },
+  { file: '10-flared-copper-roof-house.avif', alt: 'Contemporary house with a dramatic flared copper roof.' },
+  { file: '11-mountain-lodge-slate-copper-roof.avif', alt: 'Mountain lodge with layered slate roofs and copper trim.' },
+  { file: '12-weathered-patina-copper-roof.avif', alt: 'Stone house with a weathered green patina copper roof.' },
+  { file: '13-turquoise-tile-copper-trim-roof.avif', alt: 'Curved turquoise tile roofs outlined with copper trim.' },
+  { file: '14-lakeside-multicolor-slate-roof.avif', alt: 'Lakeside house with multicolor slate roofs and copper edging.' },
+  { file: '15-ornate-green-tile-copper-roof.avif', alt: 'Ornate villa with green tile roofs and bright copper trim.' },
+  { file: '16-coastal-curved-shingle-roof.avif', alt: 'Coastal house with curved gray shingles and copper details.' },
+  { file: '17-desert-standing-seam-copper-roof.avif', alt: 'Desert house with sculpted standing-seam copper roofing.' },
+  { file: '18-curved-dark-shingle-lake-house.avif', alt: 'Lake house with dark curved shingle roofs and copper trim.' },
+  { file: '19-sunset-coastal-curved-roof-home.avif', alt: 'Coastal home at sunset with layered curved roofs.' },
+  { file: '20-ornate-copper-slate-arched-roof.avif', alt: 'Ornate house with arched slate roofs and copper framing.' },
+  { file: '21-purple-curved-metal-coastal-roof.avif', alt: 'Coastal home with a glossy purple curved metal roof.' },
+  { file: '22-desert-copper-tile-estate.avif', alt: 'Large desert estate with layered copper-colored tile roofs.' },
+  { file: '23-purple-slate-copper-mansion.avif', alt: 'Fantasy mansion with purple slate roofs and copper trim.' },
+  { file: '24-angular-white-metal-roof.avif', alt: 'Modern white house with sharp angular metal roofs.' },
+  { file: '25-red-copper-slate-gothic-house.avif', alt: 'Gothic house with steep slate roofs and red copper accents.' },
+  { file: '26-copper-turret-gothic-mansion.avif', alt: 'Gothic mansion with copper roofs and tall pointed turrets.' },
+  { file: '27-white-metal-gold-trim-coastal-roof.avif', alt: 'Coastal building with layered white metal roofs and gold trim.' },
+  { file: '28-cobalt-blue-tile-coastal-estate.avif', alt: 'Coastal estate with cobalt blue tile roofs and layered gables.' },
+  { file: '29-terracotta-tile-desert-estate.avif', alt: 'Desert estate with warm terracotta tile roofs and courtyards.' },
+  { file: '30-sunset-lakeside-standing-seam-lodge.avif', alt: 'Lakeside lodge at sunset with clean standing-seam metal roofs.' },
+  { file: '31-tiered-dark-standing-seam-roof.avif', alt: 'Large home with tiered dark standing-seam roofs.' },
+  { file: '32-sunset-lakeside-copper-shingle-estate.avif', alt: 'Lakeside estate at sunset with layered copper shingle roofs.' },
+  { file: '33-dark-slate-lakeside-estate.avif', alt: 'Lakeside estate with steep dark slate roofs.' },
+  { file: '34-iridescent-teal-tile-coastal-hotel.avif', alt: 'Coastal hotel with iridescent teal tile roofs.' },
+  { file: '35-green-tile-copper-trim-lakeside-mansion.avif', alt: 'Lakeside mansion with green tile roofs and copper trim.' },
+  { file: '36-tan-tile-vineyard-estate.avif', alt: 'Vineyard estate with broad tan tile roofs.' },
+  { file: '37-silver-metal-tile-coastal-home.avif', alt: 'Coastal home with sculpted silver metal tile roofs.' },
+  { file: '38-gold-hexagonal-tile-coastal-resort.avif', alt: 'Coastal resort with geometric gold hexagonal tile roofs.' },
+  { file: '39-cedar-shake-mountain-lodge.avif', alt: 'Mountain lodge with layered cedar shake roofs.' },
+  { file: '40-modern-solar-panel-roof-building.avif', alt: 'Modern building with an integrated solar panel roof.' },
+  { file: '41-dark-slate-turret-coastal-estate.avif', alt: 'Coastal estate with dark slate roofs and pointed turrets.' },
+  { file: '42-tropical-thatch-oceanfront-villa.avif', alt: 'Oceanfront villa with layered tropical thatch roofs.' },
+  { file: '43-modern-green-living-roof-building.avif', alt: 'Modern building with a lush green living roof.' },
+  { file: '44-curved-green-living-roof-building.avif', alt: 'Contemporary building with curved green living roofs.' },
+  { file: '45-cobalt-blue-tile-coastal-villa.avif', alt: 'Coastal villa with vivid cobalt blue tile roofs.' },
+  { file: '46-indigo-tile-coastal-estate.avif', alt: 'Coastal estate with layered indigo tile roofs.' },
+  { file: '47-red-terracotta-tile-coastal-estate.avif', alt: 'Coastal estate with red terracotta tile roofs.' },
+  { file: '48-terracotta-tile-mountain-estate.avif', alt: 'Mountain estate with sweeping terracotta tile roofs.' },
+  { file: '49-grey-metal-standing-seam-lakeside-estate.avif', alt: 'Lakeside estate with cool grey standing-seam metal roofs.' },
+  { file: '50-patina-metal-standing-seam-coastal-lodge.avif', alt: 'Coastal lodge with patina metal standing-seam roofs.' },
+  { file: '51-charcoal-standing-seam-lakeside-home.avif', alt: 'Lakeside home with charcoal standing-seam roofing.' },
+  { file: '52-dark-metal-standing-seam-mountain-home.avif', alt: 'Mountain home with dark metal standing-seam roofs.' },
+  { file: '53-copper-shingle-turret-coastal-estate.avif', alt: 'Coastal estate with copper shingle roofs and a turret.' },
+  { file: '54-copper-shingle-oceanfront-estate.avif', alt: 'Oceanfront estate with layered copper shingle roofs.' },
+  { file: '55-charcoal-slate-lakeside-mansion.avif', alt: 'Lakeside mansion with charcoal slate roofs.' },
+  { file: '56-dark-slate-coastal-stone-estate.avif', alt: 'Coastal stone estate with broad dark slate roofs.' },
+  { file: '57-patina-scalloped-tile-lakeside-mansion.avif', alt: 'Lakeside mansion with patina scalloped tile roofs.' },
+  { file: '58-iridescent-teal-diamond-tile-coastal-mansion.avif', alt: 'Coastal mansion with iridescent teal diamond tile roofs.' },
+  { file: '59-patina-scalloped-tile-coastal-chateau.avif', alt: 'Coastal chateau with layered patina scalloped tile roofs.' },
+  { file: '60-green-scalloped-tile-copper-trim-mansion.avif', alt: 'Mansion with green scalloped tile roofs and copper trim.' },
+  { file: '61-sand-tile-coastal-estate.avif', alt: 'Coastal estate with softly colored sand tile roofs.' },
+  { file: '62-cream-tile-waterfront-estate.avif', alt: 'Waterfront mansion with elegant cream tile roofs.' },
+  { file: '63-slate-grey-tile-coastal-home.avif', alt: 'Coastal home with slate grey tile roofs.' },
+  { file: '64-light-grey-tile-coastal-villa.avif', alt: 'Coastal villa with layered light grey tile roofs.' },
+  { file: '65-gold-hexagonal-tile-waterfront-mansion.avif', alt: 'Waterfront mansion with ornate gold hexagonal tile roofs.' },
+  { file: '66-gold-scalloped-tile-tropical-estate.avif', alt: 'Tropical estate with gleaming gold scalloped tile roofs.' },
+  { file: '67-cedar-shake-lakeside-lodge.avif', alt: 'Lakeside lodge with warm cedar shake roofs.' },
+  { file: '68-cedar-shake-lakeside-estate.avif', alt: 'Lakeside estate with expansive cedar shake roofs.' },
+  { file: '69-dark-solar-tile-lakeside-villa.avif', alt: 'Lakeside villa with integrated dark solar tile roofs.' },
+  { file: '70-solar-tile-lakeside-stone-home.avif', alt: 'Stone lakeside home with solar tile roofing.' },
+  { file: '71-slate-blue-scalloped-tile-coastal-mansion.avif', alt: 'Coastal mansion with slate blue scalloped tile roofs.' },
+  { file: '72-slate-blue-scalloped-tile-coastal-mansion.avif', alt: 'Coastal mansion with layered slate blue scalloped tile roofs.' },
+  { file: '73-tropical-thatch-cliffside-villa.avif', alt: 'Cliffside villa with sweeping tropical thatch roofs.' },
+  { file: '74-thatch-roof-tropical-pool-villa.avif', alt: 'Tropical pool villa with layered thatch roofs.' },
+  { file: '75-living-green-roof-coastal-retreat.avif', alt: 'Coastal retreat with a lush living green roof.' },
+  { file: '76-angular-green-living-roof-coastal-villa.avif', alt: 'Coastal villa with angular green living roofs.' },
 ]
 
 function shuffleGalleryImages(images: GalleryImage[]) {
@@ -628,7 +631,7 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
           <div className="gallery-sequence-list" ref={sequenceListRef}>
             {images.map((image, imageIndex) => (
               <button className={activeIndex === imageIndex ? 'is-active' : ''} type="button" onClick={() => onSelect(imageIndex)} key={image.file} aria-label={`View image ${imageIndex + 1}: ${image.alt}`} aria-current={activeIndex === imageIndex ? 'true' : undefined}>
-                <img src={`${asset}gallery/${image.file}`} alt="" loading="lazy" decoding="async" />
+                <img src={`${asset}gallery/${galleryPreviewFile(image.file)}`} alt="" loading="lazy" decoding="async" />
                 <span>{String(imageIndex + 1).padStart(2, '0')}</span>
               </button>
             ))}
@@ -705,11 +708,11 @@ function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen, onHover
       aria-label={`Open image ${displayed.imageIndex + 1}: ${displayed.image.alt}`}
       style={{ '--gallery-index': slot } as React.CSSProperties}
     >
-      <img className={`gallery-card-image gallery-card-image-current${incoming ? ` gallery-card-image-outgoing gallery-card-image-out-${incomingDirection}` : ''}`} src={`${asset}gallery/${displayed.image.file}`} alt={displayed.image.alt} loading={slot < 3 ? 'eager' : 'lazy'} />
+      <img className={`gallery-card-image gallery-card-image-current${incoming ? ` gallery-card-image-outgoing gallery-card-image-out-${incomingDirection}` : ''}`} src={`${asset}gallery/${galleryCardFile(displayed.image.file, slot)}`} alt={displayed.image.alt} loading={slot < 3 ? 'eager' : 'lazy'} />
       {incoming && (
         <img
           className={`gallery-card-image gallery-card-image-incoming gallery-card-image-from-${incomingDirection}`}
-          src={`${asset}gallery/${incoming.image.file}`}
+          src={`${asset}gallery/${galleryCardFile(incoming.image.file, slot)}`}
           alt=""
           onAnimationEnd={() => {
             setDisplayed(incoming)
@@ -780,7 +783,7 @@ function Gallery() {
             </div>
             <div className="gallery-material-art">
               <div className="gallery-material-clip">
-                <img src={`${asset}gallery/material-library.jpg`} alt="A front-facing display of sixteen fantasy roofing material samples arranged in two columns like a premium architectural showroom library." />
+                <img src={`${asset}gallery/material-library.avif`} alt="A front-facing display of sixteen fantasy roofing material samples arranged in two columns like a premium architectural showroom library." />
                 <div className="gallery-material-labels">
                   {roofMaterials.map(([number, name, detail]) => (
                     <div className="gallery-material-label" key={number}>
