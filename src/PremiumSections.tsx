@@ -237,18 +237,20 @@ export function AssociationsMarquee() {
     <div className="associations-marquee-group" aria-hidden={clone || undefined}>
       {row.map((badge) => (
         <div className="association-badge-cell" data-kind={badge.kind} key={`${badge.file}-${clone ? 'clone' : 'original'}`}>
-          <img
-            src={`/assets/associations/${badge.file}`}
-            alt={clone ? '' : associationLabel(badge.file)}
-            aria-hidden={clone || undefined}
-            width={badge.width}
-            height={badge.height}
-            decoding="async"
-            loading="eager"
-            onLoad={() => markAssociationFileReady(badge.file)}
-            onError={() => markAssociationFileReady(badge.file)}
-            style={{ '--association-scale': badge.scale ?? 1, '--association-hover-scale': badge.hoverScale ?? (badge.scale ?? 1) * 1.14 } as CSSProperties}
-          />
+          <span className="association-badge-effects">
+            <img
+              src={`/assets/associations/${badge.file}`}
+              alt={clone ? '' : associationLabel(badge.file)}
+              aria-hidden={clone || undefined}
+              width={badge.width}
+              height={badge.height}
+              decoding="async"
+              loading="eager"
+              onLoad={() => markAssociationFileReady(badge.file)}
+              onError={() => markAssociationFileReady(badge.file)}
+              style={{ '--association-scale': badge.scale ?? 1, '--association-hover-scale': badge.hoverScale ?? (badge.scale ?? 1) * 1.14 } as CSSProperties}
+            />
+          </span>
         </div>
       ))}
     </div>
