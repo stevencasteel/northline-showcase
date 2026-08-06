@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import { AlertCircle, ArrowRight, ArrowUpRight, CalendarDays, ChevronLeft, ChevronRight, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
@@ -241,7 +241,7 @@ function Services() {
 
 type GalleryImage = { file: string; alt: string }
 
-const galleryImages: GalleryImage[] = [
+const galleryImageCatalog: GalleryImage[] = [
   { file: '01-gothic-mountain-house-copper-trim.jpg', alt: 'Stone mountain house with steep slate roofs and copper trim.' },
   { file: '02-curved-copper-coastal-roof.jpg', alt: 'Modern coastal house with a wide curved copper roof.' },
   { file: '03-white-metal-roof-gold-trim.jpg', alt: 'White sculptural metal roof with polished gold trim.' },
@@ -269,7 +269,70 @@ const galleryImages: GalleryImage[] = [
   { file: '25-red-copper-slate-gothic-house.jpg', alt: 'Gothic house with steep slate roofs and red copper accents.' },
   { file: '26-copper-turret-gothic-mansion.jpg', alt: 'Gothic mansion with copper roofs and tall pointed turrets.' },
   { file: '27-white-metal-gold-trim-coastal-roof.jpg', alt: 'Coastal building with layered white metal roofs and gold trim.' },
+  { file: '28-cobalt-blue-tile-coastal-estate.png', alt: 'Coastal estate with cobalt blue tile roofs and layered gables.' },
+  { file: '29-terracotta-tile-desert-estate.png', alt: 'Desert estate with warm terracotta tile roofs and courtyards.' },
+  { file: '30-sunset-lakeside-standing-seam-lodge.png', alt: 'Lakeside lodge at sunset with clean standing-seam metal roofs.' },
+  { file: '31-tiered-dark-standing-seam-roof.png', alt: 'Large home with tiered dark standing-seam roofs.' },
+  { file: '32-sunset-lakeside-copper-shingle-estate.png', alt: 'Lakeside estate at sunset with layered copper shingle roofs.' },
+  { file: '33-dark-slate-lakeside-estate.png', alt: 'Lakeside estate with steep dark slate roofs.' },
+  { file: '34-iridescent-teal-tile-coastal-hotel.png', alt: 'Coastal hotel with iridescent teal tile roofs.' },
+  { file: '35-green-tile-copper-trim-lakeside-mansion.png', alt: 'Lakeside mansion with green tile roofs and copper trim.' },
+  { file: '36-tan-tile-vineyard-estate.png', alt: 'Vineyard estate with broad tan tile roofs.' },
+  { file: '37-silver-metal-tile-coastal-home.png', alt: 'Coastal home with sculpted silver metal tile roofs.' },
+  { file: '38-gold-hexagonal-tile-coastal-resort.png', alt: 'Coastal resort with geometric gold hexagonal tile roofs.' },
+  { file: '39-cedar-shake-mountain-lodge.png', alt: 'Mountain lodge with layered cedar shake roofs.' },
+  { file: '40-modern-solar-panel-roof-building.png', alt: 'Modern building with an integrated solar panel roof.' },
+  { file: '41-dark-slate-turret-coastal-estate.png', alt: 'Coastal estate with dark slate roofs and pointed turrets.' },
+  { file: '42-tropical-thatch-oceanfront-villa.png', alt: 'Oceanfront villa with layered tropical thatch roofs.' },
+  { file: '43-modern-green-living-roof-building.png', alt: 'Modern building with a lush green living roof.' },
+  { file: '44-curved-green-living-roof-building.png', alt: 'Contemporary building with curved green living roofs.' },
+  { file: '45-cobalt-blue-tile-coastal-villa.png', alt: 'Coastal villa with vivid cobalt blue tile roofs.' },
+  { file: '46-indigo-tile-coastal-estate.png', alt: 'Coastal estate with layered indigo tile roofs.' },
+  { file: '47-red-terracotta-tile-coastal-estate.png', alt: 'Coastal estate with red terracotta tile roofs.' },
+  { file: '48-terracotta-tile-mountain-estate.png', alt: 'Mountain estate with sweeping terracotta tile roofs.' },
+  { file: '49-grey-metal-standing-seam-lakeside-estate.png', alt: 'Lakeside estate with cool grey standing-seam metal roofs.' },
+  { file: '50-patina-metal-standing-seam-coastal-lodge.png', alt: 'Coastal lodge with patina metal standing-seam roofs.' },
+  { file: '51-charcoal-standing-seam-lakeside-home.png', alt: 'Lakeside home with charcoal standing-seam roofing.' },
+  { file: '52-dark-metal-standing-seam-mountain-home.png', alt: 'Mountain home with dark metal standing-seam roofs.' },
+  { file: '53-copper-shingle-turret-coastal-estate.png', alt: 'Coastal estate with copper shingle roofs and a turret.' },
+  { file: '54-copper-shingle-oceanfront-estate.png', alt: 'Oceanfront estate with layered copper shingle roofs.' },
+  { file: '55-charcoal-slate-lakeside-mansion.png', alt: 'Lakeside mansion with charcoal slate roofs.' },
+  { file: '56-dark-slate-coastal-stone-estate.png', alt: 'Coastal stone estate with broad dark slate roofs.' },
+  { file: '57-patina-scalloped-tile-lakeside-mansion.png', alt: 'Lakeside mansion with patina scalloped tile roofs.' },
+  { file: '58-iridescent-teal-diamond-tile-coastal-mansion.png', alt: 'Coastal mansion with iridescent teal diamond tile roofs.' },
+  { file: '59-patina-scalloped-tile-coastal-chateau.png', alt: 'Coastal chateau with layered patina scalloped tile roofs.' },
+  { file: '60-green-scalloped-tile-copper-trim-mansion.png', alt: 'Mansion with green scalloped tile roofs and copper trim.' },
+  { file: '61-sand-tile-coastal-estate.png', alt: 'Coastal estate with softly colored sand tile roofs.' },
+  { file: '62-cream-tile-waterfront-mansion.png', alt: 'Waterfront mansion with elegant cream tile roofs.' },
+  { file: '63-slate-grey-tile-coastal-home.png', alt: 'Coastal home with slate grey tile roofs.' },
+  { file: '64-light-grey-tile-coastal-villa.png', alt: 'Coastal villa with layered light grey tile roofs.' },
+  { file: '65-gold-hexagonal-tile-waterfront-mansion.png', alt: 'Waterfront mansion with ornate gold hexagonal tile roofs.' },
+  { file: '66-gold-scalloped-tile-tropical-estate.png', alt: 'Tropical estate with gleaming gold scalloped tile roofs.' },
+  { file: '67-cedar-shake-lakeside-lodge.png', alt: 'Lakeside lodge with warm cedar shake roofs.' },
+  { file: '68-cedar-shake-lakeside-estate.png', alt: 'Lakeside estate with expansive cedar shake roofs.' },
+  { file: '69-dark-solar-tile-lakeside-villa.png', alt: 'Lakeside villa with integrated dark solar tile roofs.' },
+  { file: '70-solar-tile-lakeside-stone-home.png', alt: 'Stone lakeside home with solar tile roofing.' },
+  { file: '71-slate-blue-scalloped-tile-coastal-mansion.png', alt: 'Coastal mansion with slate blue scalloped tile roofs.' },
+  { file: '72-slate-blue-scalloped-tile-coastal-mansion.png', alt: 'Coastal mansion with layered slate blue scalloped tile roofs.' },
+  { file: '73-tropical-thatch-cliffside-villa.png', alt: 'Cliffside villa with sweeping tropical thatch roofs.' },
+  { file: '74-thatch-roof-tropical-pool-villa.png', alt: 'Tropical pool villa with layered thatch roofs.' },
+  { file: '75-living-green-roof-coastal-retreat.png', alt: 'Coastal retreat with a lush living green roof.' },
+  { file: '76-angular-green-living-roof-coastal-villa.png', alt: 'Coastal villa with angular green living roofs.' },
 ]
+
+function shuffleGalleryImages(images: GalleryImage[]) {
+  const shuffled = [...images]
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1))
+    const currentImage = shuffled[index]
+    shuffled[index] = shuffled[randomIndex]
+    shuffled[randomIndex] = currentImage
+  }
+  return shuffled
+}
+
+// Shuffle once per app load so every refresh presents a new gallery sequence.
+const galleryImages = shuffleGalleryImages(galleryImageCatalog)
 
 const roofMaterials = [
   ['01', 'Terracotta barrel tile', 'Burnt orange / rounded profile'],
@@ -293,6 +356,24 @@ const roofMaterials = [
 // Keep the preview curated while the modal remains the complete gallery.
 const galleryPreviewIndices = GALLERY_PREVIEW_SLOTS.map(({ initialImage }) => initialImage)
 const galleryObserverOptions: IntersectionObserverInit = { rootMargin: '20% 0px', threshold: 0.04 }
+
+const clampScrollPosition = (value: number, maximum: number) => Math.min(Math.max(value, 0), maximum)
+
+function centerGallerySequenceItem(list: HTMLElement, item: HTMLElement, behavior: ScrollBehavior) {
+  const listRect = list.getBoundingClientRect()
+  const itemRect = item.getBoundingClientRect()
+  const maximumScrollLeft = Math.max(0, list.scrollWidth - list.clientWidth)
+  const maximumScrollTop = Math.max(0, list.scrollHeight - list.clientHeight)
+
+  if (maximumScrollLeft > maximumScrollTop) {
+    const itemCenter = list.scrollLeft + itemRect.left - listRect.left + itemRect.width / 2
+    list.scrollTo({ left: clampScrollPosition(itemCenter - list.clientWidth / 2, maximumScrollLeft), behavior })
+    return
+  }
+
+  const itemCenter = list.scrollTop + itemRect.top - listRect.top + itemRect.height / 2
+  list.scrollTo({ top: clampScrollPosition(itemCenter - list.clientHeight / 2, maximumScrollTop), behavior })
+}
 
 function GalleryArrowButton({ direction, keyboardActive, pressCount, suppressHover, onActivate }: {
   direction: 'previous' | 'next'
@@ -501,6 +582,7 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   const isClosingRef = useRef(false)
   const [closeShockwave, setCloseShockwave] = useState(0)
   const [closePressed, setClosePressed] = useState(false)
+  const hasPositionedSequenceRef = useRef(false)
   const activeImage = images[activeIndex]
 
   useEffect(() => {
@@ -567,9 +649,26 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
     }
   }, [activeControl, navigate])
 
-  useEffect(() => {
-    sequenceListRef.current?.querySelector<HTMLElement>('[aria-current="true"]')?.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+  useLayoutEffect(() => {
+    const sequenceList = sequenceListRef.current
+    const activeItem = sequenceList?.querySelector<HTMLElement>('[aria-current="true"]')
+    if (!sequenceList || !activeItem) return
+
+    centerGallerySequenceItem(sequenceList, activeItem, hasPositionedSequenceRef.current ? 'smooth' : 'auto')
+    hasPositionedSequenceRef.current = true
   }, [activeIndex])
+
+  useLayoutEffect(() => {
+    const sequenceList = sequenceListRef.current
+    if (!sequenceList || !('ResizeObserver' in window)) return
+
+    const observer = new ResizeObserver(() => {
+      const activeItem = sequenceList.querySelector<HTMLElement>('[aria-current="true"]')
+      if (activeItem) centerGallerySequenceItem(sequenceList, activeItem, 'auto')
+    })
+    observer.observe(sequenceList)
+    return () => observer.disconnect()
+  }, [])
 
   const modal = (
     <div className={`gallery-modal-backdrop${isClosing ? ' is-closing' : ''}`} role="presentation" onPointerDown={(event) => { if (event.currentTarget === event.target) handleClose() }}>
