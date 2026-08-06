@@ -10,9 +10,9 @@ import { HOLOGRAM } from './config/hologram'
 type BookHandler = { onBook: () => void }
 
 const underlaymentImage = '/assets/source/protection-underlayment.png'
-const protectionSphereImage = '/assets/ui/copper-sphere-etched-large-generated.png'
-const protectionSphereLeftImage = '/assets/ui/copper-sphere-etched-large-hover-left.png'
-const protectionSphereRightImage = '/assets/ui/copper-sphere-etched-large-hover-right.png'
+const protectionSphereImage = '/assets/ui/copper-sphere-etched-large-generated.avif'
+const protectionSphereLeftImage = '/assets/ui/copper-sphere-etched-large-hover-left.avif'
+const protectionSphereRightImage = '/assets/ui/copper-sphere-etched-large-hover-right.avif'
 const protectionHoverTransitionMs = 240
 
 type AssociationBadgeKind = 'standard' | 'landscape' | 'wide' | 'ultrawide'
@@ -91,7 +91,7 @@ const reviews = [
     name: 'Seris Rhuke',
     role: 'Lakeside homeowner',
     quote: 'The storm rolled across the lake before dawn. Northline had us dry, safe, and fully documented before lunch—and the new slate looks extraordinary.',
-    portrait: '/assets/reviews/seris-rhuke.png',
+    portrait: '/assets/reviews/seris-rhuke.avif',
     googlePlace: 'Illyrion Spire',
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=The%20Garden%2C%2026%20Gandalf%27s%20Cutting%2C%20Waikato%203472%2C%20New%20Zealand',
   },
@@ -99,7 +99,7 @@ const reviews = [
     name: 'Nyaren Klourm',
     role: 'Architect & property owner',
     quote: 'They found the ventilation problem everyone else missed, showed me every layer, and left the copper transitions cleaner than the original drawings.',
-    portrait: '/assets/reviews/nyaren-klourm.png',
+    portrait: '/assets/reviews/nyaren-klourm.avif',
     googlePlace: 'Aestir Hollow',
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=Green%20Dragon%20Inn%2C%20Hobbiton%20Movie%20Set%2C%20Waikato%2C%20New%20Zealand',
   },
@@ -107,7 +107,7 @@ const reviews = [
     name: 'Baeloon Pluhng',
     role: 'Mountain innkeeper',
     quote: 'Our roof has twelve valleys and not one simple line. The crew treated every seam like finish carpentry and left the grounds immaculate.',
-    portrait: '/assets/reviews/baeloon-pluhng.png',
+    portrait: '/assets/reviews/baeloon-pluhng.avif',
     googlePlace: 'The Goorough District',
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=The%20Shire%27s%20Rest%2C%20501%20Buckland%20Road%2C%20Hinuera%2C%20Matamata%203472%2C%20New%20Zealand',
   },
