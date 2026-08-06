@@ -381,7 +381,7 @@ export function AssociationsMarquee() {
         const easing = 1 - Math.exp(-delta / 260)
         marqueeVelocity.current[rowIndex] += (targetVelocity - marqueeVelocity.current[rowIndex]) * easing
         const rowConfig = associationRowsConfig[rowIndex]
-        const nextProgress = (progress + rowConfig.direction * marqueeVelocity.current[rowIndex] * delta / rowConfig.durationSeconds / 1000 + 1) % 1
+        const nextProgress = (progress + marqueeVelocity.current[rowIndex] * delta / rowConfig.durationSeconds / 1000) % 1
         marqueeProgress.current[rowIndex] = nextProgress
         const translate = rowConfig.direction < 0 ? -nextProgress * 50 : -50 + nextProgress * 50
         trackRefs.current[rowIndex]?.style.setProperty('transform', `translate3d(${translate}%,0,0)`)
