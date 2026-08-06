@@ -212,12 +212,9 @@ function Services() {
   }, [])
 
   return (
-    <section className={`services-section${visible ? ' is-visible' : ''}`} id="services" aria-labelledby="services-title" aria-describedby="services-background-description" ref={sectionRef}>
+    <section className={`services-section${visible ? ' is-visible' : ''}`} id="services" aria-label="Services" aria-describedby="services-background-description" ref={sectionRef}>
       <span id="services-background-description" className="visually-hidden">Background image: A wide, light beige background featuring a subtle, fine-grained texture resembling paper or smooth stone.</span>
       <div className="services-layout">
-        <div className="services-brutalist-heading">
-          <p className="section-kicker" id="services-title">Services</p>
-        </div>
         <div className="services-slice-grid">
           {services.map((service, index) => (
             <a
@@ -767,11 +764,8 @@ function Gallery() {
   )
 
   return (
-    <section className={`gallery-section${inView ? ' is-visible' : ''}`} id="work" aria-labelledby="gallery-title" ref={sectionRef}>
+    <section className={`gallery-section${inView ? ' is-visible' : ''}`} id="work" aria-label="Gallery" ref={sectionRef}>
       <div className="gallery-layout">
-        <div className="gallery-brutalist-heading">
-          <p className="section-kicker" id="gallery-title">Gallery</p>
-        </div>
         <div className="gallery-content">
           <div className="gallery-showcase-shell">
             <div className="gallery-showcase">
