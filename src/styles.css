@@ -35,7 +35,7 @@ body.gallery-modal-open { background: #102432; }
 ::-webkit-scrollbar-thumb { border: 3px solid #102432; border-radius: 999px; background: #d25f26; }
 ::-webkit-scrollbar-thumb:hover { background: #f18a54; }
 a { color: inherit; text-decoration: none; }
-.site-header { --brand-height: 4.39cqw; aspect-ratio: 6821 / 246.57; padding: .99% 2.55%; background: linear-gradient(rgba(229,220,210,.28), rgba(229,220,210,.28)), url('/assets/textures/navbar-underlayment.png') center / cover no-repeat, #e5dcd2; display: flex; align-items: center; gap: 1.4%; position: relative; z-index: 2; }
+.site-header { --brand-height: 4.39cqw; aspect-ratio: 6821 / 246.57; padding: .99% 2.55%; background: linear-gradient(rgba(229,220,210,.28), rgba(229,220,210,.28)), url('/assets/navbar/navbar-underlayment.avif') center / cover no-repeat, #e5dcd2; display: flex; align-items: center; gap: 1.4%; position: relative; z-index: 2; }
 .site-header > * { animation: nav-drop-in .7s cubic-bezier(.22, 1, .36, 1) both; }
 .site-header > .brand { animation-delay: .04s; }
 .site-header > .primary-nav { animation-delay: .12s; }
@@ -134,7 +134,7 @@ a { color: inherit; text-decoration: none; }
 .appointment-form-error svg { width: 1.05rem; height: 1.05rem; flex: none; color: #f18a54; }
 @keyframes modal-fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes modal-rise-in { from { opacity: 0; transform: translateY(1rem) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-.badge-strip { --shirt-hem-height: clamp(26px, 3.15cqw, 52px); --copper-edge-height: clamp(5px, .55cqw, 9px); --copper-edge-shadow-height: clamp(6px, .6cqw, 10px); z-index: 1; height: calc(100cqw * 548 / 6821 + var(--shirt-hem-height) - 12px); position: relative; overflow: hidden; background: linear-gradient(rgba(16,36,50,.08), rgba(16,36,50,.08)), url('/assets/textures/badge-banner-workshirt-full-hem.png') center bottom / 100% var(--shirt-hem-height) no-repeat, url('/assets/textures/badge-banner-workshirt.png') center bottom / cover no-repeat, #102432; color: #fff; padding: .7% 4.5%; }
+.badge-strip { --shirt-hem-height: clamp(26px, 3.15cqw, 52px); --copper-edge-height: clamp(5px, .55cqw, 9px); --copper-edge-shadow-height: clamp(6px, .6cqw, 10px); z-index: 1; height: calc(100cqw * 548 / 6821 + var(--shirt-hem-height) - 12px); position: relative; overflow: hidden; background: linear-gradient(rgba(16,36,50,.08), rgba(16,36,50,.08)), url('/assets/badges/badge-banner-workshirt-full-hem.avif') center bottom / 100% var(--shirt-hem-height) no-repeat, url('/assets/badges/badge-banner-workshirt.avif') center bottom / cover no-repeat, #102432; color: #fff; padding: .7% 4.5%; }
 .badge-strip::before { content: ''; position: absolute; top: 0; right: -32px; left: -32px; z-index: 1; height: calc(var(--copper-edge-height) + var(--copper-edge-shadow-height)); background-image: linear-gradient(to bottom, transparent 0 calc(var(--copper-edge-height) - 2px), rgba(4,20,33,.34) calc(var(--copper-edge-height) - 1px), rgba(4,20,33,.56) var(--copper-edge-height), rgba(4,20,33,0) 100%), url('/assets/ui/copper-edge.avif'); background-position: 0 0, center top; background-size: 100% 100%, 100% var(--copper-edge-height); background-repeat: no-repeat; filter: drop-shadow(0 3.5px 6px rgba(4,20,33,.52)); pointer-events: none; }
 .badge-sprite-canvas { position: absolute; top: calc((100% - var(--shirt-hem-height)) / 2 + 8px); left: 4.5%; z-index: 2; width: 91%; aspect-ratio: 2127 / 171; transform: translateY(-50%); }
 .badge-slice { position: absolute; top: 0; height: 100%; overflow: hidden; opacity: 0; transform: translateY(88%) scale(.98); transform-origin: center bottom; animation: badge-cascade .72s cubic-bezier(.22, 1, .36, 1) forwards; }
@@ -173,7 +173,7 @@ a { color: inherit; text-decoration: none; }
 }
 .badge-banner { display: block; width: 100%; height: auto; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
-.services-section { position: relative; overflow: hidden; padding: 3.2cqw 2.55% 3.8cqw; color: #041421; background: linear-gradient(rgba(229,220,210,.12), rgba(229,220,210,.12)), url('/assets/textures/services-cover-board.jpg') center / cover no-repeat, #e5dcd2; }
+.services-section { position: relative; overflow: hidden; padding: 3.2cqw 2.55% 3.8cqw; color: #041421; background: linear-gradient(rgba(229,220,210,.12), rgba(229,220,210,.12)), url('/assets/services/services-cover-board.avif') center / cover no-repeat, #e5dcd2; }
 .services-section::before { content: ''; position: absolute; top: 0; right: -32px; left: -32px; z-index: 3; height: clamp(18px, 1.75cqw, 28px); background: linear-gradient(to bottom, rgba(4,20,33,.85), rgba(4,20,33,.28) 34%, rgba(4,20,33,.10) 64%, rgba(4,20,33,0)); pointer-events: none; }
 .services-layout { display: block; }
 .services-slice-grid { display: flex; height: 29cqw; overflow: hidden; background: transparent; }

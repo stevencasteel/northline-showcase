@@ -9,7 +9,7 @@ import { HOLOGRAM } from './config/hologram'
 
 type BookHandler = { onBook: () => void }
 
-const underlaymentImage = '/assets/source/protection-underlayment.png'
+const underlaymentImage = '/assets/protection/protection-underlayment.avif'
 const protectionSphereImage = '/assets/ui/copper-sphere-etched-large-generated.avif'
 const protectionSphereLeftImage = '/assets/ui/copper-sphere-etched-large-hover-left.avif'
 const protectionSphereRightImage = '/assets/ui/copper-sphere-etched-large-hover-right.avif'
@@ -126,7 +126,7 @@ function HowWeProtectSection() {
           data-drag-indicator={comparison.indicatorVisible && comparison.direction ? 'visible' : undefined}
           style={{ '--premium-split': `${comparison.value}%` } as CSSProperties}
         >
-          <img className="premium-protection-image" src="/assets/source/protection-finished-roof.jpg" alt="A completed premium slate and copper roof" />
+          <img className="premium-protection-image" src="/assets/protection/protection-finished-roof.avif" alt="A completed premium slate and copper roof" />
           <img className="premium-protection-image premium-protection-layer" src={underlaymentImage} alt="The same roof with its underlayment construction exposed" />
           <input
             className="premium-protection-range"
