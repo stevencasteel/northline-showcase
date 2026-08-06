@@ -278,12 +278,12 @@ export function PremiumFooter({ onBook }: BookHandler) {
   const reveal = useRevealOnce<HTMLElement>({ threshold: .12 })
   return (
     <footer className={`premium-footer${reveal.revealed ? ' is-visible' : ''}`} id="contact" ref={reveal.ref}>
-      <div className="premium-footer-matte" aria-hidden="true"><img className="premium-footer-back" src="/assets/footer/footer-roofscape-backdrop.png" alt="" /><img className="premium-footer-front" src="/assets/footer/footer-eaves-foreground.png" alt="" /></div>
+      <div className="premium-footer-matte" aria-hidden="true"><img className="premium-footer-back" src="/assets/footer/footer-roofscape-backdrop.avif" alt="" /><img className="premium-footer-front" src="/assets/footer/footer-eaves-foreground.avif" alt="" /></div>
       <div className="premium-footer-content premium-shell">
         <div className="premium-footer-primary">
           <div className="premium-footer-brand" data-premium-reveal>
             <div className="premium-footer-brand-plaque">
-              <img className="premium-footer-brand-frame" src="/assets/footer/brand-plaque.png" alt="" aria-hidden="true" />
+              <img className="premium-footer-brand-frame" src="/assets/footer/brand-plaque.avif" alt="" aria-hidden="true" />
               <div className="premium-footer-brand-surface"><img src="/assets/brand/combination-mark.svg" alt="Northline Roofing" /></div>
             </div>
             <div className="premium-footer-contact">
@@ -299,7 +299,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
               <a href={siteConfig.location.mapsUrl} target="_blank" rel="noreferrer">Open in Google Maps ↗</a>
             </div>
             <div className="premium-footer-map-frame">
-              <img src="/assets/footer/map-frame.png" alt="" aria-hidden="true" />
+              <img src="/assets/footer/map-frame.avif" alt="" aria-hidden="true" />
               <iframe src={siteConfig.location.embedUrl} title={`Google Map showing ${siteConfig.location.name}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
             </div>
           </section>
@@ -422,7 +422,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
       className={`customer-service-hologram${showEffect ? ' is-active' : ''}${hidden ? ' is-obscured' : ''}${hovered ? ' is-hovered' : ''}`}
       aria-hidden={!showEffect}
     >
-      <img className="customer-service-hologram-puck" src="/assets/customer service/customer_service_hologram_puck.png" alt="" aria-hidden="true" />
+      <img className="customer-service-hologram-puck" src="/assets/customer service/customer_service_hologram_puck.avif" alt="" aria-hidden="true" />
       <span className="customer-service-hologram-reveal" aria-hidden="true">
         <img src={HOLOGRAM.image.replace('%20', ' ')} alt="" />
         <svg className="customer-service-hologram-effects" viewBox={`0 0 ${HOLOGRAM.width} ${HOLOGRAM.height}`} preserveAspectRatio="xMidYMid meet" xmlnsXlink="http://www.w3.org/1999/xlink" aria-hidden="true">
