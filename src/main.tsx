@@ -58,13 +58,22 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
 
   useEffect(() => {
     const images = [skyImageRef.current, foregroundImageRef.current].filter((image): image is HTMLImageElement => Boolean(image))
+    let readinessCheckStarted = false
+    let cancelled = false
     const checkLoaded = () => {
-      if (images.every((image) => image.complete && image.naturalWidth > 0)) setHeroAssetsReady(true)
+      if (readinessCheckStarted || !images.every((image) => image.complete && image.naturalWidth > 0)) return
+      readinessCheckStarted = true
+      Promise.all(images.map((image) => image.decode().catch(() => undefined))).then(() => {
+        if (!cancelled) setHeroAssetsReady(true)
+      })
     }
 
     images.forEach((image) => image.addEventListener('load', checkLoaded))
     checkLoaded()
-    return () => images.forEach((image) => image.removeEventListener('load', checkLoaded))
+    return () => {
+      cancelled = true
+      images.forEach((image) => image.removeEventListener('load', checkLoaded))
+    }
   }, [])
 
   useEffect(() => {
@@ -118,6 +127,7 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
         </div>
       </div>
       <img className="hero-image" ref={foregroundImageRef} src={`${asset}hero/foreground.avif`} alt="A wide panoramic scene showing a human construction worker and a green-skinned orc installing tiles on the vast, intricate roof of a grand estate overlooking a pristine lake landscape. A middle-aged human with grey stubble leans forward on the right slope beside a muscular orc operating a bright orange power tool. The sweeping roof is clad in glossy bluish-green solar shingles with polished copper trim, arched dormers, and elegant finials; below, evergreen trees line a deep-blue bay toward distant mountains. The sky area is transparent so this foreground layer can be paired with a separate sky layer." />
+      <div className="hero-reveal-curtain" aria-hidden="true" />
       <div className="hero-overlay" />
       <div className="hero-content">
         <p className="eyebrow">Northline Roofing</p>
