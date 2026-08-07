@@ -362,7 +362,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
         </div>
 
         <div className="premium-footer-utility">
-          <nav aria-label="Footer navigation"><a href="#top">Home</a><a href="#services">Services</a><a href="#work">Gallery</a><a href="#associations">Associations</a><a href="#protection">Protection</a><a href="#reviews">Reviews</a><a href="#contact">Contact</a></nav>
+          <nav aria-label="Footer navigation"><a href="#top">Home</a><a href="#services">Services</a><a href="#work">Gallery</a><a href="#associations">Associations</a><a href="#protection">Protection</a><a href="#reviews">Reviews</a><a href="#founder">Founder</a><a href="#contact">Contact</a></nav>
           <div><span>{siteConfig.hours.replace(', ', ' / ')}</span><a href="#top">Back to top ↑</a></div>
         </div>
       </div>
