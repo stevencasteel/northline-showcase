@@ -40,6 +40,7 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
         <a href="#associations">Associations</a>
         <a href="#protection">Protection</a>
         <a href="#reviews">Reviews</a>
+        <a href="#founder">Founder</a>
         <a href="#contact">Contact</a>
       </nav>
       <a className="header-phone" href={siteConfig.phoneHref}><Phone size={17} strokeWidth={2.4} /> {siteConfig.phoneDisplay}</a>
@@ -243,11 +244,9 @@ function Services() {
       <div className="services-layout">
         <div className="services-slice-grid">
           {services.map((service, index) => (
-            <a
+            <article
               className="service-slice"
-              href="#contact"
               key={service.title}
-              aria-label={`${service.title} service — contact Northline Roofing`}
               style={{ '--service-index': index } as React.CSSProperties}
             >
               <img src={`${asset}${service.image}`} alt={service.alt} />
@@ -257,7 +256,7 @@ function Services() {
                 <strong>{service.title === 'Repairs & Inspections' ? <>Repairs &<br />Inspections</> : service.title === 'Custom Fabrication' ? <>Custom<br />Fabrication</> : service.title}</strong>
                 <span>{service.text}</span>
               </span>
-            </a>
+            </article>
           ))}
         </div>
       </div>
