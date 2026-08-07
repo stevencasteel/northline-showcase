@@ -205,21 +205,24 @@ function FounderSection() {
       />
 
       <div className="premium-founder-copy">
-        <p className="premium-founder-eyebrow" data-premium-reveal>A Note From the Founder</p>
         <h2 id="premium-founder-title" data-premium-reveal>
           From the Bench
           <span>to the Roofline.</span>
         </h2>
 
         <div className="premium-founder-body" data-premium-reveal>
-          <p>Roofing is a trade of details. The flashing, seams, drainage, fasteners and finish are the parts most people never think about—and the parts that decide whether a roof truly lasts.</p>
-          <p>Northline was built around a simple standard: know the material, respect the structure, and never leave work behind that you wouldn’t put your own name on.</p>
+          <p>Roofing is a trade of details. Northline was built on a simple standard:<br /><em><strong>know the material, respect the structure, and build work worthy of your name.</strong></em></p>
         </div>
 
         <blockquote className="premium-founder-quote" data-premium-reveal>
           <p>“Craft is what remains after the crew leaves.”</p>
-          <cite>— Founder, Northline Roofing</cite>
         </blockquote>
+
+        <div className="premium-founder-signoff" data-premium-reveal>
+          <strong>Don Rafael Montoya</strong>
+          <span>Founder &amp; Master Roofer</span>
+          <em className="premium-founder-signature" aria-label="Don Rafael Montoya signature">Don Rafael Montoya</em>
+        </div>
       </div>
 
       <img
