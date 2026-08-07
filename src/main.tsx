@@ -23,6 +23,23 @@ function CopperEdgeSeam() {
   return <span className="copper-edge-seam" aria-hidden="true" />
 }
 
+type NavbarArtProps = {
+  file: string
+  hoverFile?: string
+  width: number
+  height: number
+  alt: string
+}
+
+function NavbarArt({ file, hoverFile, width, height, alt }: NavbarArtProps) {
+  return (
+    <span className="navbar-art" aria-hidden={alt ? undefined : true}>
+      <img className="navbar-art-default" src={`${asset}navbar/${file}`} alt={alt} width={width} height={height} />
+      {hoverFile && <img className="navbar-art-hover" src={`${asset}navbar/${hoverFile}`} alt="" width={width} height={height} aria-hidden="true" />}
+    </span>
+  )
+}
+
 function AnimatedHeroLine({ text, accent = false }: { text: string; accent?: boolean }) {
   return <span className={`hero-line${accent ? ' hero-accent' : ''}`} style={{ '--line-delay': '.14s' } as React.CSSProperties} aria-hidden="true">{Array.from(text).map((character, index) => <span className="hero-char" style={{ '--char-index': index } as React.CSSProperties} key={`${character}-${index}`}>{character === ' ' ? '\u00a0' : character}</span>)}</span>
 }
@@ -35,16 +52,20 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
         <img className="brand-logo" src={`${asset}brand/combination-mark.svg`} alt="Northline Roofing combination logo: a geometric navy, cream, and burnt-orange N emblem beside NORTHLINE ROOFING and the subtitle RESIDENTIAL & COMMERCIAL SYSTEMS." />
       </a>
       <nav className="primary-nav" aria-label="Primary navigation">
-        <a href="#services">Services</a>
-        <a href="#work">Gallery</a>
-        <a href="#associations">Associations</a>
-        <a href="#protection">Protection</a>
-        <a href="#reviews">Reviews</a>
-        <a href="#founder">Founder</a>
-        <a href="#contact">Contact</a>
+        <a href="#services" aria-label="Services"><NavbarArt file="nav_services_default.png" hoverFile="nav_services_hover.png" width={447} height={164} alt="Services" /></a>
+        <a href="#work" aria-label="Gallery"><NavbarArt file="nav_gallery_default.png" hoverFile="nav_gallery_hover.png" width={440} height={154} alt="Gallery" /></a>
+        <a href="#associations" aria-label="Associations"><NavbarArt file="nav_associations_default.png" hoverFile="nav_associations_hover.png" width={492} height={150} alt="Associations" /></a>
+        <a href="#protection" aria-label="Protection"><NavbarArt file="nav_protection_default.png" hoverFile="nav_protection_hover.png" width={464} height={142} alt="Protection" /></a>
+        <a href="#reviews" aria-label="Reviews"><NavbarArt file="nav_reviews_default.png" hoverFile="nav_reviews_hover.png" width={415} height={163} alt="Reviews" /></a>
+        <a href="#founder" aria-label="Founder"><NavbarArt file="nav_founder_default.png" hoverFile="nav_founder_hover.png" width={414} height={154} alt="Founder" /></a>
+        <a href="#contact" aria-label="Contact"><NavbarArt file="nav_contact_default.png" hoverFile="nav_contact_hover.png" width={426} height={150} alt="Contact" /></a>
       </nav>
-      <a className="header-phone" href={siteConfig.phoneHref}><Phone size={17} strokeWidth={2.4} /> {siteConfig.phoneDisplay}</a>
-      <button className="header-quote" type="button" onClick={onBookAppointment}><CalendarDays aria-hidden="true" /> <span>Book an Appointment</span> <ArrowRight aria-hidden="true" /></button>
+      <a className="header-phone navbar-art-link" href={siteConfig.phoneHref} aria-label={`Call ${siteConfig.phoneDisplay}`}>
+        <NavbarArt file="nav_phone_default.png" width={955} height={202} alt={`Call ${siteConfig.phoneDisplay}`} />
+      </a>
+      <button className="header-quote navbar-art-button" type="button" onClick={onBookAppointment} aria-label="Book an appointment">
+        <NavbarArt file="nav_book-appt_default.png" width={966} height={180} alt="Book an appointment" />
+      </button>
     </header>
   )
 }
