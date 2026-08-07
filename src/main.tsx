@@ -601,15 +601,18 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   const [closeShockwave, setCloseShockwave] = useState(0)
   const [closePressed, setClosePressed] = useState(false)
   const activeImage = images[activeIndex]
+  const preloadedImagesRef = useRef(new Map<string, HTMLImageElement>())
 
   useEffect(() => {
-    const neighborIndexes = [activeIndex, (activeIndex - 1 + images.length) % images.length, (activeIndex + 1) % images.length]
-    const preloads = neighborIndexes.map((index) => {
+    const preloadIndexes = [-2, -1, 0, 1, 2].map((offset) => (activeIndex + offset + images.length) % images.length)
+    preloadIndexes.forEach((index) => {
+      const src = `${asset}gallery/${images[index].file}`
+      if (preloadedImagesRef.current.has(src)) return
       const image = new Image()
-      image.src = `${asset}gallery/${images[index].file}`
-      return image
+      image.decoding = 'async'
+      image.src = src
+      preloadedImagesRef.current.set(src, image)
     })
-    return () => preloads.forEach((image) => { image.src = '' })
   }, [activeIndex, images])
 
   const handleClose = useCallback(() => {
@@ -656,7 +659,7 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
             <span>Roofscape</span>
             <strong>{String(activeIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}</strong>
           </div>
-          <img src={`${asset}gallery/${activeImage.file}`} alt={activeImage.alt} decoding="async" />
+          <img src={`${asset}gallery/${activeImage.file}`} alt={activeImage.alt} loading="eager" decoding="async" />
           <GalleryArrowButton direction="previous" keyboardActive={activeControl === 'previous'} pressCount={controlPressCount.previous} suppressHover={suppressArrowHover} onActivate={() => navigate(-1)} />
           <GalleryArrowButton direction="next" keyboardActive={activeControl === 'next'} pressCount={controlPressCount.next} suppressHover={suppressArrowHover} onActivate={() => navigate(1)} />
         </div>
