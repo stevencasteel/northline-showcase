@@ -221,11 +221,11 @@ a { color: inherit; text-decoration: none; }
 .copper-edge-seam { --copper-edge-height: clamp(5px, .55cqw, 9px); --copper-edge-shadow-height: clamp(6px, .6cqw, 10px); position: relative; z-index: 5; display: block; height: calc(var(--copper-edge-height) + var(--copper-edge-shadow-height)); margin-bottom: calc((var(--copper-edge-height) + var(--copper-edge-shadow-height)) * -1); background-image: linear-gradient(to bottom, transparent 0 calc(var(--copper-edge-height) - 2px), rgba(4,20,33,.34) calc(var(--copper-edge-height) - 1px), rgba(4,20,33,.56) var(--copper-edge-height), rgba(4,20,33,0) 100%), url('/assets/ui/copper-edge.avif'); background-position: 0 0, center top; background-size: 100% 100%, 100% var(--copper-edge-height); background-repeat: no-repeat; filter: drop-shadow(0 3.5px 6px rgba(4,20,33,.52)); pointer-events: none; }
 .gallery-layout { display: block; transform: translateY(.5%); }
 .gallery-content { --gallery-content-gap: clamp(12px, 1.35cqw, 24px); position: relative; display: grid; grid-template-columns: minmax(0, 68.5fr) minmax(0, 31.5fr); column-gap: var(--gallery-content-gap); align-items: stretch; min-width: 0; padding-bottom: 1.25cqw; }
-.gallery-material-heading { display: grid; gap: clamp(2px, .25cqw, 5px); margin: 0; }
+.gallery-material-heading { display: grid; gap: clamp(2px, .25cqw, 5px); margin: 0; opacity: 0; transform: translateX(3.2cqw); }
 .gallery-material-kicker { color: #d25f26; font-family: 'IBM Plex Mono', monospace; font-size: clamp(6px, 2.2cqw, 11px); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .gallery-material-heading h2 { margin: 0; color: #e5dcd2; font-family: Anton, sans-serif; font-size: clamp(12px, 6.2cqw, 30px); font-weight: 400; letter-spacing: .03em; line-height: .95; text-transform: uppercase; }
 .gallery-material-rule { width: 100%; height: 1px; margin-top: clamp(2px, .25cqw, 5px); background: #d25f26; }
-.gallery-material-art { position: relative; align-self: end; width: 100%; min-height: 0; aspect-ratio: 1013 / 1520; overflow: visible; isolation: isolate; background: transparent; box-shadow: 0 .2cqw .38cqw rgba(0,0,0,.38),0 .9cqw 1.85cqw rgba(0,0,0,.27); }
+.gallery-material-art { position: relative; align-self: end; width: 100%; min-height: 0; aspect-ratio: 1013 / 1520; overflow: visible; isolation: isolate; background: transparent; opacity: 0; transform: translateX(3.2cqw); box-shadow: 0 .2cqw .38cqw rgba(0,0,0,.38),0 .9cqw 1.85cqw rgba(0,0,0,.27); }
 .gallery-material-art::after,.gallery-showcase-shell::after { position: absolute; right: 3%; bottom: -.18cqw; left: 3%; z-index: -1; height: .38cqw; content: ''; background: rgba(0,0,0,.34); filter: blur(.3cqw); pointer-events: none; }
 .gallery-material-clip { position: absolute; inset: 0; overflow: hidden; background: #102432; box-shadow: inset 0 0 0 1px rgba(229,220,210,.12); }
 .gallery-material-clip > img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
@@ -286,7 +286,10 @@ a { color: inherit; text-decoration: none; }
 .gallery-card-view:hover svg { color: #f18a54; transform: translate(.5cqw, -.5cqw) scale(1.25); }
 .gallery-card:focus-visible { outline: .18cqw solid #f18a54; outline-offset: -.18cqw; }
 .gallery-section.is-visible .gallery-card { animation: gallery-card-in .7s cubic-bezier(.22,1,.36,1) both; animation-delay: calc(.12s + (var(--gallery-index) * .045s)); }
+.gallery-section.is-visible .gallery-material-heading { animation: gallery-material-slide-in .7s cubic-bezier(.22,1,.36,1) .2s both; }
+.gallery-section.is-visible .gallery-material-art { animation: gallery-material-slide-in .7s cubic-bezier(.22,1,.36,1) .32s both; }
 @keyframes gallery-card-in { to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes gallery-material-slide-in { from { opacity: 0; transform: translateX(3.2cqw); } to { opacity: 1; transform: translateX(0); } }
 @keyframes gallery-index-digit-roll { from { transform: translateY(0); } to { transform: translateY(calc(var(--digit-steps) * -1em)); } }
 @keyframes gallery-image-slide-from-top { from { transform: translate3d(0, -100%, 0) scale(1.11); } to { transform: translate3d(0, 0, 0) scale(1.11); } }
 @keyframes gallery-image-slide-from-left { from { transform: translate3d(-100%, 0, 0) scale(1.11); } to { transform: translate3d(0, 0, 0) scale(1.11); } }

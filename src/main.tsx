@@ -8,6 +8,7 @@ import { AssociationsMarquee, CustomerServiceHologram, PremiumFooter, PremiumSec
 import { useBodyScrollLock } from './hooks/useBodyScrollLock'
 import { useDocumentVisibility } from './hooks/useDocumentVisibility'
 import { useInView } from './hooks/useInView'
+import { useRevealOnce } from './hooks/useRevealOnce'
 import { useDialogFocus } from './hooks/useDialogFocus'
 import { useGalleryKeyboardNavigation } from './hooks/useGalleryKeyboardNavigation'
 import { useActiveThumbnailScroll } from './hooks/useActiveThumbnailScroll'
@@ -773,9 +774,11 @@ function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen, onHover
 }
 
 function Gallery() {
-  const sectionRef = useRef<HTMLElement>(null)
+  const galleryReveal = useRevealOnce<HTMLElement>(galleryObserverOptions)
+  const sectionRef = galleryReveal.ref
+  const inView = galleryReveal.inView
+  const revealed = galleryReveal.revealed
   const images = galleryImages
-  const inView = useInView(sectionRef, galleryObserverOptions)
   const documentVisible = useDocumentVisibility()
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const hoveredSlotRef = useRef<number | null>(null)
@@ -799,7 +802,7 @@ function Gallery() {
   )
 
   return (
-    <section className={`gallery-section${inView ? ' is-visible' : ''}`} id="work" aria-label="Gallery" ref={sectionRef}>
+    <section className={`gallery-section${revealed ? ' is-visible' : ''}`} id="work" aria-label="Gallery" ref={sectionRef}>
       <div className="gallery-layout">
         <div className="gallery-content">
           <div className="gallery-showcase-shell">

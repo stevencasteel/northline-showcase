@@ -7,4 +7,4 @@ cd "${SCRIPT_DIR}/.."
 
 printf '\e]0;Northline Roofing Source Context\a'
 node scripts/create-source-context.js
-open "${SCRIPT_DIR}"
+open -R "${SCRIPT_DIR}/../docs/northline-roofing_source_code.txt"

@@ -10,5 +10,5 @@ export function useRevealOnce<T extends Element>(options?: IntersectionObserverI
     if (inView) setRevealed(true)
   }, [inView])
 
-  return { ref, revealed }
+  return { ref, inView, revealed }
 }
