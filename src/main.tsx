@@ -51,13 +51,26 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
   const heroRef = useRef<HTMLElement>(null)
   const skyTrackRef = useRef<HTMLDivElement>(null)
   const skyImageRef = useRef<HTMLImageElement>(null)
+  const foregroundImageRef = useRef<HTMLImageElement>(null)
+  const [heroAssetsReady, setHeroAssetsReady] = useState(false)
   const inView = useInView(heroRef, { threshold: 0.01 })
   const documentVisible = useDocumentVisibility()
 
   useEffect(() => {
+    const images = [skyImageRef.current, foregroundImageRef.current].filter((image): image is HTMLImageElement => Boolean(image))
+    const checkLoaded = () => {
+      if (images.every((image) => image.complete && image.naturalWidth > 0)) setHeroAssetsReady(true)
+    }
+
+    images.forEach((image) => image.addEventListener('load', checkLoaded))
+    checkLoaded()
+    return () => images.forEach((image) => image.removeEventListener('load', checkLoaded))
+  }, [])
+
+  useEffect(() => {
     const track = skyTrackRef.current
     const image = skyImageRef.current
-    if (!track || !image || !inView || !documentVisible) return
+    if (!track || !image || !heroAssetsReady || !inView || !documentVisible) return
 
     let frame = 0
     let offset = 0
@@ -95,14 +108,16 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
       window.removeEventListener('resize', measure)
       image.removeEventListener('load', measure)
     }
-  }, [documentVisible, inView])
+  }, [documentVisible, heroAssetsReady, inView])
 
   return (
-    <section className={`hero${inView && documentVisible ? ' is-sky-active' : ''}`} id="top" ref={heroRef}>
-      <div className="hero-sky-track" ref={skyTrackRef} aria-hidden="true">
-        <img className="hero-sky" ref={skyImageRef} src={`${asset}hero/sky.avif`} alt="Bright blue sky with fluffy white cumulus clouds over distant mountain ranges, designed as a seamless background layer for the Northline Roofing hero image." />
+    <section className={`hero${inView && documentVisible ? ' is-sky-active' : ''}${heroAssetsReady ? ' is-hero-assets-ready' : ''}`} id="top" ref={heroRef}>
+      <div className="hero-sky-reveal" aria-hidden="true">
+        <div className="hero-sky-track" ref={skyTrackRef}>
+          <img className="hero-sky" ref={skyImageRef} src={`${asset}hero/sky.avif`} alt="Bright blue sky with fluffy white cumulus clouds over distant mountain ranges, designed as a seamless background layer for the Northline Roofing hero image." />
+        </div>
       </div>
-        <img className="hero-image" src={`${asset}hero/foreground.avif`} alt="A wide panoramic scene showing a human construction worker and a green-skinned orc installing tiles on the vast, intricate roof of a grand estate overlooking a pristine lake landscape. A middle-aged human with grey stubble leans forward on the right slope beside a muscular orc operating a bright orange power tool. The sweeping roof is clad in glossy bluish-green solar shingles with polished copper trim, arched dormers, and elegant finials; below, evergreen trees line a deep-blue bay toward distant mountains. The sky area is transparent so this foreground layer can be paired with a separate sky layer." />
+      <img className="hero-image" ref={foregroundImageRef} src={`${asset}hero/foreground.avif`} alt="A wide panoramic scene showing a human construction worker and a green-skinned orc installing tiles on the vast, intricate roof of a grand estate overlooking a pristine lake landscape. A middle-aged human with grey stubble leans forward on the right slope beside a muscular orc operating a bright orange power tool. The sweeping roof is clad in glossy bluish-green solar shingles with polished copper trim, arched dormers, and elegant finials; below, evergreen trees line a deep-blue bay toward distant mountains. The sky area is transparent so this foreground layer can be paired with a separate sky layer." />
       <div className="hero-overlay" />
       <div className="hero-content">
         <p className="eyebrow">Northline Roofing</p>
