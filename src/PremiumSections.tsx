@@ -182,8 +182,61 @@ function GoogleReviewsSection() {
   )
 }
 
+function FounderSection() {
+  const reveal = useRevealOnce<HTMLElement>({ threshold: .16 })
+
+  return (
+    <section
+      className={`premium-founder${reveal.revealed ? ' is-visible' : ''}`}
+      id="founder"
+      ref={reveal.ref}
+      aria-labelledby="premium-founder-title"
+    >
+      <div className="premium-founder-texture" aria-hidden="true" />
+
+      <img
+        className="premium-founder-art premium-founder-art-left"
+        src="/assets/founder/founder_left_frame.png"
+        alt="Northline Roofing founder in his metalworking workshop"
+        width="1500"
+        height="1715"
+        decoding="async"
+        loading="lazy"
+      />
+
+      <div className="premium-founder-copy">
+        <p className="premium-founder-eyebrow" data-premium-reveal>A Note From the Founder</p>
+        <h2 id="premium-founder-title" data-premium-reveal>
+          From the Bench
+          <span>to the Roofline.</span>
+        </h2>
+
+        <div className="premium-founder-body" data-premium-reveal>
+          <p>Roofing is a trade of details. The flashing, seams, drainage, fasteners and finish are the parts most people never think about—and the parts that decide whether a roof truly lasts.</p>
+          <p>Northline was built around a simple standard: know the material, respect the structure, and never leave work behind that you wouldn’t put your own name on.</p>
+        </div>
+
+        <blockquote className="premium-founder-quote" data-premium-reveal>
+          <p>“Craft is what remains after the crew leaves.”</p>
+          <cite>— Founder, Northline Roofing</cite>
+        </blockquote>
+      </div>
+
+      <img
+        className="premium-founder-art premium-founder-art-right"
+        src="/assets/founder/founder_right_frame.png"
+        alt="Northline Roofing founder working on a tile roof"
+        width="1500"
+        height="995"
+        decoding="async"
+        loading="lazy"
+      />
+    </section>
+  )
+}
+
 export function PremiumSections() {
-  return <div className="premium-sections"><HowWeProtectSection /><GoogleReviewsSection /></div>
+  return <div className="premium-sections"><HowWeProtectSection /><GoogleReviewsSection /><FounderSection /></div>
 }
 
 export function AssociationsMarquee() {
@@ -356,8 +409,9 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
 
   useEffect(() => {
     const reviews = document.getElementById('reviews')
+    const founder = document.getElementById('founder')
     const gallery = document.getElementById('work')
-    if (!reviews && !gallery) return
+    if (!reviews && !founder && !gallery) return
     if (!('IntersectionObserver' in window)) {
       setActive(true)
       return
@@ -369,6 +423,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
       })
     }, { threshold: .35 })
     if (reviews) observer.observe(reviews)
+    if (founder) observer.observe(founder)
     if (gallery) observer.observe(gallery)
     return () => observer.disconnect()
   }, [])
