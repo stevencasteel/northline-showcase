@@ -221,7 +221,7 @@ function FounderSection() {
         <div className="premium-founder-signoff" data-premium-reveal>
           <strong>Don Rafael Montoya</strong>
           <span>Founder &amp; Master Roofer</span>
-          <em className="premium-founder-signature" aria-label="Don Rafael Montoya signature">Don Rafael Montoya</em>
+          <img className="premium-founder-signature" src="/assets/founder/don-rafael-montoya-signature.png" alt="Don Rafael Montoya signature" width="1774" height="887" decoding="async" />
         </div>
       </div>
 
