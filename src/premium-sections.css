@@ -350,20 +350,3 @@
 .customer-service-hologram-distortion { opacity: .84; transform-box: fill-box; transform-origin: 50% 55%; }
 @keyframes customer-service-skew-a { 0%,42%,100% { opacity: 0; transform: translateX(-2.1px) skewX(-.27deg); } 50% { opacity: .32; transform: translateX(2.1px) skewX(.27deg); } 92% { opacity: .32; transform: translateX(-2.1px) skewX(-.27deg); } }
 @keyframes customer-service-skew-b { 0%,42%,100% { opacity: .32; transform: translateX(2.1px) skewX(.27deg); } 50% { opacity: 0; transform: translateX(-2.1px) skewX(-.27deg); } 92% { opacity: 0; transform: translateX(2.1px) skewX(.27deg); } }
-
-@media (max-width: 700px) {
-  .premium-founder { height: 145cqw; min-height: 0; place-items: start center; }
-  .premium-founder-copy { top: 0; left: 40.2%; width: 60cqw; padding: 18cqw 0 38cqw; transform: translateX(-50%); }
-  .premium-founder-copy h2 { font-size: 10.4cqw; line-height: 1.02; }
-  .premium-founder-body { width: 56cqw; margin-top: 4.2cqw; font-size: 3.15cqw; line-height: 1.52; }
-  .premium-founder-quote { width: 56cqw; margin-top: 4.8cqw; padding-top: 4.5cqw; }
-  .premium-founder-quote::before { width: 15cqw; }
-  .premium-founder-quote p { font-size: 4.6cqw; }
-  .premium-founder-signoff { margin-top: 4.2cqw; }
-  .premium-founder-signoff strong { font-size: 2.7cqw; }
-  .premium-founder-signoff span { margin-top: 1.2cqw; font-size: 1.7cqw; }
-  .premium-founder-signature { width: 36cqw; margin-top: 2cqw; }
-  .premium-founder-art { height: 45cqw; }
-  .premium-founder-art-left { bottom: 3.5cqw; }
-  .premium-founder-art-right { right: 0; bottom: 3.5cqw; }
-}
