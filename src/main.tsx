@@ -674,29 +674,33 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
       <section className={`gallery-modal-frame${isClosing ? ' is-closing' : ''}`} role="dialog" aria-modal="true" aria-label="Roofscape gallery viewer" tabIndex={-1} ref={modalFrameRef} onAnimationEnd={(event) => {
         if (isClosing && event.target === event.currentTarget && event.animationName === 'gallery-frame-out') onClose()
       }}>
-        <div className="gallery-modal-stage" onPointerMove={() => setSuppressArrowHover(false)}>
-          <div className="gallery-modal-meta">
-            <span>Roofscape</span>
-            <strong>{String(activeIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}</strong>
-          </div>
-          <img {...responsiveImage(`${asset}gallery/${activeImage.file}`, '94vw', 960)} alt={activeImage.alt} loading="eager" decoding="async" />
-          <GalleryArrowButton direction="previous" keyboardActive={activeControl === 'previous'} pressCount={controlPressCount.previous} suppressHover={suppressArrowHover} onActivate={() => navigate(-1)} />
-          <GalleryArrowButton direction="next" keyboardActive={activeControl === 'next'} pressCount={controlPressCount.next} suppressHover={suppressArrowHover} onActivate={() => navigate(1)} />
-        </div>
-        <aside className="gallery-sequence" aria-label="All gallery images">
-          <div className="gallery-sequence-list" ref={sequenceListRef}>
-            {images.map((image, imageIndex) => (
-              <button className={activeIndex === imageIndex ? 'is-active' : ''} type="button" onClick={() => onSelect(imageIndex)} key={image.file} aria-label={`View image ${imageIndex + 1}: ${image.alt}`} aria-current={activeIndex === imageIndex ? 'true' : undefined}>
-                <img {...responsiveImage(`${asset}gallery/${image.file}`, '112px', 640)} alt="" loading="lazy" decoding="async" />
-                <span>{String(imageIndex + 1).padStart(2, '0')}</span>
-              </button>
-            ))}
-          </div>
-        </aside>
         <button className={`gallery-modal-close${closePressed ? ' is-pointer-pressed' : ''}`} type="button" aria-label="Close gallery" onClick={handleClose} onPointerDown={() => setClosePressed(true)} onPointerUp={() => setClosePressed(false)} onPointerLeave={() => setClosePressed(false)} onPointerCancel={() => setClosePressed(false)}>
           {closeShockwave > 0 && <span className="gallery-arrow-shockwave" key={closeShockwave} aria-hidden="true" />}
           <span className={`gallery-arrow-icon${closePressed ? ' is-pointer-pressed' : ''}`}><X aria-hidden="true" /></span>
         </button>
+        <div className="gallery-modal-content">
+          <div className="gallery-modal-stage" onPointerMove={() => setSuppressArrowHover(false)}>
+            <div className="gallery-modal-meta">
+              <span>Roofscape</span>
+              <strong>{String(activeIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}</strong>
+            </div>
+            <img {...responsiveImage(`${asset}gallery/${activeImage.file}`, '94vw', 960)} alt={activeImage.alt} loading="eager" decoding="async" />
+          </div>
+          <aside className="gallery-sequence" aria-label="All gallery images">
+            <div className="gallery-sequence-list" ref={sequenceListRef}>
+              {images.map((image, imageIndex) => (
+                <button className={activeIndex === imageIndex ? 'is-active' : ''} type="button" onClick={() => onSelect(imageIndex)} key={image.file} aria-label={`View image ${imageIndex + 1}: ${image.alt}`} aria-current={activeIndex === imageIndex ? 'true' : undefined}>
+                  <img {...responsiveImage(`${asset}gallery/${image.file}`, '112px', 640)} alt="" loading="lazy" decoding="async" />
+                  <span>{String(imageIndex + 1).padStart(2, '0')}</span>
+                </button>
+              ))}
+            </div>
+          </aside>
+        </div>
+        <div className="gallery-modal-navigation">
+          <GalleryArrowButton direction="previous" keyboardActive={activeControl === 'previous'} pressCount={controlPressCount.previous} suppressHover={suppressArrowHover} onActivate={() => navigate(-1)} />
+          <GalleryArrowButton direction="next" keyboardActive={activeControl === 'next'} pressCount={controlPressCount.next} suppressHover={suppressArrowHover} onActivate={() => navigate(1)} />
+        </div>
       </section>
     </div>
   )
