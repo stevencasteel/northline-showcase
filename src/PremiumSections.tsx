@@ -118,8 +118,9 @@ function HowWeProtectSection() {
   const comparison = useComparisonSlider({ initialValue: 54, intentThreshold: protectionIntentThreshold, releaseDelayMs: protectionHoverTransitionMs })
 
   return (
-    <section className="premium-protection premium-shell" id="protection" aria-label="Roof layers: finished roof and exposed underlayment">
-      <div className={`premium-protection-console${reveal.revealed ? ' is-visible' : ''}`} data-premium-reveal ref={reveal.ref}>
+    <section className="premium-protection" id="protection" aria-label="Roof layers: finished roof and exposed underlayment">
+      <div className="premium-shell">
+        <div className={`premium-protection-console${reveal.revealed ? ' is-visible' : ''}`} data-premium-reveal ref={reveal.ref}>
         <div
           className="premium-protection-stage"
           data-drag-direction={comparison.direction ?? undefined}
@@ -156,6 +157,7 @@ function HowWeProtectSection() {
             </span>
           </div>
         </div>
+        </div>
       </div>
     </section>
   )
@@ -164,16 +166,18 @@ function HowWeProtectSection() {
 function GoogleReviewsSection() {
   const reveal = useRevealOnce<HTMLElement>({ threshold: .12 })
   return (
-    <section className={`premium-reviews premium-shell${reveal.revealed ? ' is-visible' : ''}`} id="reviews" ref={reveal.ref}>
-      <div className="premium-review-grid">
-        {reviews.map((review, index) => (
-          <article className="premium-review-card" data-premium-reveal key={review.name} style={{ '--premium-review-index': index } as CSSProperties}>
-            <div className="premium-review-fasteners" aria-hidden="true"><i /><i /><i /><i /></div>
-            <header><StageImage base={review.portrait} sizes="8vw" defaultWidth={640} stage="reviews" alt={`${review.name}, ${review.role}`} /><div><h3>{review.name}</h3><p>{review.role}</p></div><span className="premium-review-rating" aria-label="Rated five out of five"><span>5</span><i>/</i><span>5</span></span></header>
-            <blockquote>“{review.quote}”</blockquote>
-            <footer><a className="premium-review-google-link" href={review.googleUrl} target="_blank" rel="noreferrer" aria-label={`Open ${review.googlePlace} on Google Maps`}><span>{review.googlePlace}</span><img src="/assets/brand/google-g-logo.svg" alt="" aria-hidden="true" /></a></footer>
-          </article>
-        ))}
+    <section className={`premium-reviews${reveal.revealed ? ' is-visible' : ''}`} id="reviews" ref={reveal.ref}>
+      <div className="premium-shell">
+        <div className="premium-review-grid">
+          {reviews.map((review, index) => (
+            <article className="premium-review-card" data-premium-reveal key={review.name} style={{ '--premium-review-index': index } as CSSProperties}>
+              <div className="premium-review-fasteners" aria-hidden="true"><i /><i /><i /><i /></div>
+              <header><StageImage base={review.portrait} sizes="8vw" defaultWidth={640} stage="reviews" alt={`${review.name}, ${review.role}`} /><div><h3>{review.name}</h3><p>{review.role}</p></div><span className="premium-review-rating" aria-label="Rated five out of five"><span>5</span><i>/</i><span>5</span></span></header>
+              <blockquote>“{review.quote}”</blockquote>
+              <footer><a className="premium-review-google-link" href={review.googleUrl} target="_blank" rel="noreferrer" aria-label={`Open ${review.googlePlace} on Google Maps`}><span>{review.googlePlace}</span><img src="/assets/brand/google-g-logo.svg" alt="" aria-hidden="true" /></a></footer>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   )
@@ -232,7 +236,7 @@ function FounderSection() {
 }
 
 export function PremiumSections() {
-  return <div className="premium-sections"><HowWeProtectSection /><GoogleReviewsSection /><FounderSection /></div>
+  return <div className="premium-sections"><HowWeProtectSection /><div className="copper-edge-seam" aria-hidden="true" /><GoogleReviewsSection /><FounderSection /></div>
 }
 
 export function AssociationsMarquee() {

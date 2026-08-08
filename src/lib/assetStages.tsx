@@ -13,8 +13,8 @@ const requiredAssets: Record<AssetStage, string[]> = {
   services: ['/assets/services/services-cover-board', '/assets/services/residential-roofing', '/assets/services/commercial-roofing', '/assets/services/custom-metal', '/assets/services/repairs-inspections'],
   gallery: ['/assets/gallery/paper_texture', '/assets/gallery/material-library'],
   associations: ['/assets/associations/associations_bg_texture', '/assets/associations/badge_row-1_01_high_vale_roof_tile', '/assets/associations/badge_row-1_02_century_seal_roof_assurance', '/assets/associations/badge_row-2_01_ironmere', '/assets/associations/badge_row-2_02_stormglass'],
-  protection: ['/assets/protection/protection-finished-roof', '/assets/protection/protection-underlayment', '/assets/ui/copper-sphere-etched-large-generated'],
-  reviews: ['/assets/reviews/seris-rhuke', '/assets/reviews/nyaren-klourm', '/assets/reviews/baeloon-pluhng'],
+  protection: ['/assets/protection/copper_background_texture.jpg', '/assets/protection/protection-finished-roof', '/assets/protection/protection-underlayment', '/assets/ui/copper-sphere-etched-large-generated'],
+  reviews: ['/assets/reviews/leaf_background_texture.jpg', '/assets/reviews/seris-rhuke', '/assets/reviews/nyaren-klourm', '/assets/reviews/baeloon-pluhng'],
   founder: ['/assets/founder/founder-jean-texture', '/assets/founder/founder_left_frame', '/assets/founder/founder_right_frame'],
   footer: ['/assets/footer/footer-roofscape-backdrop', '/assets/footer/footer-eaves-foreground', '/assets/footer/brand-plaque', '/assets/footer/map-frame'],
 }
@@ -28,9 +28,11 @@ type AssetStageContextValue = {
 
 const AssetStageContext = createContext<AssetStageContextValue | null>(null)
 
-function loadAndDecodeImage(base: string, width: number) {
+function loadAndDecodeImage(baseOrUrl: string, width: number) {
   const image = new Image()
-  const source = responsiveSource(base, width)
+  const source = baseOrUrl.endsWith('.jpg') || baseOrUrl.endsWith('.jpeg') || baseOrUrl.endsWith('.png')
+    ? baseOrUrl
+    : responsiveSource(baseOrUrl, width)
   return new Promise<void>((resolve) => {
     image.onload = () => {
       if (typeof image.decode === 'function') void image.decode().catch(() => undefined).finally(resolve)

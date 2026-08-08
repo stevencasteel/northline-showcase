@@ -36,8 +36,8 @@
 .premium-footer.is-visible [data-premium-reveal] { opacity: 1; transform: none; }
 
 .premium-protection {
-  padding-top: min(5.5cqw, 5.5rem);
-  padding-bottom: min(11cqw, 11rem);
+  padding-block: min(5.5cqw, 5.5rem);
+  background: linear-gradient(rgba(229,220,210,.16), rgba(229,220,210,.16)), var(--asset-protection-texture) center / cover no-repeat, var(--premium-cream);
 }
 .premium-protection-console {
   padding: .75rem;
@@ -203,8 +203,8 @@
 .premium-protection-range::-webkit-slider-thumb { width: 1px; height: 100%; appearance: none; -webkit-appearance: none; background: transparent; }
 .premium-protection-range::-moz-range-track { width: 100%; height: 100%; border: 0; background: transparent; }
 .premium-protection-range::-moz-range-thumb { width: 1px; height: 100%; border: 0; border-radius: 0; background: transparent; }
-.premium-reviews { padding-bottom: min(11cqw,11rem); }
-.premium-review-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: min(1.1rem,1.2cqw); perspective: 1400px; }
+.premium-reviews { padding-block: min(5.5cqw,5.5rem); background: linear-gradient(rgba(229,220,210,.18), rgba(229,220,210,.18)), var(--asset-reviews-texture) center / cover no-repeat, var(--premium-cream); }
+.premium-review-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: min(2rem,2.2cqw); perspective: 1400px; }
 .premium-review-card { position: relative; min-height: min(30.5rem,34cqw); padding: min(2.6rem,2.9cqw); border: 1px solid rgba(107,60,31,.36); display: flex; flex-direction: column; overflow: hidden; background: linear-gradient(145deg,rgba(255,255,255,.86),rgba(237,225,208,.62)),url('/assets/reviews/roofing-felt-fiber-640.webp') center / 560px,#f2eadf; box-shadow: 0 1.1rem 3.4rem rgba(4,20,33,.12),inset 0 0 0 8px rgba(185,110,66,.12); transform: rotate(calc((var(--premium-review-index) - 1) * .65deg)); transition: opacity .7s ease, transform .85s cubic-bezier(.2,.78,.2,1), box-shadow .3s ease; transition-delay: calc(var(--premium-review-index) * .1s); }
 .premium-reviews.is-visible .premium-review-card:hover { z-index: 2; transform: translateY(-.6rem) rotate(0); box-shadow: 0 2rem 5rem rgba(4,20,33,.22),inset 0 0 0 8px rgba(185,110,66,.16); }
 .premium-review-fasteners i { position: absolute; width: .7rem; height: .7rem; border: 1px solid #6b3b21; border-radius: 50%; background: radial-gradient(circle at 35% 30%,#f1b37c,#7d4323 70%); box-shadow: 0 1px 3px rgba(0,0,0,.4); }
