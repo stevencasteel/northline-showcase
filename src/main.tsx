@@ -809,6 +809,7 @@ function Gallery() {
   const images = galleryImages
   const documentVisible = useDocumentVisibility()
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const [activeMaterialIndex, setActiveMaterialIndex] = useState<number | null>(null)
   const hoveredSlotRef = useRef<number | null>(null)
   const closeGallery = useCallback(() => setActiveIndex(null), [])
   const previewIndices = useGalleryPreviewRotation(
@@ -848,12 +849,19 @@ function Gallery() {
               <div className="gallery-material-clip">
                 <StageImage base="/assets/gallery/material-library" sizes="32vw" defaultWidth={960} stage="gallery" alt="A front-facing display of sixteen fantasy roofing material samples arranged in two columns like a premium architectural showroom library." />
                 <div className="gallery-material-labels">
-                  {roofMaterials.map(([number, name, detail]) => (
-                    <div className="gallery-material-label" key={number}>
+                  {roofMaterials.map(([number, name, detail], index) => (
+                    <button
+                      className={`gallery-material-label${activeMaterialIndex === index ? ' is-active' : ''}`}
+                      type="button"
+                      onClick={() => setActiveMaterialIndex((current) => current === index ? null : index)}
+                      key={number}
+                      aria-label={`${number}: ${name}. ${detail}`}
+                      aria-pressed={activeMaterialIndex === index}
+                    >
                       <span>{number}</span>
                       <strong>{name}</strong>
                       <small>{detail}</small>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -894,7 +902,8 @@ function App() {
 }
 
 function Root() {
-  return <AssetStageProvider><App /></AssetStageProvider>
+  const galleryAssets = galleryPreviewIndices.map((index) => `/assets/gallery/${galleryImages[index].file}`)
+  return <AssetStageProvider galleryAssets={galleryAssets}><App /></AssetStageProvider>
 }
 
 createRoot(document.getElementById('root')!).render(<Root />)

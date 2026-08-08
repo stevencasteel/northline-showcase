@@ -11,7 +11,7 @@ const requiredAssets: Record<AssetStage, string[]> = {
   hero: ['/assets/hero/sky', '/assets/hero/foreground'],
   badges: ['/assets/badges/banner', '/assets/badges/badge-banner-workshirt', '/assets/badges/badge-banner-workshirt-full-hem'],
   services: ['/assets/services/services-cover-board', '/assets/services/residential-roofing', '/assets/services/commercial-roofing', '/assets/services/custom-metal', '/assets/services/repairs-inspections'],
-  gallery: ['/assets/gallery/paper_texture', '/assets/gallery/material-library', '/assets/gallery/01-gothic-mountain-house-copper-trim', '/assets/gallery/03-white-metal-roof-gold-trim', '/assets/gallery/08-iridescent-curved-slate-roof', '/assets/gallery/10-flared-copper-roof-house', '/assets/gallery/14-lakeside-multicolor-slate-roof', '/assets/gallery/17-desert-standing-seam-copper-roof'],
+  gallery: ['/assets/gallery/paper_texture', '/assets/gallery/material-library'],
   associations: ['/assets/associations/associations_bg_texture', '/assets/associations/badge_row-1_01_high_vale_roof_tile', '/assets/associations/badge_row-1_02_century_seal_roof_assurance', '/assets/associations/badge_row-2_01_ironmere', '/assets/associations/badge_row-2_02_stormglass'],
   protection: ['/assets/protection/protection-finished-roof', '/assets/protection/protection-underlayment', '/assets/ui/copper-sphere-etched-large-generated'],
   reviews: ['/assets/reviews/seris-rhuke', '/assets/reviews/nyaren-klourm', '/assets/reviews/baeloon-pluhng'],
@@ -41,7 +41,7 @@ function loadAndDecodeImage(base: string, width: number) {
   })
 }
 
-export function AssetStageProvider({ children }: { children: ReactNode }) {
+export function AssetStageProvider({ children, galleryAssets = [] }: { children: ReactNode; galleryAssets?: string[] }) {
   const initialConstrained = typeof window !== 'undefined' && window.matchMedia('(max-width: 700px)').matches
   const [constrained, setConstrained] = useState(initialConstrained)
   const [enabledStages, setEnabledStages] = useState<AssetStage[]>(initialConstrained ? ['hero'] : stageOrder)
@@ -64,7 +64,8 @@ export function AssetStageProvider({ children }: { children: ReactNode }) {
     const run = async () => {
       for (let index = 0; index < stageOrder.length - 1; index += 1) {
         const stage = stageOrder[index]
-        await Promise.allSettled(requiredAssets[stage].map((base) => loadAndDecodeImage(base, 640)))
+        const assets = stage === 'gallery' ? [...requiredAssets.gallery, ...galleryAssets] : requiredAssets[stage]
+        await Promise.allSettled(assets.map((base) => loadAndDecodeImage(base, 640)))
         if (cancelled) return
         const next = stageOrder[index + 1]
         setEnabledStages((current) => current.includes(next) ? current : [...current, next])
@@ -72,7 +73,7 @@ export function AssetStageProvider({ children }: { children: ReactNode }) {
     }
     void run()
     return () => { cancelled = true }
-  }, [constrained])
+  }, [constrained, galleryAssets])
 
   const value = useMemo<AssetStageContextValue>(() => {
     return {
