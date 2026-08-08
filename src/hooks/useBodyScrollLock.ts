@@ -1,5 +1,8 @@
 import { useEffect } from 'react'
 
+let activeScrollLocks = 0
+let hadScrollLockClassBeforeFirstLock = false
+
 export function useBodyScrollLock(locked: boolean) {
   useEffect(() => {
     if (!locked) return
@@ -7,6 +10,11 @@ export function useBodyScrollLock(locked: boolean) {
     const scrollY = window.scrollY
     const body = document.body
     const root = document.documentElement
+    if (activeScrollLocks === 0) {
+      hadScrollLockClassBeforeFirstLock = body.classList.contains('body-scroll-locked')
+    }
+    activeScrollLocks += 1
+    body.classList.add('body-scroll-locked')
     const previous = {
       bodyOverflow: body.style.overflow,
       rootOverflow: root.style.overflow,
@@ -30,6 +38,7 @@ export function useBodyScrollLock(locked: boolean) {
     if (scrollbarWidth > 0) body.style.paddingRight = `${scrollbarWidth}px`
 
     return () => {
+      activeScrollLocks = Math.max(0, activeScrollLocks - 1)
       root.style.scrollBehavior = 'auto'
       root.style.overflow = previous.rootOverflow
       body.style.overflow = previous.bodyOverflow
@@ -39,6 +48,9 @@ export function useBodyScrollLock(locked: boolean) {
       body.style.right = previous.bodyRight
       body.style.width = previous.bodyWidth
       body.style.paddingRight = previous.bodyPaddingRight
+      if (activeScrollLocks === 0 && !hadScrollLockClassBeforeFirstLock) {
+        body.classList.remove('body-scroll-locked')
+      }
       window.scrollTo(scrollX, scrollY)
       root.style.scrollBehavior = previous.rootScrollBehavior
     }

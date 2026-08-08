@@ -104,7 +104,9 @@ function widthsForSource(sourcePath, sourceWidth) {
   const relative = path.relative(assetsRoot, sourcePath).split(path.sep).join('/')
   const isCompactFamily = (
     (relative.startsWith('associations/source_files/') && !relative.includes('associations_bg_texture'))
-    || (relative.startsWith('reviews/source_files/') && !relative.includes('roofing-felt-fiber'))
+    || (relative.startsWith('reviews/source_files/')
+      && !relative.includes('roofing-felt-fiber')
+      && !relative.includes('leaf_background_texture'))
     || relative.startsWith('customer service/source_files/')
     || relative.startsWith('ui/source_files/copper-sphere-')
   )

@@ -662,13 +662,6 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   useBodyScrollLock(true)
   useDialogFocus(modalFrameRef, handleClose)
 
-  useEffect(() => {
-    document.body.classList.add('gallery-modal-open')
-    return () => {
-      document.body.classList.remove('gallery-modal-open')
-    }
-  }, [])
-
   const modal = (
     <div className={`gallery-modal-backdrop${isClosing ? ' is-closing' : ''}`} role="presentation" onPointerDown={(event) => { if (event.currentTarget === event.target) handleClose() }}>
       <section className={`gallery-modal-frame${isClosing ? ' is-closing' : ''}`} role="dialog" aria-modal="true" aria-label="Roofscape gallery viewer" tabIndex={-1} ref={modalFrameRef} onAnimationEnd={(event) => {

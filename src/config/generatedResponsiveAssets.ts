@@ -1398,6 +1398,19 @@ export const RESPONSIVE_ASSETS = {
       2560
     ]
   },
+  "/assets/protection/copper_background_texture": {
+    "sourceWidth": 5920,
+    "sourceHeight": 3098,
+    "hasAlpha": false,
+    "format": "webp",
+    "widths": [
+      640,
+      960,
+      1440,
+      1920,
+      2560
+    ]
+  },
   "/assets/protection/powder-coated-navy-steel": {
     "sourceWidth": 1254,
     "sourceHeight": 1254,
@@ -1437,6 +1450,19 @@ export const RESPONSIVE_ASSETS = {
     "format": "webp",
     "widths": [
       640
+    ]
+  },
+  "/assets/reviews/leaf_background_texture": {
+    "sourceWidth": 7506,
+    "sourceHeight": 3444,
+    "hasAlpha": false,
+    "format": "webp",
+    "widths": [
+      640,
+      960,
+      1440,
+      1920,
+      2560
     ]
   },
   "/assets/reviews/nyaren-klourm": {
