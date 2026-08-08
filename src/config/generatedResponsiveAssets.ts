@@ -1384,6 +1384,46 @@ export const RESPONSIVE_ASSETS = {
       2560
     ]
   },
+  "/assets/navbar/nav_book-appt_default": {
+    "sourceWidth": 966,
+    "sourceHeight": 179,
+    "hasAlpha": true,
+    "format": "webp",
+    "widths": [
+      640,
+      960
+    ]
+  },
+  "/assets/navbar/nav_book-appt_hover": {
+    "sourceWidth": 966,
+    "sourceHeight": 179,
+    "hasAlpha": true,
+    "format": "webp",
+    "widths": [
+      640,
+      960
+    ]
+  },
+  "/assets/navbar/nav_phone_default": {
+    "sourceWidth": 1154,
+    "sourceHeight": 244,
+    "hasAlpha": true,
+    "format": "webp",
+    "widths": [
+      640,
+      960
+    ]
+  },
+  "/assets/navbar/nav_phone_hover": {
+    "sourceWidth": 1154,
+    "sourceHeight": 244,
+    "hasAlpha": true,
+    "format": "webp",
+    "widths": [
+      640,
+      960
+    ]
+  },
   "/assets/navbar/navbar-underlayment": {
     "sourceWidth": 3627,
     "sourceHeight": 224,

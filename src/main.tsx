@@ -26,18 +26,28 @@ function CopperEdgeSeam() {
 }
 
 type NavbarArtProps = {
-  file: string
+  file?: string
   hoverFile?: string
+  responsiveBase?: string
+  responsiveHoverBase?: string
   width: number
   height: number
   alt: string
 }
 
-function NavbarArt({ file, hoverFile, width, height, alt }: NavbarArtProps) {
+function NavbarArt({ file, hoverFile, responsiveBase, responsiveHoverBase, width, height, alt }: NavbarArtProps) {
+  const defaultImage = responsiveBase
+    ? responsiveImage(responsiveBase, '15vw', 640)
+    : { src: `${asset}navbar/${file}`, width, height }
+  const hoverImage = responsiveHoverBase
+    ? responsiveImage(responsiveHoverBase, '15vw', 640)
+    : hoverFile
+      ? { src: `${asset}navbar/${hoverFile}`, width, height }
+      : null
   return (
     <span className="navbar-art" aria-hidden={alt ? undefined : true}>
-      <img className="navbar-art-default" src={`${asset}navbar/${file}`} alt={alt} width={width} height={height} />
-      {hoverFile && <img className="navbar-art-hover" src={`${asset}navbar/${hoverFile}`} alt="" width={width} height={height} aria-hidden="true" />}
+      <img className="navbar-art-default" {...defaultImage} alt={alt} />
+      {hoverImage && <img className="navbar-art-hover" {...hoverImage} alt="" aria-hidden="true" />}
     </span>
   )
 }
@@ -63,10 +73,10 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
         <a href="#contact" aria-label="Contact"><NavbarArt file="nav_contact_default.png" hoverFile="nav_contact_hover.png" width={426} height={150} alt="Contact" /></a>
       </nav>
       <a className="header-phone navbar-art-link" href={siteConfig.phoneHref} aria-label={`Call ${siteConfig.phoneDisplay}`}>
-        <NavbarArt file="nav_phone_default.png" width={955} height={202} alt={`Call ${siteConfig.phoneDisplay}`} />
+        <NavbarArt responsiveBase="/assets/navbar/nav_phone_default" responsiveHoverBase="/assets/navbar/nav_phone_hover" width={1154} height={244} alt={`Call ${siteConfig.phoneDisplay}`} />
       </a>
       <button className="header-quote navbar-art-button" type="button" onClick={onBookAppointment} aria-label="Book an appointment">
-        <NavbarArt file="nav_book-appt_default.png" width={966} height={180} alt="Book an appointment" />
+        <NavbarArt responsiveBase="/assets/navbar/nav_book-appt_default" responsiveHoverBase="/assets/navbar/nav_book-appt_hover" width={966} height={180} alt="Book an appointment" />
       </button>
     </header>
   )
