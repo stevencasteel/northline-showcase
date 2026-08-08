@@ -165,9 +165,6 @@ function GoogleReviewsSection() {
   const reveal = useRevealOnce<HTMLElement>({ threshold: .12 })
   return (
     <section className={`premium-reviews premium-shell${reveal.revealed ? ' is-visible' : ''}`} id="reviews" ref={reveal.ref}>
-      <div className="premium-reviews-heading" data-premium-reveal>
-        <div className="premium-google-mark" aria-label="Reviews on Google"><img src="/assets/brand/google-g-logo.svg" alt="Google G" /><span>Reviews on Google</span></div>
-      </div>
       <div className="premium-review-grid">
         {reviews.map((review, index) => (
           <article className="premium-review-card" data-premium-reveal key={review.name} style={{ '--premium-review-index': index } as CSSProperties}>
