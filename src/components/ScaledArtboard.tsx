@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 
-const ARTBOARD_REFERENCE_WIDTH_PX = 1440
+const DESKTOP_ARTBOARD_REFERENCE_WIDTH_PX = 1440
+const MOBILE_ARTBOARD_REFERENCE_WIDTH_PX = 720
 const SCALE_CHANGE_EPSILON = 0.0001
 const HEIGHT_CHANGE_EPSILON_PX = 0.5
 const MIN_MEASURABLE_WIDTH_PX = 1
@@ -12,7 +13,7 @@ type ScaledArtboardProps = {
 export function ScaledArtboard({ children }: ScaledArtboardProps) {
   const hostRef = useRef<HTMLDivElement>(null)
   const innerRef = useRef<HTMLDivElement>(null)
-  const [layout, setLayout] = useState({ artboardWidth: ARTBOARD_REFERENCE_WIDTH_PX, scale: 1, height: 0 })
+  const [layout, setLayout] = useState({ artboardWidth: DESKTOP_ARTBOARD_REFERENCE_WIDTH_PX, scale: 1, height: 0 })
 
   useLayoutEffect(() => {
     const host = hostRef.current
@@ -23,7 +24,8 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
 
     const update = () => {
       const hostWidth = Math.max(host.getBoundingClientRect().width, MIN_MEASURABLE_WIDTH_PX)
-      const artboardWidth = Math.max(ARTBOARD_REFERENCE_WIDTH_PX, hostWidth)
+      const referenceWidth = window.matchMedia('(max-width: 700px)').matches ? MOBILE_ARTBOARD_REFERENCE_WIDTH_PX : DESKTOP_ARTBOARD_REFERENCE_WIDTH_PX
+      const artboardWidth = Math.max(referenceWidth, hostWidth)
       const scale = hostWidth / artboardWidth
       const height = inner.scrollHeight * scale
       setLayout((current) => current.artboardWidth === artboardWidth && Math.abs(current.scale - scale) < SCALE_CHANGE_EPSILON && Math.abs(current.height - height) < HEIGHT_CHANGE_EPSILON_PX ? current : { artboardWidth, scale, height })
@@ -42,6 +44,8 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
       resizeObserver.observe(inner)
     }
     window.addEventListener('resize', scheduleUpdate)
+    const referenceMedia = window.matchMedia('(max-width: 700px)')
+    referenceMedia.addEventListener?.('change', scheduleUpdate)
     const imageListeners: HTMLImageElement[] = []
     inner.querySelectorAll<HTMLImageElement>('img').forEach((image) => {
       if (image.complete) return
@@ -52,6 +56,7 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
     return () => {
       resizeObserver?.disconnect()
       window.removeEventListener('resize', scheduleUpdate)
+      referenceMedia.removeEventListener?.('change', scheduleUpdate)
       imageListeners.forEach((image) => image.removeEventListener('load', scheduleUpdate))
       window.cancelAnimationFrame(resizeFrame)
       void fontReady
@@ -67,7 +72,7 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
 
   return (
     <div className="scaled-artboard" ref={hostRef} style={{ height: layout.height || undefined }}>
-      <div className="scaled-artboard-inner" ref={innerRef} style={innerStyle}>
+      <div className="scaled-artboard-inner" ref={innerRef} style={innerStyle} data-artboard-width={layout.artboardWidth}>
         {children}
       </div>
     </div>

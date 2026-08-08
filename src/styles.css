@@ -18,64 +18,10 @@
   --hologram-period: 4.2s;
   --hologram-width: 720;
   --hologram-height: 1626;
-  --asset-navbar-underlayment: url('/assets/navbar/navbar-underlayment-1440.webp');
-  --asset-copper-edge: url('/assets/ui/copper-edge-1440.webp');
-  --asset-badge-workshirt: url('/assets/badges/badge-banner-workshirt-1440.webp');
-  --asset-badge-workshirt-hem: url('/assets/badges/badge-banner-workshirt-full-hem-1440.webp');
-  --asset-services-cover-board: url('/assets/services/services-cover-board-1440.avif');
-  --asset-gallery-paper: url('/assets/gallery/paper_texture-1440.webp');
-  --asset-associations-texture: url('/assets/associations/associations_bg_texture-1440.webp');
-  --asset-founder-texture: url('/assets/founder/founder-jean-texture-1440.webp');
   font-family: Inter, sans-serif;
   color: var(--color-ink);
   background: var(--color-cream);
   font-synthesis: none;
-}
-@media (max-width: 700px) {
-  :root {
-    --asset-navbar-underlayment: url('/assets/navbar/navbar-underlayment-640.webp');
-    --asset-copper-edge: url('/assets/ui/copper-edge-640.webp');
-    --asset-badge-workshirt: url('/assets/badges/badge-banner-workshirt-640.webp');
-    --asset-badge-workshirt-hem: url('/assets/badges/badge-banner-workshirt-full-hem-640.webp');
-    --asset-services-cover-board: url('/assets/services/services-cover-board-640.avif');
-    --asset-gallery-paper: url('/assets/gallery/paper_texture-640.webp');
-    --asset-associations-texture: url('/assets/associations/associations_bg_texture-640.webp');
-    --asset-founder-texture: url('/assets/founder/founder-jean-texture-640.webp');
-  }
-}
-@media (min-width: 701px) and (max-width: 1199px) {
-  :root {
-    --asset-navbar-underlayment: url('/assets/navbar/navbar-underlayment-960.webp');
-    --asset-copper-edge: url('/assets/ui/copper-edge-960.webp');
-    --asset-badge-workshirt: url('/assets/badges/badge-banner-workshirt-960.webp');
-    --asset-badge-workshirt-hem: url('/assets/badges/badge-banner-workshirt-full-hem-960.webp');
-    --asset-services-cover-board: url('/assets/services/services-cover-board-960.avif');
-    --asset-gallery-paper: url('/assets/gallery/paper_texture-960.webp');
-    --asset-associations-texture: url('/assets/associations/associations_bg_texture-960.webp');
-    --asset-founder-texture: url('/assets/founder/founder-jean-texture-960.webp');
-  }
-}
-@media (min-width: 1920px) and (max-width: 2399px) {
-  :root {
-    --asset-navbar-underlayment: url('/assets/navbar/navbar-underlayment-1920.webp');
-    --asset-copper-edge: url('/assets/ui/copper-edge-1920.webp');
-    --asset-badge-workshirt: url('/assets/badges/badge-banner-workshirt-1920.webp');
-    --asset-badge-workshirt-hem: url('/assets/badges/badge-banner-workshirt-full-hem-1920.webp');
-    --asset-services-cover-board: url('/assets/services/services-cover-board-1920.avif');
-    --asset-gallery-paper: url('/assets/gallery/paper_texture-1920.webp');
-    --asset-associations-texture: url('/assets/associations/associations_bg_texture-1920.webp');
-    --asset-founder-texture: url('/assets/founder/founder-jean-texture-1920.webp');
-  }
-}
-@media (min-width: 2400px) {
-  :root {
-    --asset-navbar-underlayment: url('/assets/navbar/navbar-underlayment-2560.webp');
-    --asset-copper-edge: url('/assets/ui/copper-edge-2560.webp');
-    --asset-services-cover-board: url('/assets/services/services-cover-board-2560.avif');
-    --asset-gallery-paper: url('/assets/gallery/paper_texture-2560.webp');
-    --asset-associations-texture: url('/assets/associations/associations_bg_texture-2560.webp');
-    --asset-founder-texture: url('/assets/founder/founder-jean-texture-2560.webp');
-  }
 }
 * { box-sizing: border-box; }
 html, body { width: 100%; margin: 0; overflow-x: hidden; overflow-x: clip; }
@@ -84,6 +30,24 @@ html { scroll-behavior: smooth; scrollbar-color: #d25f26 #102432; scrollbar-widt
 body.gallery-modal-open { background: #102432; }
 .scaled-artboard { position: relative; width: 100%; max-width: none; overflow: hidden; overflow: clip; contain: layout paint; }
 .scaled-artboard-inner { position: relative; max-width: none; min-width: 0; overflow: visible; container-type: inline-size; will-change: transform; }
+.asset-placeholder { display: block; width: 100%; height: 100%; background: transparent; }
+.app { --asset-navbar-underlayment: none; --asset-copper-edge: none; --asset-badge-workshirt: none; --asset-badge-workshirt-hem: none; --asset-services-cover-board: none; --asset-gallery-paper: none; --asset-associations-texture: none; --asset-founder-texture: none; }
+@media (max-width: 700px) {
+  .app.asset-stage-hero { --asset-navbar-underlayment: url('/assets/navbar/navbar-underlayment-640.webp'); --asset-copper-edge: url('/assets/ui/copper-edge-640.webp'); }
+  .app.asset-stage-badges { --asset-badge-workshirt: url('/assets/badges/badge-banner-workshirt-640.webp'); --asset-badge-workshirt-hem: url('/assets/badges/badge-banner-workshirt-full-hem-640.webp'); }
+  .app.asset-stage-services { --asset-services-cover-board: url('/assets/services/services-cover-board-640.avif'); }
+  .app.asset-stage-gallery { --asset-gallery-paper: url('/assets/gallery/paper_texture-640.webp'); }
+  .app.asset-stage-associations { --asset-associations-texture: url('/assets/associations/associations_bg_texture-640.webp'); }
+  .app.asset-stage-founder { --asset-founder-texture: url('/assets/founder/founder-jean-texture-640.webp'); }
+}
+@media (min-width: 701px) {
+  .app.asset-stage-hero { --asset-navbar-underlayment: url('/assets/navbar/navbar-underlayment-1440.webp'); --asset-copper-edge: url('/assets/ui/copper-edge-1440.webp'); }
+  .app.asset-stage-badges { --asset-badge-workshirt: url('/assets/badges/badge-banner-workshirt-1440.webp'); --asset-badge-workshirt-hem: url('/assets/badges/badge-banner-workshirt-full-hem-1440.webp'); }
+  .app.asset-stage-services { --asset-services-cover-board: url('/assets/services/services-cover-board-1440.avif'); }
+  .app.asset-stage-gallery { --asset-gallery-paper: url('/assets/gallery/paper_texture-1440.webp'); }
+  .app.asset-stage-associations { --asset-associations-texture: url('/assets/associations/associations_bg_texture-1440.webp'); }
+  .app.asset-stage-founder { --asset-founder-texture: url('/assets/founder/founder-jean-texture-1440.webp'); }
+}
 ::-webkit-scrollbar { width: 16px; height: 16px; }
 ::-webkit-scrollbar-track { background: #102432; }
 ::-webkit-scrollbar-thumb { border: 3px solid #102432; border-radius: 999px; background: #d25f26; }

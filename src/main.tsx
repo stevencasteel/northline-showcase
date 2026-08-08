@@ -17,6 +17,7 @@ import { ScaledArtboard } from './components/ScaledArtboard'
 import { siteConfig } from './config/site'
 import { GALLERY_PREVIEW_SLOTS, GALLERY_SWAP_CONFIG } from './config/gallery'
 import { responsiveImage } from './lib/responsiveImage'
+import { AssetStageProvider, StageImage, useAssetStage } from './lib/assetStages'
 
 const asset = '/assets/'
 
@@ -215,19 +216,12 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
 }
 
 function BadgeStrip() {
-  const bannerImage = responsiveImage('/assets/badges/banner', '91vw', 1440)
   return (
     <section className="badge-strip" id="about" aria-label="Northline Roofing qualifications">
       <div className="badge-sprite-canvas" aria-hidden="true">
-        <div className="badge-slice badge-slice-one"><img {...bannerImage} alt="" /></div>
-        <div className="badge-slice badge-divider-one"><img {...bannerImage} alt="" /></div>
-        <div className="badge-slice badge-slice-two"><img {...bannerImage} alt="" /></div>
-        <div className="badge-slice badge-divider-two"><img {...bannerImage} alt="" /></div>
-        <div className="badge-slice badge-slice-three"><img {...bannerImage} alt="" /></div>
-        <div className="badge-slice badge-divider-three"><img {...bannerImage} alt="" /></div>
-        <div className="badge-slice badge-slice-four"><img {...bannerImage} alt="" /></div>
+        {['badge-slice-one', 'badge-divider-one', 'badge-slice-two', 'badge-divider-two', 'badge-slice-three', 'badge-divider-three', 'badge-slice-four'].map((className) => <div className={`badge-slice ${className}`} key={className}><StageImage base="/assets/badges/banner" sizes="91vw" defaultWidth={1440} stage="badges" alt="" /></div>)}
       </div>
-      <img className="badge-banner visually-hidden" {...bannerImage} alt="Northline Roofing promotional banner divided into four sections by copper divider bars: a copper award medal with 300 YEARS EXPERIENCE; a copper palm tree with TROPICS LICENSED; a copper cityscape with RESIDENTIAL & COMMERCIAL; and a copper anvil and hammer with CUSTOM METAL FABRICATION." />
+      <StageImage className="badge-banner visually-hidden" base="/assets/badges/banner" sizes="91vw" defaultWidth={1440} stage="badges" alt="Northline Roofing promotional banner divided into four sections by copper divider bars: a copper award medal with 300 YEARS EXPERIENCE; a copper palm tree with TROPICS LICENSED; a copper cityscape with RESIDENTIAL & COMMERCIAL; and a copper anvil and hammer with CUSTOM METAL FABRICATION." />
       <p className="visually-hidden">Northline Roofing qualifications: 300 years experience. Tropics licensed. Residential and commercial roofing. Custom metal fabrication.</p>
     </section>
   )
@@ -272,7 +266,7 @@ function Services() {
               key={service.title}
               style={{ '--service-index': index } as React.CSSProperties}
             >
-              <img {...responsiveImage(`${asset}${service.image}`, '26vw', 960)} alt={service.alt} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" />
+              <StageImage base={`${asset}${service.image}`} sizes="26vw" defaultWidth={960} stage="services" alt={service.alt} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" />
               <span className="service-slice-shade" />
               <span className="service-slice-number">0{index + 1}</span>
               <span className="service-slice-content">
@@ -623,9 +617,16 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   const preloadedImagesRef = useRef(new Map<string, HTMLImageElement>())
 
   useEffect(() => {
-    const preloadIndexes = [-2, -1, 0, 1, 2].map((offset) => (activeIndex + offset + images.length) % images.length)
+    const preloadIndexes = [-1, 0, 1].map((offset) => (activeIndex + offset + images.length) % images.length)
+    preloadedImagesRef.current.forEach((image, src) => {
+      const stillWanted = preloadIndexes.some((index) => responsiveImage(`${asset}gallery/${images[index].file}`, '94vw', 960).src === src)
+      if (!stillWanted) {
+        image.src = ''
+        preloadedImagesRef.current.delete(src)
+      }
+    })
     preloadIndexes.forEach((index) => {
-      const src = responsiveImage(`${asset}gallery/${images[index].file}`, '94vw', 1440).src
+      const src = responsiveImage(`${asset}gallery/${images[index].file}`, '94vw', 960).src
       if (preloadedImagesRef.current.has(src)) return
       const image = new Image()
       image.decoding = 'async'
@@ -678,7 +679,7 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
             <span>Roofscape</span>
             <strong>{String(activeIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}</strong>
           </div>
-          <img {...responsiveImage(`${asset}gallery/${activeImage.file}`, '94vw', 1440)} alt={activeImage.alt} loading="eager" decoding="async" />
+          <img {...responsiveImage(`${asset}gallery/${activeImage.file}`, '94vw', 960)} alt={activeImage.alt} loading="eager" decoding="async" />
           <GalleryArrowButton direction="previous" keyboardActive={activeControl === 'previous'} pressCount={controlPressCount.previous} suppressHover={suppressArrowHover} onActivate={() => navigate(-1)} />
           <GalleryArrowButton direction="next" keyboardActive={activeControl === 'next'} pressCount={controlPressCount.next} suppressHover={suppressArrowHover} onActivate={() => navigate(1)} />
         </div>
@@ -765,10 +766,13 @@ function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen, onHover
       aria-label={`Open image ${displayed.imageIndex + 1}: ${displayed.image.alt}`}
       style={{ '--gallery-index': slot } as React.CSSProperties}
     >
-      <img {...responsiveImage(`${asset}gallery/${displayed.image.file}`, cardSizes, 960)} className={`gallery-card-image gallery-card-image-current${incoming ? ` gallery-card-image-outgoing gallery-card-image-out-${incomingDirection}` : ''}`} alt={displayed.image.alt} loading={slot < 3 ? 'eager' : 'lazy'} />
+      <StageImage base={`${asset}gallery/${displayed.image.file}`} sizes={cardSizes} defaultWidth={960} stage="gallery" className={`gallery-card-image gallery-card-image-current${incoming ? ` gallery-card-image-outgoing gallery-card-image-out-${incomingDirection}` : ''}`} alt={displayed.image.alt} loading={slot < 3 ? 'eager' : 'lazy'} />
       {incoming && (
-        <img
-          {...responsiveImage(`${asset}gallery/${incoming.image.file}`, cardSizes, 960)}
+        <StageImage
+          base={`${asset}gallery/${incoming.image.file}`}
+          sizes={cardSizes}
+          defaultWidth={960}
+          stage="gallery"
           className={`gallery-card-image gallery-card-image-incoming gallery-card-image-from-${incomingDirection}`}
           alt=""
           onAnimationEnd={() => {
@@ -842,7 +846,7 @@ function Gallery() {
             </div>
             <div className="gallery-material-art">
               <div className="gallery-material-clip">
-                <img {...responsiveImage('/assets/gallery/material-library', '32vw', 960)} alt="A front-facing display of sixteen fantasy roofing material samples arranged in two columns like a premium architectural showroom library." />
+                <StageImage base="/assets/gallery/material-library" sizes="32vw" defaultWidth={960} stage="gallery" alt="A front-facing display of sixteen fantasy roofing material samples arranged in two columns like a premium architectural showroom library." />
                 <div className="gallery-material-labels">
                   {roofMaterials.map(([number, name, detail]) => (
                     <div className="gallery-material-label" key={number}>
@@ -866,8 +870,9 @@ function App() {
   const [appointmentOpen, setAppointmentOpen] = useState(false)
   const openAppointment = useCallback(() => setAppointmentOpen(true), [])
   const closeAppointment = useCallback(() => setAppointmentOpen(false), [])
+  const { style, stageClassName } = useAssetStage()
   return (
-    <div className="app">
+    <div className={`app ${stageClassName}`} style={style}>
       <ScaledArtboard>
         <Header onBookAppointment={openAppointment} />
         <main>
@@ -888,4 +893,8 @@ function App() {
   )
 }
 
-createRoot(document.getElementById('root')!).render(<App />)
+function Root() {
+  return <AssetStageProvider><App /></AssetStageProvider>
+}
+
+createRoot(document.getElementById('root')!).render(<Root />)

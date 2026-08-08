@@ -7,6 +7,7 @@ import { useComparisonSlider } from './hooks/useComparisonSlider'
 import { siteConfig } from './config/site'
 import { HOLOGRAM } from './config/hologram'
 import { responsiveImage, responsiveSource } from './lib/responsiveImage'
+import { StageImage } from './lib/assetStages'
 
 type BookHandler = { onBook: () => void }
 
@@ -125,8 +126,8 @@ function HowWeProtectSection() {
           data-drag-indicator={comparison.indicatorVisible && comparison.direction ? 'visible' : undefined}
           style={{ '--premium-split': `${comparison.value}%` } as CSSProperties}
         >
-          <img className="premium-protection-image" {...responsiveImage('/assets/protection/protection-finished-roof', '100vw', 1440)} alt="A completed premium slate and copper roof" />
-          <img className="premium-protection-image premium-protection-layer" {...responsiveImage(underlaymentImage, '100vw', 1440)} alt="The same roof with its underlayment construction exposed" />
+          <StageImage className="premium-protection-image" base="/assets/protection/protection-finished-roof" sizes="100vw" stage="protection" alt="A completed premium slate and copper roof" />
+          <StageImage className="premium-protection-image premium-protection-layer" base={underlaymentImage} sizes="100vw" stage="protection" alt="The same roof with its underlayment construction exposed" />
           <input
             className="premium-protection-range"
             type="range"
@@ -148,9 +149,9 @@ function HowWeProtectSection() {
           <div className="premium-protection-divider" aria-hidden="true">
             <span className="premium-protection-thumb">
               <span className="premium-protection-thumb-surface">
-                <img className="premium-protection-sphere premium-protection-sphere-default" {...responsiveImage(protectionSphereImage, '8vw', 640)} alt="" aria-hidden="true" />
-                <img className="premium-protection-sphere premium-protection-sphere-left" {...responsiveImage(protectionSphereLeftImage, '8vw', 640)} alt="" aria-hidden="true" />
-                <img className="premium-protection-sphere premium-protection-sphere-right" {...responsiveImage(protectionSphereRightImage, '8vw', 640)} alt="" aria-hidden="true" />
+                <StageImage className="premium-protection-sphere premium-protection-sphere-default" base={protectionSphereImage} sizes="8vw" defaultWidth={640} stage="protection" alt="" aria-hidden="true" />
+                <StageImage className="premium-protection-sphere premium-protection-sphere-left" base={protectionSphereLeftImage} sizes="8vw" defaultWidth={640} stage="protection" alt="" aria-hidden="true" />
+                <StageImage className="premium-protection-sphere premium-protection-sphere-right" base={protectionSphereRightImage} sizes="8vw" defaultWidth={640} stage="protection" alt="" aria-hidden="true" />
               </span>
             </span>
           </div>
@@ -171,7 +172,7 @@ function GoogleReviewsSection() {
         {reviews.map((review, index) => (
           <article className="premium-review-card" data-premium-reveal key={review.name} style={{ '--premium-review-index': index } as CSSProperties}>
             <div className="premium-review-fasteners" aria-hidden="true"><i /><i /><i /><i /></div>
-            <header><img {...responsiveImage(review.portrait, '8vw', 640)} alt={`${review.name}, ${review.role}`} /><div><h3>{review.name}</h3><p>{review.role}</p></div><span className="premium-review-rating" aria-label="Rated five out of five"><span>5</span><i>/</i><span>5</span></span></header>
+            <header><StageImage base={review.portrait} sizes="8vw" defaultWidth={640} stage="reviews" alt={`${review.name}, ${review.role}`} /><div><h3>{review.name}</h3><p>{review.role}</p></div><span className="premium-review-rating" aria-label="Rated five out of five"><span>5</span><i>/</i><span>5</span></span></header>
             <blockquote>“{review.quote}”</blockquote>
             <footer><a className="premium-review-google-link" href={review.googleUrl} target="_blank" rel="noreferrer" aria-label={`Open ${review.googlePlace} on Google Maps`}><span>{review.googlePlace}</span><img src="/assets/brand/google-g-logo.svg" alt="" aria-hidden="true" /></a></footer>
           </article>
@@ -193,9 +194,9 @@ function FounderSection() {
     >
       <div className="premium-founder-texture" aria-hidden="true" />
 
-      <img
+      <StageImage
         className="premium-founder-art premium-founder-art-left"
-        {...responsiveImage('/assets/founder/founder_left_frame', '30vw', 1440)}
+        base="/assets/founder/founder_left_frame" sizes="30vw" stage="founder"
         alt="Northline Roofing founder in his metalworking workshop"
         decoding="async"
         loading="lazy"
@@ -222,9 +223,9 @@ function FounderSection() {
         </div>
       </div>
 
-      <img
+      <StageImage
         className="premium-founder-art premium-founder-art-right"
-        {...responsiveImage('/assets/founder/founder_right_frame', '50vw', 1440)}
+        base="/assets/founder/founder_right_frame" sizes="50vw" stage="founder"
         alt="Northline Roofing founder working on a tile roof"
         decoding="async"
         loading="lazy"
@@ -280,8 +281,11 @@ export function AssociationsMarquee() {
       {row.map((badge) => (
         <div className="association-badge-cell" data-kind={badge.kind} key={`${badge.file}-${clone ? 'clone' : 'original'}`}>
           <span className="association-badge-effects">
-            <img
-              {...responsiveImage(`/assets/associations/${badge.file}`, `${Math.ceil((badge.width / badge.height) * 12)}vw`, 640)}
+            <StageImage
+              base={`/assets/associations/${badge.file}`}
+              sizes={`${Math.ceil((badge.width / badge.height) * 12)}vw`}
+              defaultWidth={640}
+              stage="associations"
               alt={clone ? '' : associationLabel(badge.file)}
               aria-hidden={clone || undefined}
               width={badge.width}
@@ -318,12 +322,12 @@ export function PremiumFooter({ onBook }: BookHandler) {
   const reveal = useRevealOnce<HTMLElement>({ threshold: .12 })
   return (
     <footer className={`premium-footer${reveal.revealed ? ' is-visible' : ''}`} id="contact" ref={reveal.ref}>
-      <div className="premium-footer-matte" aria-hidden="true"><img className="premium-footer-back" {...responsiveImage('/assets/footer/footer-roofscape-backdrop', '100vw', 1440)} alt="" /><img className="premium-footer-front" {...responsiveImage('/assets/footer/footer-eaves-foreground', '100vw', 1440)} alt="" /></div>
+      <div className="premium-footer-matte" aria-hidden="true"><StageImage className="premium-footer-back" base="/assets/footer/footer-roofscape-backdrop" sizes="100vw" stage="footer" alt="" /><StageImage className="premium-footer-front" base="/assets/footer/footer-eaves-foreground" sizes="100vw" stage="footer" alt="" /></div>
       <div className="premium-footer-content premium-shell">
         <div className="premium-footer-primary">
           <div className="premium-footer-brand" data-premium-reveal>
             <div className="premium-footer-brand-plaque">
-              <img className="premium-footer-brand-frame" {...responsiveImage('/assets/footer/brand-plaque', '36vw', 960)} alt="" aria-hidden="true" />
+              <StageImage className="premium-footer-brand-frame" base="/assets/footer/brand-plaque" sizes="36vw" defaultWidth={960} stage="footer" alt="" aria-hidden="true" />
               <div className="premium-footer-brand-surface"><img src="/assets/brand/combination-mark.svg" alt="Northline Roofing" /></div>
             </div>
             <div className="premium-footer-contact">
@@ -339,7 +343,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
               <a href={siteConfig.location.mapsUrl} target="_blank" rel="noreferrer">Open in Google Maps ↗</a>
             </div>
             <div className="premium-footer-map-frame">
-              <img {...responsiveImage('/assets/footer/map-frame', '60vw', 960)} alt="" aria-hidden="true" />
+              <StageImage base="/assets/footer/map-frame" sizes="60vw" defaultWidth={960} stage="footer" alt="" aria-hidden="true" />
               <iframe src={siteConfig.location.embedUrl} title={`Google Map showing ${siteConfig.location.name}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
             </div>
           </section>
