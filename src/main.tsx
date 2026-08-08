@@ -82,6 +82,39 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
   )
 }
 
+function useNavbarScrollState() {
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const update = () => setScrolled(window.scrollY > 4)
+    update()
+    window.addEventListener('scroll', update, { passive: true })
+    return () => window.removeEventListener('scroll', update)
+  }, [])
+
+  return scrolled
+}
+
+function useNavbarScrollOffset(shellRef: React.RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const shell = shellRef.current
+    if (!shell) return
+
+    const root = document.documentElement
+    const update = () => root.style.setProperty('--sticky-header-height', `${shell.getBoundingClientRect().height}px`)
+    update()
+    const resizeObserver = 'ResizeObserver' in window ? new ResizeObserver(update) : null
+    resizeObserver?.observe(shell)
+    window.addEventListener('resize', update)
+
+    return () => {
+      resizeObserver?.disconnect()
+      window.removeEventListener('resize', update)
+      root.style.removeProperty('--sticky-header-height')
+    }
+  }, [shellRef])
+}
+
 function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
   const heroRef = useRef<HTMLElement>(null)
   const skyTrackRef = useRef<HTMLDivElement>(null)
@@ -885,11 +918,16 @@ function App() {
   const [appointmentOpen, setAppointmentOpen] = useState(false)
   const openAppointment = useCallback(() => setAppointmentOpen(true), [])
   const closeAppointment = useCallback(() => setAppointmentOpen(false), [])
+  const stickyHeaderShellRef = useRef<HTMLDivElement>(null)
+  const navbarScrolled = useNavbarScrollState()
+  useNavbarScrollOffset(stickyHeaderShellRef)
   const { style, stageClassName } = useAssetStage()
   return (
     <div className={`app ${stageClassName}`} style={style}>
-      <ScaledArtboard>
+      <div className={`sticky-header-shell${navbarScrolled ? ' is-scrolled' : ''}`} ref={stickyHeaderShellRef}>
         <Header onBookAppointment={openAppointment} />
+      </div>
+      <ScaledArtboard>
         <main>
           <Hero onBookAppointment={openAppointment} />
           <BadgeStrip />
