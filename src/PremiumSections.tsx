@@ -332,13 +332,13 @@ export function PremiumFooter({ onBook }: BookHandler) {
               <div className="premium-footer-brand-surface"><img src="/assets/brand/combination-mark.svg" alt="Northline Roofing" /></div>
             </div>
             <div className="premium-footer-contact-rack" aria-label="Contact Northline Roofing">
+              <button className="premium-footer-raster-control raster-control" type="button" onClick={onBook} aria-label="Book an appointment">
+                <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_hover' }} width={966} height={180} alt="Book an appointment" />
+              </button>
               <a className="premium-footer-raster-control raster-control" href={siteConfig.phoneHref} aria-label={`Call ${siteConfig.phoneDisplay}`}>
                 <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_phone_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_phone_hover' }} width={1154} height={244} alt={`Call ${siteConfig.phoneDisplay}`} />
               </a>
               <EmailCopyButton />
-              <button className="premium-footer-raster-control raster-control" type="button" onClick={onBook} aria-label="Book an appointment">
-                <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_hover' }} width={966} height={180} alt="Book an appointment" />
-              </button>
             </div>
           </div>
 
