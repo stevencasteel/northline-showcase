@@ -60,7 +60,7 @@ body.body-scroll-locked { background: #102432; }
 a { color: inherit; text-decoration: none; }
 .sticky-header-shell { position: sticky; top: 0; z-index: var(--z-header); width: 100%; container-type: inline-size; box-shadow: 0 0 0 rgba(4,20,33,0); transition: box-shadow .28s ease; }
 .sticky-header-shell.is-scrolled { box-shadow: none; }
-.sticky-header-shell.is-scrolled .site-header { -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 8px), transparent 100%); mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 8px), transparent 100%); }
+.sticky-header-shell.is-scrolled .site-header { -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 4px), transparent 100%); mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 4px), transparent 100%); }
 .site-header { --nav-art-height: 2.5824cqw; --nav-gap: .27cqw; --nav-edge-inset: 1.2cqw; --nav-section-gap: 1cqw; height: 4.2cqw; padding: .4cqw var(--nav-edge-inset); background: linear-gradient(rgba(229,220,210,.28), rgba(229,220,210,.28)), var(--asset-navbar-underlayment) center / cover no-repeat, #e5dcd2; display: flex; align-items: center; column-gap: var(--nav-gap); position: relative; z-index: 2; }
 .site-header > * { animation: nav-drop-in .7s cubic-bezier(.22, 1, .36, 1) both; }
 .site-header > .brand { animation: nav-brand-drop .72s cubic-bezier(.22, 1, .36, 1) 0s both; }
