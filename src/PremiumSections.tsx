@@ -369,6 +369,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
 export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidden: boolean }) {
   const hologramRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(false)
+  const [dismissed, setDismissed] = useState(false)
   const [hovered, setHovered] = useState(false)
   const documentVisible = useDocumentVisibility()
   const rawId = useId()
@@ -427,7 +428,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
     return () => observer.disconnect()
   }, [])
 
-  const showEffect = active && !hidden
+  const showEffect = active && !hidden && !dismissed
 
   useEffect(() => {
     if (!showEffect || !documentVisible) return
@@ -477,6 +478,19 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
       aria-hidden={!showEffect}
     >
       <img className="customer-service-hologram-puck" {...responsiveImage('/assets/customer service/customer_service_hologram_puck', '160px', 640)} alt="" aria-hidden="true" />
+      <button
+        className="customer-service-hologram-minimize"
+        type="button"
+        aria-label="Minimize customer service assistant"
+        tabIndex={showEffect ? 0 : -1}
+        onClick={(event) => {
+          event.currentTarget.blur()
+          setHovered(false)
+          setDismissed(true)
+        }}
+      >
+        <span aria-hidden="true" />
+      </button>
       <span className="customer-service-hologram-reveal" aria-hidden="true">
         <img {...responsiveImage(HOLOGRAM.image, '160px', 640)} alt="" />
         <svg className="customer-service-hologram-effects" viewBox={`0 0 ${HOLOGRAM.width} ${HOLOGRAM.height}`} preserveAspectRatio="xMidYMid meet" xmlnsXlink="http://www.w3.org/1999/xlink" aria-hidden="true">
