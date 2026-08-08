@@ -1368,7 +1368,6 @@ export const RESPONSIVE_ASSETS = {
     "widths": [
       640,
       960,
-      1440,
       1920
     ]
   },
@@ -1399,8 +1398,8 @@ export const RESPONSIVE_ASSETS = {
     ]
   },
   "/assets/protection/copper_background_texture": {
-    "sourceWidth": 5920,
-    "sourceHeight": 3098,
+    "sourceWidth": 3000,
+    "sourceHeight": 1570,
     "hasAlpha": false,
     "format": "webp",
     "widths": [
@@ -1453,8 +1452,8 @@ export const RESPONSIVE_ASSETS = {
     ]
   },
   "/assets/reviews/leaf_background_texture": {
-    "sourceWidth": 7506,
-    "sourceHeight": 3444,
+    "sourceWidth": 3000,
+    "sourceHeight": 1376,
     "hasAlpha": false,
     "format": "webp",
     "widths": [

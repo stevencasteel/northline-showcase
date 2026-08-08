@@ -151,7 +151,7 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
           <img className="hero-sky" ref={skyImageRef} {...responsiveImage('/assets/hero/sky', '100vw', 1440)} alt="Bright blue sky with fluffy white cumulus clouds over distant mountain ranges, designed as a seamless background layer for the Northline Roofing hero image." />
         </div>
       </div>
-      <img className="hero-image" ref={foregroundImageRef} {...responsiveImage('/assets/hero/foreground', '100vw', 1440)} alt="A wide panoramic scene showing a human construction worker and a green-skinned orc installing tiles on the vast, intricate roof of a grand estate overlooking a pristine lake landscape. A middle-aged human with grey stubble leans forward on the right slope beside a muscular orc operating a bright orange power tool. The sweeping roof is clad in glossy bluish-green solar shingles with polished copper trim, arched dormers, and elegant finials; below, evergreen trees line a deep-blue bay toward distant mountains. The sky area is transparent so this foreground layer can be paired with a separate sky layer." />
+      <img className="hero-image" ref={foregroundImageRef} {...responsiveImage('/assets/hero/foreground', '100vw', 1920)} alt="A wide panoramic scene showing a human construction worker and a green-skinned orc installing tiles on the vast, intricate roof of a grand estate overlooking a pristine lake landscape. A middle-aged human with grey stubble leans forward on the right slope beside a muscular orc operating a bright orange power tool. The sweeping roof is clad in glossy bluish-green solar shingles with polished copper trim, arched dormers, and elegant finials; below, evergreen trees line a deep-blue bay toward distant mountains. The sky area is transparent so this foreground layer can be paired with a separate sky layer." />
       <div className="hero-reveal-curtain" aria-hidden="true" />
       <div className="hero-overlay" />
       <div className="hero-content">
@@ -266,7 +266,7 @@ function Services() {
               key={service.title}
               style={{ '--service-index': index } as React.CSSProperties}
             >
-              <StageImage base={`${asset}${service.image}`} sizes="26vw" defaultWidth={960} stage="services" alt={service.alt} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" />
+              <StageImage base={`${asset}${service.image}`} sizes="44vw" defaultWidth={1440} stage="services" alt={service.alt} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" />
               <span className="service-slice-shade" />
               <span className="service-slice-number">0{index + 1}</span>
               <span className="service-slice-content">

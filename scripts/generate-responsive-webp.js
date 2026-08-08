@@ -102,6 +102,9 @@ function outputPathFor(base, width, sourceWidth, format) {
 
 function widthsForSource(sourcePath, sourceWidth) {
   const relative = path.relative(assetsRoot, sourcePath).split(path.sep).join('/')
+  if (relative === 'hero/source_files/foreground.png') {
+    return [640, 960, 1920].filter((width) => width <= sourceWidth)
+  }
   const isCompactFamily = (
     (relative.startsWith('associations/source_files/') && !relative.includes('associations_bg_texture'))
     || (relative.startsWith('reviews/source_files/')
