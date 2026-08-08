@@ -1,5 +1,4 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
-import { ArrowRight, CalendarDays } from 'lucide-react'
 import { useDocumentVisibility } from './hooks/useDocumentVisibility'
 import { useInView } from './hooks/useInView'
 import { useRevealOnce } from './hooks/useRevealOnce'
@@ -8,6 +7,7 @@ import { siteConfig } from './config/site'
 import { HOLOGRAM } from './config/hologram'
 import { responsiveImage, responsiveSource } from './lib/responsiveImage'
 import { StageImage } from './lib/assetStages'
+import { RasterStateArt } from './components/RasterStateArt'
 
 type BookHandler = { onBook: () => void }
 
@@ -331,11 +331,15 @@ export function PremiumFooter({ onBook }: BookHandler) {
               <StageImage className="premium-footer-brand-frame" base="/assets/footer/brand-plaque" sizes="36vw" defaultWidth={960} stage="footer" alt="" aria-hidden="true" />
               <div className="premium-footer-brand-surface"><img src="/assets/brand/combination-mark.svg" alt="Northline Roofing" /></div>
             </div>
-            <div className="premium-footer-contact">
-              <a href={siteConfig.phoneHref}><span>Call</span><strong>{siteConfig.phoneDisplay}</strong><i aria-hidden="true">↗</i></a>
-              <a href={`mailto:${siteConfig.email}`}><span>Email</span><strong>{siteConfig.email}</strong><i aria-hidden="true">↗</i></a>
+            <div className="premium-footer-contact-rack" aria-label="Contact Northline Roofing">
+              <a className="premium-footer-raster-control raster-control" href={siteConfig.phoneHref} aria-label={`Call ${siteConfig.phoneDisplay}`}>
+                <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_phone_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_phone_hover' }} width={1154} height={244} alt={`Call ${siteConfig.phoneDisplay}`} />
+              </a>
+              <EmailCopyButton />
+              <button className="premium-footer-raster-control raster-control" type="button" onClick={onBook} aria-label="Book an appointment">
+                <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_hover' }} width={966} height={180} alt="Book an appointment" />
+              </button>
             </div>
-            <button className="premium-footer-book" type="button" onClick={onBook}><CalendarDays aria-hidden="true" /><span>Book an Appointment</span><ArrowRight aria-hidden="true" /></button>
           </div>
 
           <section className="premium-footer-map" id="location" aria-labelledby="premium-footer-map-title" data-premium-reveal>
@@ -350,12 +354,55 @@ export function PremiumFooter({ onBook }: BookHandler) {
           </section>
         </div>
 
-        <div className="premium-footer-utility">
-          <nav aria-label="Footer navigation"><a href="#top">Home</a><a href="#services">Services</a><a href="#work">Gallery</a><a href="#associations">Associations</a><a href="#protection">Protection</a><a href="#reviews">Reviews</a><a href="#founder">Founder</a><a href="#contact">Contact</a></nav>
-          <div><span>{siteConfig.hours.replace(', ', ' / ')}</span><a href="#top">Back to top ↑</a></div>
-        </div>
       </div>
     </footer>
+  )
+}
+
+function EmailCopyButton() {
+  const [copied, setCopied] = useState(false)
+  const resetTimerRef = useRef<number | null>(null)
+
+  useEffect(() => () => {
+    if (resetTimerRef.current !== null) window.clearTimeout(resetTimerRef.current)
+  }, [])
+
+  const copyEmail = async () => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(siteConfig.email)
+      } else {
+        const textarea = document.createElement('textarea')
+        textarea.value = siteConfig.email
+        textarea.setAttribute('readonly', '')
+        textarea.style.position = 'fixed'
+        textarea.style.opacity = '0'
+        document.body.appendChild(textarea)
+        textarea.select()
+        const copiedSuccessfully = document.execCommand('copy')
+        textarea.remove()
+        if (!copiedSuccessfully) return
+      }
+      setCopied(true)
+      if (resetTimerRef.current !== null) window.clearTimeout(resetTimerRef.current)
+      resetTimerRef.current = window.setTimeout(() => setCopied(false), 1800)
+    } catch {
+      // Do not expose the success artwork unless the clipboard operation completed.
+    }
+  }
+
+  return (
+    <button className="premium-footer-raster-control raster-control" type="button" onClick={() => void copyEmail()} data-raster-state={copied ? 'copied' : undefined} aria-label={`Copy ${siteConfig.email}`}>
+      <RasterStateArt
+        defaultAsset={{ responsiveBase: '/assets/navbar/nav_email_default' }}
+        hoverAsset={{ responsiveBase: '/assets/navbar/nav_email_hover' }}
+        stateAsset={{ responsiveBase: '/assets/navbar/nav_email_copied' }}
+        width={1825}
+        height={458}
+        alt={`Copy ${siteConfig.email}`}
+      />
+      <span className="visually-hidden" aria-live="polite">{copied ? 'Email address copied to clipboard.' : ''}</span>
+    </button>
   )
 }
 

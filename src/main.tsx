@@ -14,6 +14,7 @@ import { useGalleryKeyboardNavigation } from './hooks/useGalleryKeyboardNavigati
 import { useActiveThumbnailScroll } from './hooks/useActiveThumbnailScroll'
 import { useGalleryPreviewRotation } from './hooks/useGalleryPreviewRotation'
 import { ScaledArtboard } from './components/ScaledArtboard'
+import { RasterStateArt } from './components/RasterStateArt'
 import { siteConfig } from './config/site'
 import { GALLERY_PREVIEW_SLOTS, GALLERY_SWAP_CONFIG } from './config/gallery'
 import { responsiveImage } from './lib/responsiveImage'
@@ -23,33 +24,6 @@ const asset = '/assets/'
 
 function CopperEdgeSeam() {
   return <span className="copper-edge-seam" aria-hidden="true" />
-}
-
-type NavbarArtProps = {
-  file?: string
-  hoverFile?: string
-  responsiveBase?: string
-  responsiveHoverBase?: string
-  width: number
-  height: number
-  alt: string
-}
-
-function NavbarArt({ file, hoverFile, responsiveBase, responsiveHoverBase, width, height, alt }: NavbarArtProps) {
-  const defaultImage = responsiveBase
-    ? responsiveImage(responsiveBase, '15vw', 640)
-    : { src: `${asset}navbar/${file}`, width, height }
-  const hoverImage = responsiveHoverBase
-    ? responsiveImage(responsiveHoverBase, '15vw', 640)
-    : hoverFile
-      ? { src: `${asset}navbar/${hoverFile}`, width, height }
-      : null
-  return (
-    <span className="navbar-art" aria-hidden={alt ? undefined : true}>
-      <img className="navbar-art-default" {...defaultImage} alt={alt} />
-      {hoverImage && <img className="navbar-art-hover" {...hoverImage} alt="" aria-hidden="true" />}
-    </span>
-  )
 }
 
 function AnimatedHeroLine({ text, accent = false }: { text: string; accent?: boolean }) {
@@ -64,19 +38,19 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
         <img className="brand-logo" src={`${asset}brand/combination-mark.svg`} alt="Northline Roofing combination logo: a geometric navy, cream, and burnt-orange N emblem beside NORTHLINE ROOFING and the subtitle RESIDENTIAL & COMMERCIAL SYSTEMS." />
       </a>
       <nav className="primary-nav" aria-label="Primary navigation">
-        <a href="#services" aria-label="Services"><NavbarArt file="nav_services_default.png" hoverFile="nav_services_hover.png" width={447} height={164} alt="Services" /></a>
-        <a href="#work" aria-label="Gallery"><NavbarArt file="nav_gallery_default.png" hoverFile="nav_gallery_hover.png" width={440} height={154} alt="Gallery" /></a>
-        <a href="#associations" aria-label="Associations"><NavbarArt file="nav_associations_default.png" hoverFile="nav_associations_hover.png" width={492} height={150} alt="Associations" /></a>
-        <a href="#protection" aria-label="Protection"><NavbarArt file="nav_protection_default.png" hoverFile="nav_protection_hover.png" width={464} height={142} alt="Protection" /></a>
-        <a href="#reviews" aria-label="Reviews"><NavbarArt file="nav_reviews_default.png" hoverFile="nav_reviews_hover.png" width={415} height={163} alt="Reviews" /></a>
-        <a href="#founder" aria-label="Founder"><NavbarArt file="nav_founder_default.png" hoverFile="nav_founder_hover.png" width={414} height={154} alt="Founder" /></a>
-        <a href="#contact" aria-label="Contact"><NavbarArt file="nav_contact_default.png" hoverFile="nav_contact_hover.png" width={426} height={150} alt="Contact" /></a>
+        <a className="raster-control" href="#services" aria-label="Services"><RasterStateArt defaultAsset={{ file: `${asset}navbar/nav_services_default.png` }} hoverAsset={{ file: `${asset}navbar/nav_services_hover.png` }} width={447} height={164} alt="Services" /></a>
+        <a className="raster-control" href="#work" aria-label="Gallery"><RasterStateArt defaultAsset={{ file: `${asset}navbar/nav_gallery_default.png` }} hoverAsset={{ file: `${asset}navbar/nav_gallery_hover.png` }} width={440} height={154} alt="Gallery" /></a>
+        <a className="raster-control" href="#associations" aria-label="Associations"><RasterStateArt defaultAsset={{ file: `${asset}navbar/nav_associations_default.png` }} hoverAsset={{ file: `${asset}navbar/nav_associations_hover.png` }} width={492} height={150} alt="Associations" /></a>
+        <a className="raster-control" href="#protection" aria-label="Protection"><RasterStateArt defaultAsset={{ file: `${asset}navbar/nav_protection_default.png` }} hoverAsset={{ file: `${asset}navbar/nav_protection_hover.png` }} width={464} height={142} alt="Protection" /></a>
+        <a className="raster-control" href="#reviews" aria-label="Reviews"><RasterStateArt defaultAsset={{ file: `${asset}navbar/nav_reviews_default.png` }} hoverAsset={{ file: `${asset}navbar/nav_reviews_hover.png` }} width={415} height={163} alt="Reviews" /></a>
+        <a className="raster-control" href="#founder" aria-label="Founder"><RasterStateArt defaultAsset={{ file: `${asset}navbar/nav_founder_default.png` }} hoverAsset={{ file: `${asset}navbar/nav_founder_hover.png` }} width={414} height={154} alt="Founder" /></a>
+        <a className="raster-control" href="#contact" aria-label="Contact"><RasterStateArt defaultAsset={{ file: `${asset}navbar/nav_contact_default.png` }} hoverAsset={{ file: `${asset}navbar/nav_contact_hover.png` }} width={426} height={150} alt="Contact" /></a>
       </nav>
-      <a className="header-phone navbar-art-link" href={siteConfig.phoneHref} aria-label={`Call ${siteConfig.phoneDisplay}`}>
-        <NavbarArt responsiveBase="/assets/navbar/nav_phone_default" responsiveHoverBase="/assets/navbar/nav_phone_hover" width={1154} height={244} alt={`Call ${siteConfig.phoneDisplay}`} />
+      <a className="header-phone navbar-art-link raster-control" href={siteConfig.phoneHref} aria-label={`Call ${siteConfig.phoneDisplay}`}>
+        <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_phone_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_phone_hover' }} width={1154} height={244} alt={`Call ${siteConfig.phoneDisplay}`} />
       </a>
-      <button className="header-quote navbar-art-button" type="button" onClick={onBookAppointment} aria-label="Book an appointment">
-        <NavbarArt responsiveBase="/assets/navbar/nav_book-appt_default" responsiveHoverBase="/assets/navbar/nav_book-appt_hover" width={966} height={180} alt="Book an appointment" />
+      <button className="header-quote navbar-art-button raster-control" type="button" onClick={onBookAppointment} aria-label="Book an appointment">
+        <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_hover' }} width={966} height={180} alt="Book an appointment" />
       </button>
     </header>
   )

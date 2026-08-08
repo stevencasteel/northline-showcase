@@ -1404,6 +1404,39 @@ export const RESPONSIVE_ASSETS = {
       960
     ]
   },
+  "/assets/navbar/nav_email_copied": {
+    "sourceWidth": 1825,
+    "sourceHeight": 458,
+    "hasAlpha": true,
+    "format": "webp",
+    "widths": [
+      640,
+      960,
+      1440
+    ]
+  },
+  "/assets/navbar/nav_email_default": {
+    "sourceWidth": 1825,
+    "sourceHeight": 458,
+    "hasAlpha": true,
+    "format": "webp",
+    "widths": [
+      640,
+      960,
+      1440
+    ]
+  },
+  "/assets/navbar/nav_email_hover": {
+    "sourceWidth": 1825,
+    "sourceHeight": 458,
+    "hasAlpha": true,
+    "format": "webp",
+    "widths": [
+      640,
+      960,
+      1440
+    ]
+  },
   "/assets/navbar/nav_phone_default": {
     "sourceWidth": 1154,
     "sourceHeight": 244,
