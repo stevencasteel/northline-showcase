@@ -6,13 +6,14 @@ import { useRevealOnce } from './hooks/useRevealOnce'
 import { useComparisonSlider } from './hooks/useComparisonSlider'
 import { siteConfig } from './config/site'
 import { HOLOGRAM } from './config/hologram'
+import { responsiveImage, responsiveSource } from './lib/responsiveImage'
 
 type BookHandler = { onBook: () => void }
 
-const underlaymentImage = '/assets/protection/protection-underlayment.avif'
-const protectionSphereImage = '/assets/ui/copper-sphere-etched-large-generated.avif'
-const protectionSphereLeftImage = '/assets/ui/copper-sphere-etched-large-hover-left.avif'
-const protectionSphereRightImage = '/assets/ui/copper-sphere-etched-large-hover-right.avif'
+const underlaymentImage = '/assets/protection/protection-underlayment'
+const protectionSphereImage = '/assets/ui/copper-sphere-etched-large-generated'
+const protectionSphereLeftImage = '/assets/ui/copper-sphere-etched-large-hover-left'
+const protectionSphereRightImage = '/assets/ui/copper-sphere-etched-large-hover-right'
 const protectionHoverTransitionMs = 240
 
 type AssociationBadgeKind = 'standard' | 'landscape' | 'wide' | 'ultrawide'
@@ -28,53 +29,52 @@ type AssociationBadge = {
 
 const associationRows: AssociationBadge[][] = [
   [
-    { file: 'badge_row-1_01_high_vale_roof_tile.avif', width: 600, height: 585, kind: 'standard' },
-    { file: 'badge_row-1_02_century_seal_roof_assurance.avif', width: 600, height: 598, kind: 'standard' },
-    { file: 'badge_row-1_03_united_roofwrights.avif', width: 563, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_04_aurelian_slate_council.avif', width: 498, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_05_royal_sheet_and_slate.avif', width: 434, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_06_crownwatch.avif', width: 542, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_07_skyseer.avif', width: 492, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_08_tempest.avif', width: 544, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_09_emberward.avif', width: 518, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_10_windmark.avif', width: 507, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_11_hammerfall.avif', width: 574, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_12_evergreen.avif', width: 567, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_13_oldstone.avif', width: 551, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_14_sunscale.avif', width: 509, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_15_ironclad.avif', width: 600, height: 573, kind: 'standard' },
-    { file: 'badge_row-1_16_valeward.avif', width: 546, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_17_verdant_peak.avif', width: 586, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_18_everlight.avif', width: 506, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_19_gildharbor.avif', width: 600, height: 442, kind: 'landscape' },
-    { file: 'badge_row-1_20_cinderpeak.avif', width: 600, height: 597, kind: 'standard' },
-    { file: 'badge_row-1_21_highspire.avif', width: 580, height: 600, kind: 'standard' },
-    { file: 'badge_row-1_22_highmere.avif', width: 600, height: 597, kind: 'standard' },
-    { file: 'badge_row-1_23_embercrest.avif', width: 599, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_01_high_vale_roof_tile', width: 600, height: 585, kind: 'standard' },
+    { file: 'badge_row-1_02_century_seal_roof_assurance', width: 600, height: 598, kind: 'standard' },
+    { file: 'badge_row-1_03_united_roofwrights', width: 563, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_04_aurelian_slate_council', width: 498, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_05_royal_sheet_and_slate', width: 434, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_06_crownwatch', width: 542, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_07_skyseer', width: 492, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_08_tempest', width: 544, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_09_emberward', width: 518, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_10_windmark', width: 507, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_11_hammerfall', width: 574, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_12_evergreen', width: 567, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_13_oldstone', width: 551, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_14_sunscale', width: 509, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_15_ironclad', width: 600, height: 573, kind: 'standard' },
+    { file: 'badge_row-1_16_valeward', width: 546, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_17_verdant_peak', width: 586, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_18_everlight', width: 506, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_19_gildharbor', width: 600, height: 442, kind: 'landscape' },
+    { file: 'badge_row-1_20_cinderpeak', width: 600, height: 597, kind: 'standard' },
+    { file: 'badge_row-1_21_highspire', width: 580, height: 600, kind: 'standard' },
+    { file: 'badge_row-1_22_highmere', width: 600, height: 597, kind: 'standard' },
+    { file: 'badge_row-1_23_embercrest', width: 599, height: 600, kind: 'standard' },
   ],
   [
-    { file: 'badge_row-2_01_ironmere.avif', width: 600, height: 392, kind: 'landscape' },
-    { file: 'badge_row-2_02_stormglass.avif', width: 600, height: 333, kind: 'landscape', hoverScale: 1.10 },
-    { file: 'badge_row-2_03_stonewake.avif', width: 600, height: 195, kind: 'wide', hoverScale: 1.10 },
-    { file: 'badge_row-2_04_ironpeak.avif', width: 600, height: 590, kind: 'standard' },
-    { file: 'badge_row-2_05_skyforge.avif', width: 600, height: 465, kind: 'standard' },
-    { file: 'badge_row-2_06_northreach.avif', width: 600, height: 148, kind: 'ultrawide', hoverScale: 1.10 },
-    { file: 'badge_row-2_07_celestial_canopy_co-op.avif', width: 597, height: 600, kind: 'standard' },
-    { file: 'badge_row-2_08_wyverns_nest.avif', width: 543, height: 600, kind: 'standard' },
-    { file: 'badge_row-2_09_aegis.avif', width: 600, height: 257, kind: 'wide', hoverScale: 1.10 },
-    { file: 'badge_row-2_10_stoneweather.avif', width: 600, height: 571, kind: 'standard' },
-    { file: 'badge_row-2_11_skyreach.avif', width: 600, height: 428, kind: 'landscape' },
-    { file: 'badge_row-2_12_thornwall.avif', width: 600, height: 436, kind: 'landscape' },
-    { file: 'badge_row-2_13_aurelian.avif', width: 600, height: 192, kind: 'wide', hoverScale: 1.10 },
-    { file: 'badge_row-2_14_eldercape.avif', width: 526, height: 600, kind: 'standard' },
-    { file: 'badge_row-2_15_gryphon.avif', width: 600, height: 477, kind: 'standard' },
-    { file: 'badge_row-2_16_moonkeep.avif', width: 599, height: 600, kind: 'standard' },
+    { file: 'badge_row-2_01_ironmere', width: 600, height: 392, kind: 'landscape' },
+    { file: 'badge_row-2_02_stormglass', width: 600, height: 333, kind: 'landscape', hoverScale: 1.10 },
+    { file: 'badge_row-2_03_stonewake', width: 600, height: 195, kind: 'wide', hoverScale: 1.10 },
+    { file: 'badge_row-2_04_ironpeak', width: 600, height: 590, kind: 'standard' },
+    { file: 'badge_row-2_05_skyforge', width: 600, height: 465, kind: 'standard' },
+    { file: 'badge_row-2_06_northreach', width: 600, height: 148, kind: 'ultrawide', hoverScale: 1.10 },
+    { file: 'badge_row-2_07_celestial_canopy_co-op', width: 597, height: 600, kind: 'standard' },
+    { file: 'badge_row-2_08_wyverns_nest', width: 543, height: 600, kind: 'standard' },
+    { file: 'badge_row-2_09_aegis', width: 600, height: 257, kind: 'wide', hoverScale: 1.10 },
+    { file: 'badge_row-2_10_stoneweather', width: 600, height: 571, kind: 'standard' },
+    { file: 'badge_row-2_11_skyreach', width: 600, height: 428, kind: 'landscape' },
+    { file: 'badge_row-2_12_thornwall', width: 600, height: 436, kind: 'landscape' },
+    { file: 'badge_row-2_13_aurelian', width: 600, height: 192, kind: 'wide', hoverScale: 1.10 },
+    { file: 'badge_row-2_14_eldercape', width: 526, height: 600, kind: 'standard' },
+    { file: 'badge_row-2_15_gryphon', width: 600, height: 477, kind: 'standard' },
+    { file: 'badge_row-2_16_moonkeep', width: 599, height: 600, kind: 'standard' },
   ],
 ]
 
 const associationLabel = (filename: string) => filename
   .replace(/^badge_row-\d+_\d+_/, '')
-  .replace(/\.avif$/, '')
   .replace(/[-_]/g, ' ')
   .replace(/\b\w/g, (character) => character.toUpperCase())
 
@@ -91,7 +91,7 @@ const reviews = [
     name: 'Seris Rhuke',
     role: 'Lakeside homeowner',
     quote: 'The storm rolled across the lake before dawn. Northline had us dry, safe, and fully documented before lunch—and the new slate looks extraordinary.',
-    portrait: '/assets/reviews/seris-rhuke.avif',
+    portrait: '/assets/reviews/seris-rhuke',
     googlePlace: 'Illyrion Spire',
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=The%20Garden%2C%2026%20Gandalf%27s%20Cutting%2C%20Waikato%203472%2C%20New%20Zealand',
   },
@@ -99,7 +99,7 @@ const reviews = [
     name: 'Nyaren Klourm',
     role: 'Architect & property owner',
     quote: 'They found the ventilation problem everyone else missed, showed me every layer, and left the copper transitions cleaner than the original drawings.',
-    portrait: '/assets/reviews/nyaren-klourm.avif',
+    portrait: '/assets/reviews/nyaren-klourm',
     googlePlace: 'Aestir Hollow',
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=Green%20Dragon%20Inn%2C%20Hobbiton%20Movie%20Set%2C%20Waikato%2C%20New%20Zealand',
   },
@@ -107,7 +107,7 @@ const reviews = [
     name: 'Baeloon Pluhng',
     role: 'Mountain innkeeper',
     quote: 'Our roof has twelve valleys and not one simple line. The crew treated every seam like finish carpentry and left the grounds immaculate.',
-    portrait: '/assets/reviews/baeloon-pluhng.avif',
+    portrait: '/assets/reviews/baeloon-pluhng',
     googlePlace: 'The Goorough District',
     googleUrl: 'https://www.google.com/maps/search/?api=1&query=The%20Shire%27s%20Rest%2C%20501%20Buckland%20Road%2C%20Hinuera%2C%20Matamata%203472%2C%20New%20Zealand',
   },
@@ -126,8 +126,8 @@ function HowWeProtectSection() {
           data-drag-indicator={comparison.indicatorVisible && comparison.direction ? 'visible' : undefined}
           style={{ '--premium-split': `${comparison.value}%` } as CSSProperties}
         >
-          <img className="premium-protection-image" src="/assets/protection/protection-finished-roof.avif" alt="A completed premium slate and copper roof" />
-          <img className="premium-protection-image premium-protection-layer" src={underlaymentImage} alt="The same roof with its underlayment construction exposed" />
+          <img className="premium-protection-image" {...responsiveImage('/assets/protection/protection-finished-roof', '100vw', 1440)} alt="A completed premium slate and copper roof" />
+          <img className="premium-protection-image premium-protection-layer" {...responsiveImage(underlaymentImage, '100vw', 1440)} alt="The same roof with its underlayment construction exposed" />
           <input
             className="premium-protection-range"
             type="range"
@@ -149,9 +149,9 @@ function HowWeProtectSection() {
           <div className="premium-protection-divider" aria-hidden="true">
             <span className="premium-protection-thumb">
               <span className="premium-protection-thumb-surface">
-                <img className="premium-protection-sphere premium-protection-sphere-default" src={protectionSphereImage} alt="" aria-hidden="true" />
-                <img className="premium-protection-sphere premium-protection-sphere-left" src={protectionSphereLeftImage} alt="" aria-hidden="true" />
-                <img className="premium-protection-sphere premium-protection-sphere-right" src={protectionSphereRightImage} alt="" aria-hidden="true" />
+                <img className="premium-protection-sphere premium-protection-sphere-default" {...responsiveImage(protectionSphereImage, '8vw', 640)} alt="" aria-hidden="true" />
+                <img className="premium-protection-sphere premium-protection-sphere-left" {...responsiveImage(protectionSphereLeftImage, '8vw', 640)} alt="" aria-hidden="true" />
+                <img className="premium-protection-sphere premium-protection-sphere-right" {...responsiveImage(protectionSphereRightImage, '8vw', 640)} alt="" aria-hidden="true" />
               </span>
             </span>
           </div>
@@ -172,7 +172,7 @@ function GoogleReviewsSection() {
         {reviews.map((review, index) => (
           <article className="premium-review-card" data-premium-reveal key={review.name} style={{ '--premium-review-index': index } as CSSProperties}>
             <div className="premium-review-fasteners" aria-hidden="true"><i /><i /><i /><i /></div>
-            <header><img src={review.portrait} alt={`${review.name}, ${review.role}`} /><div><h3>{review.name}</h3><p>{review.role}</p></div><span className="premium-review-rating" aria-label="Rated five out of five"><span>5</span><i>/</i><span>5</span></span></header>
+            <header><img {...responsiveImage(review.portrait, '8vw', 640)} alt={`${review.name}, ${review.role}`} /><div><h3>{review.name}</h3><p>{review.role}</p></div><span className="premium-review-rating" aria-label="Rated five out of five"><span>5</span><i>/</i><span>5</span></span></header>
             <blockquote>“{review.quote}”</blockquote>
             <footer><a className="premium-review-google-link" href={review.googleUrl} target="_blank" rel="noreferrer" aria-label={`Open ${review.googlePlace} on Google Maps`}><span>{review.googlePlace}</span><img src="/assets/brand/google-g-logo.svg" alt="" aria-hidden="true" /></a></footer>
           </article>
@@ -196,10 +196,8 @@ function FounderSection() {
 
       <img
         className="premium-founder-art premium-founder-art-left"
-        src="/assets/founder/founder_left_frame.png"
+        {...responsiveImage('/assets/founder/founder_left_frame', '30vw', 1440)}
         alt="Northline Roofing founder in his metalworking workshop"
-        width="1500"
-        height="1715"
         decoding="async"
         loading="lazy"
       />
@@ -227,10 +225,8 @@ function FounderSection() {
 
       <img
         className="premium-founder-art premium-founder-art-right"
-        src="/assets/founder/founder_right_frame.png"
+        {...responsiveImage('/assets/founder/founder_right_frame', '50vw', 1440)}
         alt="Northline Roofing founder working on a tile roof"
-        width="1500"
-        height="995"
         decoding="async"
         loading="lazy"
       />
@@ -295,7 +291,7 @@ export function AssociationsMarquee() {
         <div className="association-badge-cell" data-kind={badge.kind} key={`${badge.file}-${clone ? 'clone' : 'original'}`}>
           <span className="association-badge-effects">
             <img
-              src={`/assets/associations/${badge.file}`}
+              {...responsiveImage(`/assets/associations/${badge.file}`, `${Math.ceil((badge.width / badge.height) * 12)}vw`, 640)}
               alt={clone ? '' : associationLabel(badge.file)}
               aria-hidden={clone || undefined}
               width={badge.width}
@@ -334,12 +330,12 @@ export function PremiumFooter({ onBook }: BookHandler) {
   const reveal = useRevealOnce<HTMLElement>({ threshold: .12 })
   return (
     <footer className={`premium-footer${reveal.revealed ? ' is-visible' : ''}`} id="contact" ref={reveal.ref}>
-      <div className="premium-footer-matte" aria-hidden="true"><img className="premium-footer-back" src="/assets/footer/footer-roofscape-backdrop.avif" alt="" /><img className="premium-footer-front" src="/assets/footer/footer-eaves-foreground.avif" alt="" /></div>
+      <div className="premium-footer-matte" aria-hidden="true"><img className="premium-footer-back" {...responsiveImage('/assets/footer/footer-roofscape-backdrop', '100vw', 1440)} alt="" /><img className="premium-footer-front" {...responsiveImage('/assets/footer/footer-eaves-foreground', '100vw', 1440)} alt="" /></div>
       <div className="premium-footer-content premium-shell">
         <div className="premium-footer-primary">
           <div className="premium-footer-brand" data-premium-reveal>
             <div className="premium-footer-brand-plaque">
-              <img className="premium-footer-brand-frame" src="/assets/footer/brand-plaque.avif" alt="" aria-hidden="true" />
+              <img className="premium-footer-brand-frame" {...responsiveImage('/assets/footer/brand-plaque', '36vw', 960)} alt="" aria-hidden="true" />
               <div className="premium-footer-brand-surface"><img src="/assets/brand/combination-mark.svg" alt="Northline Roofing" /></div>
             </div>
             <div className="premium-footer-contact">
@@ -355,7 +351,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
               <a href={siteConfig.location.mapsUrl} target="_blank" rel="noreferrer">Open in Google Maps ↗</a>
             </div>
             <div className="premium-footer-map-frame">
-              <img src="/assets/footer/map-frame.avif" alt="" aria-hidden="true" />
+              <img {...responsiveImage('/assets/footer/map-frame', '60vw', 960)} alt="" aria-hidden="true" />
               <iframe src={siteConfig.location.embedUrl} title={`Google Map showing ${siteConfig.location.name}`} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
             </div>
           </section>
@@ -393,7 +389,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
 
   useEffect(() => {
     const image = new Image()
-    image.src = HOLOGRAM.image
+    image.src = responsiveSource(HOLOGRAM.image, 640)
     const canvas = document.createElement('canvas')
     canvas.width = HOLOGRAM.width
     canvas.height = HOLOGRAM.height
@@ -480,9 +476,9 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
       className={`customer-service-hologram${showEffect ? ' is-active' : ''}${hidden ? ' is-obscured' : ''}${hovered ? ' is-hovered' : ''}`}
       aria-hidden={!showEffect}
     >
-      <img className="customer-service-hologram-puck" src="/assets/customer service/customer_service_hologram_puck.avif" alt="" aria-hidden="true" />
+      <img className="customer-service-hologram-puck" {...responsiveImage('/assets/customer service/customer_service_hologram_puck', '160px', 640)} alt="" aria-hidden="true" />
       <span className="customer-service-hologram-reveal" aria-hidden="true">
-        <img src={HOLOGRAM.image.replace('%20', ' ')} alt="" />
+        <img {...responsiveImage(HOLOGRAM.image, '160px', 640)} alt="" />
         <svg className="customer-service-hologram-effects" viewBox={`0 0 ${HOLOGRAM.width} ${HOLOGRAM.height}`} preserveAspectRatio="xMidYMid meet" xmlnsXlink="http://www.w3.org/1999/xlink" aria-hidden="true">
         <defs>
           <linearGradient id={skewGradientId} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2={HOLOGRAM.height}>
@@ -544,10 +540,10 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
             <feComposite in="clean-skew" in2="face-exclusion" operator="out" />
           </filter>
         </defs>
-          <g className="customer-service-hologram-skew customer-service-hologram-skew-a" filter={`url(#${skewAId})`} mask={`url(#${skewMaskId})`}><image x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} href={HOLOGRAM.image} xlinkHref={HOLOGRAM.image} preserveAspectRatio="xMidYMid meet" /></g>
-          <g className="customer-service-hologram-skew customer-service-hologram-skew-b" filter={`url(#${skewBId})`} mask={`url(#${skewMaskId})`}><image x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} href={HOLOGRAM.image} xlinkHref={HOLOGRAM.image} preserveAspectRatio="xMidYMid meet" /></g>
-          <g className="customer-service-hologram-distortion customer-service-hologram-distortion-a" filter={`url(#${rippleAId})`} mask={`url(#${rippleMaskId})`}><image x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} href={HOLOGRAM.image} xlinkHref={HOLOGRAM.image} preserveAspectRatio="xMidYMid meet" /></g>
-          <g className="customer-service-hologram-distortion customer-service-hologram-distortion-b" filter={`url(#${rippleBId})`} mask={`url(#${rippleMaskId})`}><image x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} href={HOLOGRAM.image} xlinkHref={HOLOGRAM.image} preserveAspectRatio="xMidYMid meet" /></g>
+          <g className="customer-service-hologram-skew customer-service-hologram-skew-a" filter={`url(#${skewAId})`} mask={`url(#${skewMaskId})`}><image x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} href={responsiveSource(HOLOGRAM.image, 640)} xlinkHref={responsiveSource(HOLOGRAM.image, 640)} preserveAspectRatio="xMidYMid meet" /></g>
+          <g className="customer-service-hologram-skew customer-service-hologram-skew-b" filter={`url(#${skewBId})`} mask={`url(#${skewMaskId})`}><image x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} href={responsiveSource(HOLOGRAM.image, 640)} xlinkHref={responsiveSource(HOLOGRAM.image, 640)} preserveAspectRatio="xMidYMid meet" /></g>
+          <g className="customer-service-hologram-distortion customer-service-hologram-distortion-a" filter={`url(#${rippleAId})`} mask={`url(#${rippleMaskId})`}><image x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} href={responsiveSource(HOLOGRAM.image, 640)} xlinkHref={responsiveSource(HOLOGRAM.image, 640)} preserveAspectRatio="xMidYMid meet" /></g>
+          <g className="customer-service-hologram-distortion customer-service-hologram-distortion-b" filter={`url(#${rippleBId})`} mask={`url(#${rippleMaskId})`}><image x="0" y="0" width={HOLOGRAM.width} height={HOLOGRAM.height} href={responsiveSource(HOLOGRAM.image, 640)} xlinkHref={responsiveSource(HOLOGRAM.image, 640)} preserveAspectRatio="xMidYMid meet" /></g>
         </svg>
       </span>
       <svg

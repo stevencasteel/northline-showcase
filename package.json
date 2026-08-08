@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "convert-avif": "node scripts/convert-avif.js",
+    "images:webp": "node scripts/generate-responsive-webp.js",
     "typecheck": "tsc -b",
     "check": "npm run typecheck && npm run lint && prettier --check package.json eslint.config.js",
     "format": "prettier --write package.json eslint.config.js",
