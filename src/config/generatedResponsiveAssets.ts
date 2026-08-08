@@ -462,6 +462,19 @@ export const RESPONSIVE_ASSETS = {
       1440
     ]
   },
+  "/assets/founder/founder-jean-texture": {
+    "sourceWidth": 5472,
+    "sourceHeight": 2644,
+    "hasAlpha": false,
+    "format": "webp",
+    "widths": [
+      640,
+      960,
+      1440,
+      1920,
+      2560
+    ]
+  },
   "/assets/founder/founder_left_frame": {
     "sourceWidth": 4274,
     "sourceHeight": 4887,

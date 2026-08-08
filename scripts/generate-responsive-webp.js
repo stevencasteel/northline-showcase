@@ -49,7 +49,9 @@ function walk(directory) {
 
 function familyForSource(sourcePath) {
   const sourceFilesDirectory = path.dirname(sourcePath)
-  const sectionDirectory = path.dirname(sourceFilesDirectory)
+  const sectionDirectory = path.basename(sourceFilesDirectory) === 'source_files'
+    ? path.dirname(sourceFilesDirectory)
+    : sourceFilesDirectory
   const relativeSection = path.relative(assetsRoot, sectionDirectory)
   const sourceExtension = path.extname(sourcePath)
   const baseName = path.basename(sourcePath, sourceExtension)
@@ -203,10 +205,14 @@ function writeManifest(families) {
 }
 
 async function main() {
+  const standaloneSources = [
+    path.join(assetsRoot, 'founder/founder-jean-texture.jpg'),
+  ].filter((file) => fs.existsSync(file))
   const sourceFiles = walk(assetsRoot)
     .filter((file) => file.includes(`${path.sep}source_files${path.sep}`))
     .filter(isSourceFile)
     .filter((file) => !excludedSourceNames.has(path.basename(file)))
+    .concat(standaloneSources)
     .sort()
 
   if (sourceFiles.length === 0) throw new Error('No source_files raster masters were found')

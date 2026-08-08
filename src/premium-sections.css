@@ -246,7 +246,7 @@
   color: #fff;
   background: #071925;
 }
-.premium-founder-texture { position: absolute; inset: 0; z-index: -3; background: linear-gradient(90deg,rgba(3,16,24,.18),rgba(3,16,24,.72) 31%,rgba(3,16,24,.88) 50%,rgba(3,16,24,.72) 69%,rgba(3,16,24,.18)),url('/assets/founder/founder-jean-texture.jpg') center / cover no-repeat,#071925; }
+.premium-founder-texture { position: absolute; inset: 0; z-index: -3; background: linear-gradient(90deg,rgba(3,16,24,.18),rgba(3,16,24,.72) 31%,rgba(3,16,24,.88) 50%,rgba(3,16,24,.72) 69%,rgba(3,16,24,.18)),var(--asset-founder-texture) center / cover no-repeat,#071925; }
 .premium-founder::before { position: absolute; inset: 0; z-index: -1; content: ''; pointer-events: none; background: radial-gradient(ellipse at center,rgba(4,20,33,.42),rgba(4,20,33,.16) 35%,transparent 68%); }
 .premium-founder::after { position: absolute; top: 0; right: -32px; left: -32px; z-index: 5; height: calc(var(--copper-edge-height) + var(--copper-edge-shadow-height)); content: ''; background-image: linear-gradient(to bottom,transparent 0 calc(var(--copper-edge-height) - 2px),rgba(4,20,33,.34) calc(var(--copper-edge-height) - 1px),rgba(4,20,33,.56) var(--copper-edge-height),rgba(4,20,33,0) 100%),var(--asset-copper-edge); background-position: 0 0,center top; background-size: 100% 100%,100% var(--copper-edge-height); background-repeat: no-repeat; filter: drop-shadow(0 3.5px 6px rgba(4,20,33,.52)); pointer-events: none; }
 .premium-founder-art { position: absolute; z-index: 1; display: block; width: auto; height: 31cqw; max-width: none; pointer-events: none; user-select: none; filter: drop-shadow(0 1.2cqw 1.8cqw rgba(0,0,0,.38)) drop-shadow(0 .25cqw .35cqw rgba(0,0,0,.32)); opacity: 0; transition: opacity .85s ease,transform 1s cubic-bezier(.2,.78,.2,1); }
@@ -337,8 +337,8 @@
 .customer-service-hologram-hit { position: absolute; right: 0; bottom: 0; z-index: 3; width: 100%; height: 32%; padding: 0; border: 0; border-radius: 0; background: transparent; pointer-events: none; cursor: pointer; }
 .customer-service-hologram.is-active .customer-service-hologram-hit { pointer-events: auto; }
 .customer-service-hologram-hit:focus-visible { outline: 2px solid #fff; outline-offset: .2rem; }
-.customer-service-hologram-minimize { position: absolute; top: 14.5%; right: -2.15rem; z-index: 6; width: clamp(2.75rem,3.1vw,3rem); aspect-ratio: 1; padding: 0; border: 1px solid rgba(240,183,124,.92); display: grid; place-items: center; color: #d8f8ff; background: radial-gradient(circle at 44% 40%,rgba(85,219,255,.34),rgba(8,48,75,.94) 46%,#061824 74%); box-shadow: inset 0 0 0 2px rgba(3,16,24,.9),inset 0 0 .65rem rgba(86,220,255,.28),0 0 0 1px rgba(78,205,255,.28),0 .35rem .9rem rgba(2,12,19,.5),0 0 .8rem rgba(39,190,255,.18); clip-path: polygon(28% 0,72% 0,100% 28%,100% 72%,72% 100%,28% 100%,0 72%,0 28%); opacity: 0; transform: translateX(.8rem) scale(.82); pointer-events: none; cursor: pointer; transition: opacity .24s ease .7s,transform .34s cubic-bezier(.2,.78,.2,1) .7s,filter .2s ease,box-shadow .2s ease; }
-.customer-service-hologram-minimize::before { position: absolute; inset: 4px; border: 1px solid rgba(129,225,255,.38); content: ''; clip-path: inherit; pointer-events: none; }
+.customer-service-hologram-minimize { position: absolute; top: 14.5%; right: -.75rem; z-index: 6; width: clamp(2.4rem,2.7vw,2.65rem); aspect-ratio: 1; padding: 0; border: 1px solid rgba(240,183,124,.92); border-radius: 50%; display: grid; place-items: center; overflow: hidden; color: #d8f8ff; background: radial-gradient(circle at 44% 40%,rgba(85,219,255,.34),rgba(8,48,75,.94) 46%,#061824 74%); box-shadow: inset 0 0 0 2px rgba(3,16,24,.9),inset 0 0 .65rem rgba(86,220,255,.28),0 0 0 1px rgba(78,205,255,.28),0 .35rem .9rem rgba(2,12,19,.5),0 0 .8rem rgba(39,190,255,.18); opacity: 0; transform: translateX(.8rem) scale(.82); pointer-events: none; cursor: pointer; transition: opacity .24s ease .7s,transform .34s cubic-bezier(.2,.78,.2,1) .7s,filter .2s ease,box-shadow .2s ease; }
+.customer-service-hologram-minimize::before { position: absolute; inset: 4px; border: 1px solid rgba(129,225,255,.38); border-radius: inherit; content: ''; pointer-events: none; }
 .customer-service-hologram-minimize::after { position: absolute; top: 14%; left: 19%; width: 31%; height: 12%; content: ''; background: linear-gradient(120deg,rgba(255,255,255,.55),transparent); transform: skewX(-20deg); pointer-events: none; }
 .customer-service-hologram-minimize span { width: 43%; height: 2px; border-radius: 999px; background: linear-gradient(90deg,#64dfff,#fff 48%,#efb47a); box-shadow: 0 0 .35rem #60dcff,0 0 .65rem rgba(96,220,255,.7); }
 .customer-service-hologram.is-active .customer-service-hologram-minimize { opacity: 1; transform: none; pointer-events: auto; }
@@ -362,5 +362,5 @@
 @media (max-width: 700px) {
   .customer-service-hologram { right: max(clamp(1.5rem,6vw,2.5rem),calc(env(safe-area-inset-right,0px) + 1.5rem)); width: clamp(5rem,24vw,10.5rem); transform: translateX(calc(100% + 3rem)); }
   .customer-service-hologram.is-active { transform: translateX(0); }
-  .customer-service-hologram-minimize { right: -1.4rem; width: clamp(1.75rem,8vw,2.25rem); }
+  .customer-service-hologram-minimize { right: -.55rem; width: clamp(1.55rem,7vw,2rem); }
 }

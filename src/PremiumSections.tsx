@@ -78,7 +78,6 @@ const associationLabel = (filename: string) => filename
   .replace(/[-_]/g, ' ')
   .replace(/\b\w/g, (character) => character.toUpperCase())
 
-const associationBadgeCount = associationRows.reduce((count, row) => count + row.length, 0)
 const associationRowsConfig = [
   { direction: -1, durationSeconds: 145, initialProgress: .27 },
   { direction: 1, durationSeconds: 155, initialProgress: .61 },
@@ -243,19 +242,10 @@ export function AssociationsMarquee() {
   const trackRefs = useRef<Array<HTMLDivElement | null>>([])
   const marqueeProgress = useRef<number[]>(associationRowsConfig.map(({ initialProgress }) => initialProgress))
   const marqueeVelocity = useRef<number[]>(associationRowsConfig.map(() => 0))
-  const loadedAssociationFiles = useRef(new Set<string>())
-  const [associationAssetsReady, setAssociationAssetsReady] = useState(false)
   const [hoveredRow, setHoveredRow] = useState<number | null>(null)
   const inView = useInView(sectionRef, { rootMargin: '200px 0px' })
   const documentVisible = useDocumentVisibility()
-  const isRunning = inView && documentVisible && associationAssetsReady
-
-  const markAssociationFileReady = (file: string) => {
-    const loaded = loadedAssociationFiles.current
-    if (loaded.has(file)) return
-    loaded.add(file)
-    if (loaded.size === associationBadgeCount) setAssociationAssetsReady(true)
-  }
+  const isRunning = inView && documentVisible
 
   useEffect(() => {
     if (!isRunning) {
@@ -297,9 +287,7 @@ export function AssociationsMarquee() {
               width={badge.width}
               height={badge.height}
               decoding="async"
-              loading="eager"
-              onLoad={() => markAssociationFileReady(badge.file)}
-              onError={() => markAssociationFileReady(badge.file)}
+              loading="lazy"
               style={{ '--association-scale': badge.scale ?? 1, '--association-hover-scale': badge.hoverScale ?? (badge.scale ?? 1) * 1.14 } as CSSProperties}
             />
           </span>
@@ -366,7 +354,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
   )
 }
 
-export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidden: boolean }) {
+export function CustomerServiceHologram({ onBook, hidden = false }: BookHandler & { hidden?: boolean }) {
   const hologramRef = useRef<HTMLDivElement>(null)
   const [active, setActive] = useState(false)
   const [dismissed, setDismissed] = useState(false)
@@ -419,7 +407,12 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return
-        setActive(entry.target === gallery ? false : true)
+        if (entry.target === gallery) {
+          setActive(false)
+          setDismissed(false)
+          return
+        }
+        setActive(true)
       })
     }, { threshold: .35 })
     if (reviews) observer.observe(reviews)
@@ -429,9 +422,10 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
   }, [])
 
   const showEffect = active && !hidden && !dismissed
+  const shouldAnimate = active && !dismissed
 
   useEffect(() => {
-    if (!showEffect || !documentVisible) return
+    if (!shouldAnimate || !documentVisible) return
 
     const period = HOLOGRAM.periodMs
     const startTime = performance.now()
@@ -456,7 +450,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
 
     frame = window.requestAnimationFrame(tick)
     return () => window.cancelAnimationFrame(frame)
-  }, [documentVisible, showEffect])
+  }, [documentVisible, shouldAnimate])
 
   const updateHoverFromCoordinates = (clientX: number, clientY: number) => {
     const alpha = hologramAlphaRef.current
@@ -506,7 +500,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
           <filter id={rippleAId} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="-58" y="-66" width="836" height="1758" colorInterpolationFilters="sRGB">
             <feTurbulence type="fractalNoise" baseFrequency=".012 .055" numOctaves="1" seed="7" result="ripple-noise" />
             <feTile in="ripple-noise" result="tiled-ripple" />
-            <feOffset ref={rippleOffsetARef} in="tiled-ripple" dy={HOLOGRAM.rippleStartY} result="moving-ripple"><animate attributeName="dy" from={HOLOGRAM.rippleStartY} to={HOLOGRAM.rippleStartY + HOLOGRAM.rippleTravelY} dur={`${HOLOGRAM.periodMs / 1000}s`} calcMode="linear" repeatCount="indefinite" /></feOffset>
+            <feOffset ref={rippleOffsetARef} in="tiled-ripple" dy={HOLOGRAM.rippleStartY} result="moving-ripple" />
             <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="outer-edge" />
             <feMorphology in="SourceAlpha" operator="erode" radius="9" result="inner-edge" />
             <feComposite in="outer-edge" in2="inner-edge" operator="out" result="edge-band" />
@@ -515,13 +509,13 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
             <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="12" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
             <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" result="ripple-output" />
             <feComponentTransfer in="ripple-output">
-              <feFuncA ref={rippleAlphaARef} type="linear" slope="0"><animate attributeName="slope" values="0;0;1;1;0" keyTimes={`0;${HOLOGRAM.alphaFadeInStart};${HOLOGRAM.alphaFadeInEnd};${HOLOGRAM.alphaFadeOutStart};1`} dur={`${HOLOGRAM.periodMs / 1000}s`} calcMode="linear" repeatCount="indefinite" /></feFuncA>
+              <feFuncA ref={rippleAlphaARef} type="linear" slope="0" />
             </feComponentTransfer>
           </filter>
           <filter id={rippleBId} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="-58" y="-66" width="836" height="1758" colorInterpolationFilters="sRGB">
             <feTurbulence type="fractalNoise" baseFrequency=".012 .055" numOctaves="1" seed="7" result="ripple-noise" />
             <feTile in="ripple-noise" result="tiled-ripple" />
-            <feOffset ref={rippleOffsetBRef} in="tiled-ripple" dy={HOLOGRAM.rippleStartY} result="moving-ripple"><animate attributeName="dy" from={HOLOGRAM.rippleStartY} to={HOLOGRAM.rippleStartY + HOLOGRAM.rippleTravelY} dur={`${HOLOGRAM.periodMs / 1000}s`} begin={`-${HOLOGRAM.periodMs * HOLOGRAM.phaseOffset / 1000}s`} calcMode="linear" repeatCount="indefinite" /></feOffset>
+            <feOffset ref={rippleOffsetBRef} in="tiled-ripple" dy={HOLOGRAM.rippleStartY} result="moving-ripple" />
             <feMorphology in="SourceAlpha" operator="dilate" radius="5" result="outer-edge" />
             <feMorphology in="SourceAlpha" operator="erode" radius="9" result="inner-edge" />
             <feComposite in="outer-edge" in2="inner-edge" operator="out" result="edge-band" />
@@ -530,7 +524,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
             <feDisplacementMap in="SourceGraphic" in2="moving-ripple" scale="12" xChannelSelector="R" yChannelSelector="B" result="distorted-hologram" />
             <feComposite in="distorted-hologram" in2="clean-edge-band" operator="in" result="ripple-output" />
             <feComponentTransfer in="ripple-output">
-              <feFuncA ref={rippleAlphaBRef} type="linear" slope="0"><animate attributeName="slope" values="0;0;1;1;0" keyTimes={`0;${HOLOGRAM.alphaFadeInStart};${HOLOGRAM.alphaFadeInEnd};${HOLOGRAM.alphaFadeOutStart};1`} dur={`${HOLOGRAM.periodMs / 1000}s`} begin={`-${HOLOGRAM.periodMs * HOLOGRAM.phaseOffset / 1000}s`} calcMode="linear" repeatCount="indefinite" /></feFuncA>
+              <feFuncA ref={rippleAlphaBRef} type="linear" slope="0" />
             </feComponentTransfer>
           </filter>
           <filter id={skewAId} filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" x="-58" y="-66" width="836" height="1758" colorInterpolationFilters="sRGB">
@@ -567,6 +561,7 @@ export function CustomerServiceHologram({ onBook, hidden }: BookHandler & { hidd
         xmlnsXlink="http://www.w3.org/1999/xlink"
         pointerEvents="auto"
         aria-hidden="true"
+        onClick={onBook}
         onPointerEnter={updateHoverFromPointer}
         onPointerMove={updateHoverFromPointer}
         onPointerLeave={() => setHovered(false)}

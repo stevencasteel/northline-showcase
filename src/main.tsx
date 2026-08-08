@@ -882,7 +882,7 @@ function App() {
         </main>
         <PremiumFooter onBook={openAppointment} />
       </ScaledArtboard>
-      <CustomerServiceHologram onBook={openAppointment} hidden={appointmentOpen} />
+      <CustomerServiceHologram onBook={openAppointment} />
       {appointmentOpen && <AppointmentModal onClose={closeAppointment} />}
     </div>
   )
