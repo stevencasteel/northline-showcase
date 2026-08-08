@@ -266,8 +266,8 @@ a { color: inherit; text-decoration: none; }
 .gallery-material-art::after,.gallery-showcase-shell::after { position: absolute; right: 3%; bottom: -.18cqw; left: 3%; z-index: -1; height: .38cqw; content: ''; background: rgba(0,0,0,.34); filter: blur(.3cqw); pointer-events: none; }
 .gallery-material-clip { position: absolute; inset: 0; overflow: hidden; background: #102432; box-shadow: inset 0 0 0 1px rgba(229,220,210,.12); }
 .gallery-material-clip > img { display: block; width: 100%; height: 100%; object-fit: contain; object-position: center; }
-.gallery-material-labels { position: absolute; inset: 0; }
-.gallery-material-label { position: absolute; width: 50%; height: var(--material-row-height); top: var(--material-row-top); display: grid; align-content: center; justify-items: end; gap: clamp(1px, .5cqw, 3px); padding-inline: clamp(3px, 2.5cqw, 12px); border: 0; color: inherit; background: transparent; font: inherit; text-align: right; appearance: none; cursor: pointer; opacity: 0; transition: opacity .25s ease, background .25s ease; }
+.gallery-material-labels { position: absolute; inset: 0; container-type: inline-size; }
+.gallery-material-label { position: absolute; width: 50%; height: var(--material-row-height); top: var(--material-row-top); display: grid; align-content: center; justify-items: end; gap: clamp(1px, .7cqi, 4px); padding-inline: clamp(3px, 2.9cqi, 16px); border: 0; color: inherit; background: transparent; font: inherit; text-align: right; appearance: none; cursor: pointer; opacity: 0; transition: opacity .25s ease, background .25s ease; }
 .gallery-material-label:nth-child(1), .gallery-material-label:nth-child(9) { --material-row-top: 4.736842%; --material-row-height: 10.526316%; }
 .gallery-material-label:nth-child(2), .gallery-material-label:nth-child(10) { --material-row-top: 16.052632%; --material-row-height: 10.197368%; }
 .gallery-material-label:nth-child(3), .gallery-material-label:nth-child(11) { --material-row-top: 27.302632%; --material-row-height: 10.328947%; }
@@ -279,9 +279,9 @@ a { color: inherit; text-decoration: none; }
 .gallery-material-label:nth-child(-n + 8) { left: 5.528135%; width: 44.471865%; }
 .gallery-material-label:nth-child(n + 9) { left: 50%; width: 44.866732%; }
 .gallery-material-label:nth-child(-n + 8) { justify-items: start; text-align: left; }
-.gallery-material-label span { color: #f18a54; font-family: 'IBM Plex Mono', monospace; font-size: clamp(5px, 1.9cqw, 10px); font-weight: 700; letter-spacing: .1em; }
-.gallery-material-label strong { color: #fff; font-family: Antonio, sans-serif; font-size: clamp(6px, 3cqw, 15px); font-weight: 600; line-height: 1; text-transform: uppercase; }
-.gallery-material-label small { color: #e5dcd2; font-size: clamp(5px, 1.7cqw, 9px); line-height: 1.1; }
+.gallery-material-label span { color: #f18a54; font-family: 'IBM Plex Mono', monospace; font-size: clamp(5px, 2.4cqi, 28px); font-weight: 700; letter-spacing: .1em; }
+.gallery-material-label strong { color: #fff; font-family: Antonio, sans-serif; font-size: clamp(6px, 3.6cqi, 42px); font-weight: 600; line-height: 1; text-transform: uppercase; }
+.gallery-material-label small { color: #e5dcd2; font-size: clamp(5px, 2.2cqi, 25px); line-height: 1.1; }
 @media (hover: hover) and (pointer: fine) {
   .gallery-material-label:hover, .gallery-material-label:focus-visible { opacity: 1; background: linear-gradient(90deg, transparent, rgba(4,20,33,.82)); outline: none; }
   .gallery-material-label:nth-child(-n + 8):hover, .gallery-material-label:nth-child(-n + 8):focus-visible { background: linear-gradient(90deg, rgba(4,20,33,.82), transparent); }
@@ -446,8 +446,8 @@ a { color: inherit; text-decoration: none; }
   .gallery-material-kicker { font-size: clamp(3px, 1.1cqw, 5.5px); }
   .gallery-material-heading h2 { font-size: clamp(6px, 3.1cqw, 15px); }
   .gallery-material-rule { height: .5px; margin-top: clamp(1px, .125cqw, 2.5px); }
-  .gallery-material-label { gap: clamp(.5px, .25cqw, 1.5px); padding-inline: clamp(1.5px, 1.25cqw, 6px); }
-  .gallery-material-label span { font-size: clamp(2.5px, .95cqw, 5px); }
-  .gallery-material-label strong { font-size: clamp(3px, 1.5cqw, 7.5px); }
-  .gallery-material-label small { font-size: clamp(2.5px, .85cqw, 4.5px); }
+  .gallery-material-label { gap: clamp(.5px, .9cqi, 2px); padding-inline: clamp(1.5px, 4.4cqi, 8px); }
+  .gallery-material-label span { font-size: clamp(2.5px, 3.3cqi, 8px); }
+  .gallery-material-label strong { font-size: clamp(3px, 5.2cqi, 12px); }
+  .gallery-material-label small { font-size: clamp(2.5px, 3cqi, 7px); }
 }
