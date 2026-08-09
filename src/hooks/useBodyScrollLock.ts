@@ -1,37 +1,57 @@
 import { useEffect } from 'react'
 
 let activeScrollLocks = 0
-let hadScrollLockClassBeforeFirstLock = false
-let scrollbarCompensationBeforeFirstLock = ''
+type ScrollLockBaseline = {
+  hadClass: boolean
+  compensation: string
+  scrollX: number
+  scrollY: number
+  bodyOverflow: string
+  bodyPosition: string
+  bodyTop: string
+  bodyLeft: string
+  bodyRight: string
+  bodyWidth: string
+  bodyPaddingRight: string
+  rootOverflow: string
+  rootScrollBehavior: string
+}
+
+let baseline: ScrollLockBaseline | null = null
 
 export function useBodyScrollLock(locked: boolean) {
   useEffect(() => {
     if (!locked) return
-    const scrollX = window.scrollX
-    const scrollY = window.scrollY
     const body = document.body
     const root = document.documentElement
     if (activeScrollLocks === 0) {
-      hadScrollLockClassBeforeFirstLock = body.classList.contains('body-scroll-locked')
-      scrollbarCompensationBeforeFirstLock = root.style.getPropertyValue('--scrollbar-compensation')
+      baseline = {
+        hadClass: body.classList.contains('body-scroll-locked'),
+        compensation: root.style.getPropertyValue('--scrollbar-compensation'),
+        scrollX: window.scrollX,
+        scrollY: window.scrollY,
+        bodyOverflow: body.style.overflow,
+        bodyPosition: body.style.position,
+        bodyTop: body.style.top,
+        bodyLeft: body.style.left,
+        bodyRight: body.style.right,
+        bodyWidth: body.style.width,
+        bodyPaddingRight: body.style.paddingRight,
+        rootOverflow: root.style.overflow,
+        rootScrollBehavior: root.style.scrollBehavior,
+      }
     }
     activeScrollLocks += 1
+    if (activeScrollLocks > 1) return () => { activeScrollLocks = Math.max(0, activeScrollLocks - 1) }
+
+    const scrollX = baseline?.scrollX ?? window.scrollX
+    const scrollY = baseline?.scrollY ?? window.scrollY
     body.classList.add('body-scroll-locked')
-    const previous = {
-      bodyOverflow: body.style.overflow,
-      rootOverflow: root.style.overflow,
-      bodyPosition: body.style.position,
-      bodyTop: body.style.top,
-      bodyLeft: body.style.left,
-      bodyRight: body.style.right,
-      bodyWidth: body.style.width,
-      bodyPaddingRight: body.style.paddingRight,
-      rootScrollBehavior: root.style.scrollBehavior,
-    }
     const scrollbarWidth = window.innerWidth - root.clientWidth
 
     root.style.setProperty('--scrollbar-compensation', `${scrollbarWidth}px`)
     root.style.overflow = 'hidden'
+    root.style.scrollBehavior = 'auto'
     body.style.overflow = 'hidden'
     body.style.position = 'fixed'
     body.style.top = `${-scrollY}px`
@@ -42,8 +62,10 @@ export function useBodyScrollLock(locked: boolean) {
 
     return () => {
       activeScrollLocks = Math.max(0, activeScrollLocks - 1)
-      root.style.scrollBehavior = 'auto'
+      if (activeScrollLocks > 0 || !baseline) return
+      const previous = baseline
       root.style.overflow = previous.rootOverflow
+      root.style.scrollBehavior = 'auto'
       body.style.overflow = previous.bodyOverflow
       body.style.position = previous.bodyPosition
       body.style.top = previous.bodyTop
@@ -51,15 +73,13 @@ export function useBodyScrollLock(locked: boolean) {
       body.style.right = previous.bodyRight
       body.style.width = previous.bodyWidth
       body.style.paddingRight = previous.bodyPaddingRight
-      if (activeScrollLocks === 0 && !hadScrollLockClassBeforeFirstLock) {
+      if (!previous.hadClass) {
         body.classList.remove('body-scroll-locked')
       }
-      if (activeScrollLocks === 0) {
-        if (scrollbarCompensationBeforeFirstLock) root.style.setProperty('--scrollbar-compensation', scrollbarCompensationBeforeFirstLock)
-        else root.style.removeProperty('--scrollbar-compensation')
-        scrollbarCompensationBeforeFirstLock = ''
-      }
-      window.scrollTo(scrollX, scrollY)
+      if (previous.compensation) root.style.setProperty('--scrollbar-compensation', previous.compensation)
+      else root.style.removeProperty('--scrollbar-compensation')
+      baseline = null
+      window.scrollTo({ left: scrollX, top: scrollY, behavior: 'auto' })
       root.style.scrollBehavior = previous.rootScrollBehavior
     }
   }, [locked])

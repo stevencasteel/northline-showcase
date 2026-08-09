@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { createRoot } from 'react-dom/client'
 import { AlertCircle, ArrowRight, ArrowUpRight, CalendarDays, ChevronLeft, ChevronRight, Mail, MapPin, MessageSquare, Phone, Send, UserRound, X } from 'lucide-react'
 import './styles.css'
 import './premium-sections.css'
 import { AssociationsMarquee, CustomerServiceHologram, PremiumFooter, PremiumSections } from './PremiumSections'
-import { useBodyScrollLock } from './hooks/useBodyScrollLock'
 import { useDocumentVisibility } from './hooks/useDocumentVisibility'
+import { useReducedMotion } from './hooks/useReducedMotion'
 import { useInView } from './hooks/useInView'
 import { useRevealOnce } from './hooks/useRevealOnce'
-import { useDialogFocus } from './hooks/useDialogFocus'
 import { useGalleryKeyboardNavigation } from './hooks/useGalleryKeyboardNavigation'
 import { useActiveThumbnailScroll } from './hooks/useActiveThumbnailScroll'
 import { useGalleryPreviewRotation } from './hooks/useGalleryPreviewRotation'
@@ -19,6 +17,7 @@ import { siteConfig } from './config/site'
 import { GALLERY_PREVIEW_SLOTS, GALLERY_SWAP_CONFIG } from './config/gallery'
 import { responsiveImage } from './lib/responsiveImage'
 import { AssetStageProvider, StageImage, useAssetStage } from './lib/assetStages'
+import { DialogModal } from './components/DialogModal'
 
 const asset = '/assets/'
 
@@ -97,6 +96,7 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
   const [heroAssetsReady, setHeroAssetsReady] = useState(false)
   const inView = useInView(heroRef, { threshold: 0.01 })
   const documentVisible = useDocumentVisibility()
+  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     const images = [skyImageRef.current, foregroundImageRef.current].filter((image): image is HTMLImageElement => Boolean(image))
@@ -121,7 +121,7 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
   useEffect(() => {
     const track = skyTrackRef.current
     const image = skyImageRef.current
-    if (!track || !image || !heroAssetsReady || !inView || !documentVisible) return
+    if (!track || !image || !heroAssetsReady || !inView || !documentVisible || reducedMotion) return
 
     let frame = 0
     let offset = 0
@@ -159,7 +159,7 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
       window.removeEventListener('resize', measure)
       image.removeEventListener('load', measure)
     }
-  }, [documentVisible, heroAssetsReady, inView])
+  }, [documentVisible, heroAssetsReady, inView, reducedMotion])
 
   return (
     <section className={`hero${inView && documentVisible ? ' is-sky-active' : ''}${heroAssetsReady ? ' is-hero-assets-ready' : ''}`} id="top" ref={heroRef}>
@@ -186,13 +186,9 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
 
 function AppointmentModal({ onClose }: { onClose: () => void }) {
   const [error, setError] = useState('')
-  const modalRef = useRef<HTMLElement>(null)
-  useBodyScrollLock(true)
-  useDialogFocus(modalRef, onClose)
 
   return (
-    <div className="appointment-backdrop" role="presentation" onPointerDown={(event) => { if (event.currentTarget === event.target) onClose() }}>
-      <section className="appointment-modal" role="dialog" aria-modal="true" aria-labelledby="appointment-title" ref={modalRef}>
+    <DialogModal backdropClassName="appointment-backdrop" dialogClassName="appointment-modal" ariaLabelledBy="appointment-title" onClose={onClose}>
         <header className="appointment-modal-header">
           <div>
             <p className="appointment-kicker">Northline Roofing</p>
@@ -227,8 +223,7 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
             <p className="appointment-footnote">Mon–Fri, 8am–6pm · We’ll call to confirm · No obligation</p>
           </form>
         </div>
-      </section>
-    </div>
+    </DialogModal>
   )
 }
 
@@ -621,7 +616,6 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   onSelect: (index: number) => void
   onClose: () => void
 }) {
-  const modalFrameRef = useRef<HTMLElement>(null)
   const sequenceListRef = useRef<HTMLDivElement>(null)
   const [activeControl, setActiveControl] = useState<'previous' | 'next' | null>(null)
   const [controlPressCount, setControlPressCount] = useState({ previous: 0, next: 0 })
@@ -630,6 +624,7 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   const isClosingRef = useRef(false)
   const [closeShockwave, setCloseShockwave] = useState(0)
   const [closePressed, setClosePressed] = useState(false)
+  const reducedMotion = useReducedMotion()
   const activeImage = images[activeIndex]
   const preloadedImagesRef = useRef(new Map<string, HTMLImageElement>())
 
@@ -655,9 +650,13 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   const handleClose = useCallback(() => {
     if (isClosingRef.current) return
     isClosingRef.current = true
+    if (reducedMotion) {
+      onClose()
+      return
+    }
     setCloseShockwave((current) => current + 1)
     setIsClosing(true)
-  }, [])
+  }, [onClose, reducedMotion])
 
   const navigate = useCallback((direction: -1 | 1) => {
     onSelect((activeIndex + direction + images.length) % images.length)
@@ -676,12 +675,8 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   })
   useActiveThumbnailScroll(sequenceListRef, activeIndex, keyboardRepeatingRef.current)
 
-  useBodyScrollLock(true)
-  useDialogFocus(modalFrameRef, handleClose)
-
-  const modal = (
-    <div className={`gallery-modal-backdrop${isClosing ? ' is-closing' : ''}`} role="presentation" onPointerDown={(event) => { if (event.currentTarget === event.target) handleClose() }}>
-      <section className={`gallery-modal-frame${isClosing ? ' is-closing' : ''}`} role="dialog" aria-modal="true" aria-label="Roofscape gallery viewer" tabIndex={-1} ref={modalFrameRef} onAnimationEnd={(event) => {
+  return (
+    <DialogModal backdropClassName="gallery-modal-backdrop" dialogClassName="gallery-modal-frame" ariaLabel="Roofscape gallery viewer" closing={isClosing} onClose={handleClose} onDialogAnimationEnd={(event) => {
         if (isClosing && event.target === event.currentTarget && event.animationName === 'gallery-frame-out') onClose()
       }}>
         <button className={`gallery-modal-close${closePressed ? ' is-pointer-pressed' : ''}`} type="button" aria-label="Close gallery" onClick={handleClose} onPointerDown={() => setClosePressed(true)} onPointerUp={() => setClosePressed(false)} onPointerLeave={() => setClosePressed(false)} onPointerCancel={() => setClosePressed(false)}>
@@ -711,11 +706,8 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
           <GalleryArrowButton direction="previous" keyboardActive={activeControl === 'previous'} pressCount={controlPressCount.previous} suppressHover={suppressArrowHover} onActivate={() => navigate(-1)} />
           <GalleryArrowButton direction="next" keyboardActive={activeControl === 'next'} pressCount={controlPressCount.next} suppressHover={suppressArrowHover} onActivate={() => navigate(1)} />
         </div>
-      </section>
-    </div>
+    </DialogModal>
   )
-
-  return createPortal(modal, document.body)
 }
 
 type GalleryCardProps = {
@@ -822,6 +814,7 @@ function Gallery() {
   const revealed = galleryReveal.revealed
   const images = galleryImages
   const documentVisible = useDocumentVisibility()
+  const reducedMotion = useReducedMotion()
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [activeMaterialIndex, setActiveMaterialIndex] = useState<number | null>(null)
   const hoveredSlotRef = useRef<number | null>(null)
@@ -831,7 +824,7 @@ function Gallery() {
     galleryPreviewIndices.filter((imageIndex) => galleryImages[imageIndex]),
     GALLERY_PREVIEW_SLOTS,
     GALLERY_SWAP_CONFIG,
-    !inView || !documentVisible || activeIndex !== null,
+    !inView || !documentVisible || reducedMotion || activeIndex !== null,
     hoveredSlotRef,
   )
 

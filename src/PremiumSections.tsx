@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import { useDocumentVisibility } from './hooks/useDocumentVisibility'
+import { useReducedMotion } from './hooks/useReducedMotion'
 import { useInView } from './hooks/useInView'
 import { useRevealOnce } from './hooks/useRevealOnce'
 import { useComparisonSlider } from './hooks/useComparisonSlider'
@@ -247,7 +248,8 @@ export function AssociationsMarquee() {
   const [hoveredRow, setHoveredRow] = useState<number | null>(null)
   const inView = useInView(sectionRef, { rootMargin: '200px 0px' })
   const documentVisible = useDocumentVisibility()
-  const isRunning = inView && documentVisible
+  const reducedMotion = useReducedMotion()
+  const isRunning = inView && documentVisible && !reducedMotion
 
   useEffect(() => {
     if (!isRunning) {
@@ -412,6 +414,7 @@ export function CustomerServiceHologram({ onBook, hidden = false }: BookHandler 
   const [dismissed, setDismissed] = useState(false)
   const [hovered, setHovered] = useState(false)
   const documentVisible = useDocumentVisibility()
+  const reducedMotion = useReducedMotion()
   const rawId = useId()
   const id = rawId.replace(/:/g, '')
   const rippleAId = `${id}-ripple-a`
@@ -474,7 +477,7 @@ export function CustomerServiceHologram({ onBook, hidden = false }: BookHandler 
   }, [])
 
   const showEffect = active && !hidden && !dismissed
-  const shouldAnimate = active && !dismissed
+  const shouldAnimate = active && !dismissed && !reducedMotion
 
   useEffect(() => {
     if (!shouldAnimate || !documentVisible) return
@@ -502,7 +505,7 @@ export function CustomerServiceHologram({ onBook, hidden = false }: BookHandler 
 
     frame = window.requestAnimationFrame(tick)
     return () => window.cancelAnimationFrame(frame)
-  }, [documentVisible, shouldAnimate])
+  }, [documentVisible, reducedMotion, shouldAnimate])
 
   const updateHoverFromCoordinates = (clientX: number, clientY: number) => {
     const alpha = hologramAlphaRef.current
