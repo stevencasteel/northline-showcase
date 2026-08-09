@@ -63,12 +63,17 @@ test.describe("Northline desktop interactions", () => {
     ).toBeHidden();
     await expect(trigger).toBeFocused();
 
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(100);
-    const before = await page.evaluate(() => window.scrollY);
     const footerTrigger = page
       .locator(".premium-footer-contact-rack button")
       .first();
+    await page.evaluate(() => {
+      document.documentElement.style.scrollBehavior = "auto";
+    });
+    await footerTrigger.scrollIntoViewIfNeeded();
+    await expect
+      .poll(() => page.evaluate(() => window.scrollY), { timeout: 2000 })
+      .toBeGreaterThan(100);
+    const before = await page.evaluate(() => window.scrollY);
     await footerTrigger.click();
     await expect(
       page.getByRole("dialog", { name: "Book an Appointment" }),

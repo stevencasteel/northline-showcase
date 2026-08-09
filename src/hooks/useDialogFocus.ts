@@ -4,6 +4,11 @@ export function useDialogFocus(ref: RefObject<HTMLElement | null>, onClose: () =
   useEffect(() => {
     const dialog = ref.current
     const previous = document.activeElement as HTMLElement | null
+    const lockedScrollX = window.scrollX
+    const lockedScrollY =
+      getComputedStyle(document.body).position === "fixed"
+        ? -parseFloat(document.body.style.top || "0")
+        : window.scrollY
     if (!dialog) return
     let initialFocusFrame = 0
     const focusable = () => Array.from(dialog.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'))
@@ -55,6 +60,17 @@ export function useDialogFocus(ref: RefObject<HTMLElement | null>, onClose: () =
           previous.focus()
         }
       }
+      const restoreScroll = () =>
+        window.scrollTo({
+          left: lockedScrollX,
+          top: lockedScrollY,
+          behavior: "auto",
+        })
+      restoreScroll()
+      window.requestAnimationFrame(() => {
+        restoreScroll()
+        window.setTimeout(restoreScroll, 0)
+      })
     }
   }, [onClose, ref])
 }

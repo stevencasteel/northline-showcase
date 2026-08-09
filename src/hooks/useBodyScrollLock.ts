@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 let activeScrollLocks = 0;
 type ScrollLockBaseline = {
@@ -50,7 +50,11 @@ function releaseScrollLock() {
   if (typeof window.requestAnimationFrame === "function") {
     window.requestAnimationFrame(() => {
       restoreScroll();
-      root.style.scrollBehavior = previous.rootScrollBehavior;
+      window.requestAnimationFrame(() => {
+        restoreScroll();
+        root.style.scrollBehavior = previous.rootScrollBehavior;
+        window.setTimeout(restoreScroll, 0);
+      });
     });
   } else {
     root.style.scrollBehavior = previous.rootScrollBehavior;
@@ -58,7 +62,7 @@ function releaseScrollLock() {
 }
 
 export function useBodyScrollLock(locked: boolean) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!locked) return;
     const body = document.body;
     const root = document.documentElement;
