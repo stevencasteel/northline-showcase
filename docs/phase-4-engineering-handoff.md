@@ -69,7 +69,7 @@ Local checks passed:
 
 The first GitHub Actions run for commit `d276ca6` successfully installed WebKit and reached Northline assertions on Ubuntu. It reported 22 passed, 32 skipped, 1 flaky, and 5 failed across the combined matrix. The follow-up changes separated the browser suites, skipped Darwin-only snapshots in CI, stabilized the affected assertions, and corrected modal focus/scroll restoration. The requested browser geometries remain 1280×800 and 390×844.
 
-Final GitHub Actions run for commit `22df2db` passed on Ubuntu:
+Final GitHub Actions run for commit `3a1a3b3` passed on Ubuntu:
 
 - Chromium projects (`chromium-desktop` = Chromium, `chromium-mobile` = Chromium): 13 passed, 17 skipped, 0 failed
 - WebKit projects (`webkit-desktop` = WebKit, `webkit-mobile` = WebKit): 13 passed, 17 skipped, 0 failed
@@ -103,4 +103,4 @@ The source context was regenerated at `docs/northline-roofing_source_code.txt` a
 
 ## Git state
 
-The CI-focused follow-up is committed and pushed on `main` in `22df2db` (following `806c158`, `cd2928b`, and `3a4641c`). The optional production-preview E2E change was not made; the existing Vite dev-server workflow remains in place to avoid unnecessary local/CI workflow complexity. No destructive git operations were performed.
+The CI-focused follow-up is committed and pushed on `main` in `3a1a3b3` (following `806c158`, `cd2928b`, `3a4641c`, `22df2db`, and `528b6f9`). The optional production-preview E2E change was not made; the existing Vite dev-server workflow remains in place to avoid unnecessary local/CI workflow complexity. No destructive git operations were performed.
