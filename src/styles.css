@@ -461,3 +461,7 @@ a { color: inherit; text-decoration: none; }
   .gallery-material-label strong { font-size: clamp(3px, 5.2cqi, 12px); }
   .gallery-material-label small { font-size: clamp(2.5px, 3cqi, 7px); }
 }
+
+@media (max-width: 420px) {
+  .gallery-content { --gallery-content-gap: clamp(16px, calc(101px - 20vw), 44px); }
+}
