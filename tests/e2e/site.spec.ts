@@ -73,7 +73,13 @@ test.describe("Northline desktop interactions", () => {
     await expect(
       page.getByRole("dialog", { name: "Book an Appointment" }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Close appointment form" }).click();
+    const footerDialog = page.getByRole("dialog", {
+      name: "Book an Appointment",
+    });
+    await footerDialog
+      .getByRole("button", { name: "Close appointment form" })
+      .click();
+    await expect(footerDialog).toBeHidden();
     const after = await page.evaluate(() => window.scrollY);
     expect(Math.abs(after - before)).toBeLessThan(2);
   });
@@ -143,25 +149,26 @@ test.describe("Northline desktop interactions", () => {
     );
     await expect(active).toHaveCount(1);
     await expect(active).toBeVisible();
-    const visibility = await active.evaluate((item) => {
-      const listElement = item.parentElement;
-      if (!listElement) return false;
-      const listRect = listElement.getBoundingClientRect();
-      const itemRect = item.getBoundingClientRect();
-      return (
-        itemRect.left >= listRect.left - 1 &&
-        itemRect.right <= listRect.right + 1 &&
-        itemRect.top >= listRect.top - 1 &&
-        itemRect.bottom <= listRect.bottom + 1 &&
-        listElement.scrollLeft >= 0 &&
-        listElement.scrollTop >= 0 &&
-        listElement.scrollLeft <=
-          listElement.scrollWidth - listElement.clientWidth + 1 &&
-        listElement.scrollTop <=
-          listElement.scrollHeight - listElement.clientHeight + 1
-      );
-    });
-    expect(visibility).toBe(true);
+    const isActiveThumbnailVisible = () =>
+      active.evaluate((item) => {
+        const listElement = item.parentElement;
+        if (!listElement) return false;
+        const listRect = listElement.getBoundingClientRect();
+        const itemRect = item.getBoundingClientRect();
+        return (
+          itemRect.left >= listRect.left - 1 &&
+          itemRect.right <= listRect.right + 1 &&
+          itemRect.top >= listRect.top - 1 &&
+          itemRect.bottom <= listRect.bottom + 1 &&
+          listElement.scrollLeft >= 0 &&
+          listElement.scrollTop >= 0 &&
+          listElement.scrollLeft <=
+            listElement.scrollWidth - listElement.clientWidth + 1 &&
+          listElement.scrollTop <=
+            listElement.scrollHeight - listElement.clientHeight + 1
+        );
+      });
+    await expect.poll(isActiveThumbnailVisible, { timeout: 2000 }).toBe(true);
     await expect(
       dialog.locator(".gallery-modal-arrow.is-key-active"),
     ).toHaveCount(0);
@@ -288,7 +295,8 @@ test.describe("Northline desktop interactions", () => {
 
 test.describe("Northline desktop Chromium visual snapshots", () => {
   test.skip(
-    ({ projectName }) => projectName !== "chromium-desktop",
+    ({ projectName }) =>
+      process.env.CI === "true" || projectName !== "chromium-desktop",
     "Chromium-only visual coverage",
   );
 
@@ -400,11 +408,16 @@ test.describe("Northline mobile interactions", () => {
     await page.locator("#reviews").scrollIntoViewIfNeeded();
     const hologram = page.locator(".customer-service-hologram.is-active");
     await expect(hologram).toBeVisible();
-    const viewport = page.viewportSize();
     const minimize = hologram.getByRole("button", {
       name: "Minimize customer service assistant",
     });
     await expect(minimize).toBeVisible();
+    const cssViewportWidth = await page.evaluate(() => window.innerWidth);
+    await expect
+      .poll(() =>
+        minimize.evaluate((element) => element.getBoundingClientRect().right),
+      )
+      .toBeLessThanOrEqual(cssViewportWidth);
     const geometry = await hologram.evaluate((element) => {
       const bounds = element.getBoundingClientRect();
       const minimize = element.querySelector(
@@ -412,6 +425,7 @@ test.describe("Northline mobile interactions", () => {
       );
       const minimizeBounds = minimize?.getBoundingClientRect();
       return {
+        viewportWidth: window.innerWidth,
         width: bounds.width,
         height: bounds.height,
         right: bounds.right,
@@ -424,13 +438,14 @@ test.describe("Northline mobile interactions", () => {
     expect(geometry.height).toBeGreaterThan(0);
     expect(geometry.minimizeWidth).toBeGreaterThan(0);
     expect(geometry.minimizeHeight).toBeGreaterThan(0);
-    expect(geometry.minimizeRight).toBeLessThanOrEqual(viewport?.width ?? 0);
+    expect(geometry.minimizeRight).toBeLessThanOrEqual(geometry.viewportWidth);
   });
 });
 
 test.describe("Northline mobile Chromium visual snapshots", () => {
   test.skip(
-    ({ projectName }) => projectName !== "chromium-mobile",
+    ({ projectName }) =>
+      process.env.CI === "true" || projectName !== "chromium-mobile",
     "Chromium-only visual coverage",
   );
 

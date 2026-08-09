@@ -2,7 +2,7 @@
 
 ## Current status
 
-Phase 4 corrections and the final Playwright-focused pass are implemented locally. The work is intentionally **not committed or pushed** because the Phase 4 brief explicitly requested a review handoff before committing.
+The Phase 4 corrections are committed on `main`. This follow-up adds CI-focused browser separation so local macOS Chromium remains convenient while GitHub Actions Linux is authoritative for WebKit.
 
 ## Completed work
 
@@ -44,6 +44,11 @@ The responsive asset validator now checks:
 - Every project explicitly selects its engine with `browserName`: Chromium projects use Chromium and WebKit projects use WebKit.
 - Visual screenshots remain Chromium-only; WebKit tests are behavioral.
 - CI installs both Chromium and WebKit.
+- `npm run test:e2e:chromium` runs only the two Chromium projects.
+- `npm run test:e2e:webkit` runs only the two WebKit projects.
+- `npm run test:e2e:webkit:smoke` verifies that WebKit can create a page before Northline tests begin.
+- GitHub Actions reports Chromium and WebKit as separate steps.
+- Chromium visual snapshots are skipped in CI because the checked-in snapshot corpus is macOS/Darwin-specific; local Chromium visual testing remains enabled.
 - Repeated/held-style gallery keyboard navigation verifies the active image, exactly one current thumbnail, thumbnail visibility, valid scroll bounds, and control reset.
 - Desktop mouse dragging and mobile touch-style pointer events exercise the comparison slider’s pointer path, followed by keyboard usability checks.
 - Appointment coverage includes backdrop dismissal, Tab/Shift+Tab focus trapping, and opener focus restoration.
@@ -51,7 +56,7 @@ The responsive asset validator now checks:
 
 ## Verification results
 
-All checks passed:
+Local checks passed:
 
 - `npm run validate:assets` — 158 responsive asset families validated
 - `npm run typecheck`
@@ -59,12 +64,10 @@ All checks passed:
 - `npm run format:check`
 - `npm run build`
 - `git diff --check`
-- `npx playwright test --project chromium-desktop` — 10 passed, 5 skipped, 0 failed
-- `npx playwright test --project chromium-mobile` — 5 passed, 10 skipped, 0 failed
-- `npx playwright test --project webkit-desktop --timeout=5000` — 15 failed during WebKit page initialization, 0 assertions executed
-- `npx playwright test --project webkit-mobile --timeout=5000` — 15 failed during WebKit page initialization, 0 assertions executed
+- `npm run test:e2e:chromium` — 15 passed, 15 skipped, 0 failed
+- `npm run test:e2e:webkit:smoke` remains blocked locally by macOS 14.4.1’s frozen WebKit runtime, as expected
 
-The WebKit failures are environment-level and consistent: the locally installed frozen WebKit build rejects Playwright’s `Page.overrideSetting` request for `PushAPIEnabled`. The error occurs during `browserContext.newPage`, confirming that the projects are invoking actual WebKit rather than silently using Chromium. A direct WebKit context test reproduced the same page-creation incompatibility. The requested viewport settings remain 1280×800 and 390×844.
+The first GitHub Actions run for commit `d276ca6` successfully installed WebKit and reached Northline assertions on Ubuntu. It reported 22 passed, 32 skipped, 1 flaky, and 5 failed across the combined matrix. The failures were actionable test-environment issues: Darwin-only screenshots ran on Linux, the appointment close test measured before modal cleanup settled in WebKit, the repeated-thumbnail assertion sampled before smooth scrolling settled, and the hologram check sampled during its entrance transition. The follow-up changes address those four issues without modifying production behavior. The requested browser geometries remain 1280×800 and 390×844.
 
 The source context was regenerated at `docs/northline-roofing_source_code.txt` and contains 48 readable project files.
 
@@ -76,6 +79,7 @@ The source context was regenerated at `docs/northline-roofing_source_code.txt` a
 - `scripts/validate-responsive-assets.js` — asset integrity checks
 - `scripts/create-source-context.js` — handoff bundle generation
 - `playwright.config.ts` — browser matrix
+- `scripts/playwright-webkit-smoke.mjs` — isolated WebKit page-creation check
 - `tests/e2e/site.spec.ts` — interaction and regression coverage
 - `.github/workflows/build.yml` — CI checks and browser installation
 
@@ -84,10 +88,10 @@ The source context was regenerated at `docs/northline-roofing_source_code.txt` a
 1. Review the staged-image placeholder strategy in the context of the site’s existing image selectors and browser loading behavior.
 2. Confirm the shared scroll-lock baseline is appropriate if additional modal or drawer types are introduced.
 3. Review the reduced-motion rules visually on service sections, hero transitions, and gallery modals.
-4. Re-run the WebKit projects after updating the macOS/WebKit runtime or using a compatible Playwright browser bundle. The current frozen WebKit build cannot create a page because of the `PushAPIEnabled` protocol mismatch.
-5. Consider adding an explicit nested-lock regression test if another independently mounted modal/drawer component is introduced.
-6. After review approval, inspect the complete diff, then commit and push Phase 4.
+4. Push the CI-focused changes and inspect the separate GitHub Actions Chromium, WebKit smoke, and WebKit regression steps.
+5. If Linux WebKit reports a remaining assertion, fix only the demonstrated browser-specific behavior.
+6. Consider adding an explicit nested-lock regression test if another independently mounted modal/drawer component is introduced.
 
 ## Git state
 
-Phase 4 remains uncommitted and unpushed. No destructive git operations were performed. The optional production-preview E2E change was not made; the existing Vite dev-server workflow remains in place to avoid unnecessary local/CI workflow complexity.
+The CI-focused follow-up is currently uncommitted locally. The optional production-preview E2E change was not made; the existing Vite dev-server workflow remains in place to avoid unnecessary local/CI workflow complexity. No destructive git operations were performed.
