@@ -14,7 +14,8 @@
     "format": "prettier --write package.json eslint.config.js",
     "lint": "eslint .",
     "validate:assets": "node scripts/validate-responsive-assets.js",
-    "format:check": "prettier --check src/components/DialogModal.tsx src/components/RasterStateArt.tsx src/config/services.ts src/hooks/useReducedMotion.ts src/lib/responsiveImage.ts scripts/validate-responsive-assets.js vite.config.ts"
+    "format:check": "prettier --check src/components/DialogModal.tsx src/components/RasterStateArt.tsx src/config/services.ts src/hooks/useReducedMotion.ts src/lib/responsiveImage.ts scripts/validate-responsive-assets.js playwright.config.ts tests/**/*.ts vite.config.ts",
+    "test:e2e": "playwright test"
   },
   "engines": {
     "node": ">=22.14.0"
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "9.28.0",
+    "@playwright/test": "^1.62.1",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.4",

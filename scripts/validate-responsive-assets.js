@@ -21,6 +21,10 @@ const manifest = JSON.parse(
     .replace(/ as const\s*$/, ""),
 );
 const errors = [];
+const expectedDimensions = (sourceWidth, sourceHeight, targetWidth) => {
+  const width = Math.min(sourceWidth, targetWidth);
+  return { width, height: Math.round((sourceHeight * width) / sourceWidth) };
+};
 
 const outputPath = (base, width, format, widths) => {
   const relativeBase = base.replace("/assets/", "");
@@ -45,6 +49,26 @@ for (const [base, entry] of Object.entries(manifest)) {
     }
     try {
       const metadata = await sharp(file).metadata();
+      const expected = expectedDimensions(
+        entry.sourceWidth,
+        entry.sourceHeight,
+        width ?? entry.sourceWidth,
+      );
+      const formatMatches =
+        entry.format === "avif"
+          ? ["avif", "heif"].includes(metadata.format)
+          : metadata.format === entry.format;
+      if (!formatMatches)
+        errors.push(
+          `${base}: format ${metadata.format} does not match ${entry.format}`,
+        );
+      if (
+        metadata.width !== expected.width ||
+        Math.abs((metadata.height ?? 0) - expected.height) > 1
+      )
+        errors.push(
+          `${base}: expected ${expected.width}x${expected.height}, got ${metadata.width}x${metadata.height}`,
+        );
       if (entry.hasAlpha && !metadata.hasAlpha)
         errors.push(
           `${base}: alpha channel missing from ${path.relative(projectRoot, file)}`,

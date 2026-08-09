@@ -4,9 +4,13 @@ import { fileURLToPath } from "node:url";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(scriptDir, "..");
-const outputPath = path.join(rootDir, "docs", "northline-roofing_source_code.txt");
+const outputPath = path.join(
+  rootDir,
+  "docs",
+  "northline-roofing_source_code.txt",
+);
 
-const includedRoots = ["src", "public", "docs", "scripts"];
+const includedRoots = ["src", "public", "docs", "scripts", "tests", ".github"];
 const includedRootFiles = [
   "README.md",
   "DESIGN.md",
@@ -21,6 +25,8 @@ const includedRootFiles = [
   "tailwind.config.js",
   "wrangler.jsonc",
   "index.html",
+  "playwright.config.ts",
+  ".gitignore",
 ];
 
 const ignoredDirectories = new Set([
@@ -30,6 +36,9 @@ const ignoredDirectories = new Set([
   "dist",
   "node_modules",
   "coverage",
+  "test-results",
+  "playwright-report",
+  "playwright-browsers",
 ]);
 
 const ignoredNames = new Set([
