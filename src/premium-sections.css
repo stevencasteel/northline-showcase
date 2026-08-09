@@ -311,7 +311,7 @@
 .premium-footer-map-frame > img { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
 .premium-footer-map-frame iframe { position: absolute; z-index: 2; top: 5.2%; left: 2.65%; width: 94.7%; height: 89.2%; border: 0; background: #0b1d2b; filter: saturate(.78) sepia(.1) contrast(1.04); }
 
-.customer-service-hologram { position: fixed; right: max(clamp(2.75rem,3.5vw,3.5rem), calc(env(safe-area-inset-right, 0px) + 2.75rem)); bottom: max(.4rem,env(safe-area-inset-bottom, 0px)); z-index: 18; width: clamp(12rem,19vw,18rem); aspect-ratio: var(--hologram-width) / var(--hologram-height); opacity: 0; overflow: visible; background: transparent; filter: drop-shadow(0 1.1rem 1.5rem rgba(2,12,19,.38)); transform: translateX(calc(100% + 4.75rem)); pointer-events: none; transition: opacity .35s ease .62s,transform .55s cubic-bezier(.3,.75,.2,1) .62s,filter .25s ease; }
+.customer-service-hologram { --customer-service-right-offset: max(clamp(2.75rem,3.5vw,3.5rem), calc(env(safe-area-inset-right, 0px) + 2.75rem)); position: fixed; right: calc(var(--customer-service-right-offset) + var(--scrollbar-compensation, 0px)); bottom: max(.4rem,env(safe-area-inset-bottom, 0px)); z-index: 18; width: clamp(12rem,19vw,18rem); aspect-ratio: var(--hologram-width) / var(--hologram-height); opacity: 0; overflow: visible; background: transparent; filter: drop-shadow(0 1.1rem 1.5rem rgba(2,12,19,.38)); transform: translateX(calc(100% + 4.75rem)); pointer-events: none; transition: opacity .35s ease .62s,transform .55s cubic-bezier(.3,.75,.2,1) .62s,filter .25s ease; }
 .customer-service-hologram.is-active { opacity: 1; transform: translateX(0); transition-delay: 0s; }
 .customer-service-hologram.is-obscured { opacity: 0; pointer-events: none; transition: opacity .2s ease; }
 .customer-service-hologram.is-active.is-hovered,
@@ -344,7 +344,7 @@
 @media (max-width: 700px) {
   .premium-footer { height: 68cqw; }
   .premium-footer-content { padding-bottom: 22cqw; }
-  .customer-service-hologram { right: max(clamp(1.5rem,6vw,2.5rem),calc(env(safe-area-inset-right,0px) + 1.5rem)); width: clamp(5rem,24vw,10.5rem); transform: translateX(calc(100% + 3rem)); }
+  .customer-service-hologram { --customer-service-right-offset: max(clamp(1.5rem,6vw,2.5rem),calc(env(safe-area-inset-right,0px) + 1.5rem)); width: clamp(5rem,24vw,10.5rem); transform: translateX(calc(100% + 3rem)); }
   .customer-service-hologram.is-active { transform: translateX(0); }
   .customer-service-hologram-minimize { right: -4%; width: 14%; border-width: .5px; box-shadow: inset 0 0 0 1px rgba(3,16,24,.9),inset 0 0 .28rem rgba(86,220,255,.28),0 0 0 .5px rgba(78,205,255,.28),0 0 .35rem rgba(0,111,180,.55),0 0 .7rem rgba(0,54,115,.28); }
   .customer-service-hologram-minimize:hover { box-shadow: inset 0 0 0 1px rgba(3,16,24,.9),inset 0 0 .38rem rgba(86,220,255,.45),0 0 0 .5px rgba(240,183,124,.58),0 0 .45rem rgba(39,190,255,.52),0 0 .8rem rgba(39,190,255,.25); }

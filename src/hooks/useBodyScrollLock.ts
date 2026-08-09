@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 
 let activeScrollLocks = 0
 let hadScrollLockClassBeforeFirstLock = false
+let scrollbarCompensationBeforeFirstLock = ''
 
 export function useBodyScrollLock(locked: boolean) {
   useEffect(() => {
@@ -12,6 +13,7 @@ export function useBodyScrollLock(locked: boolean) {
     const root = document.documentElement
     if (activeScrollLocks === 0) {
       hadScrollLockClassBeforeFirstLock = body.classList.contains('body-scroll-locked')
+      scrollbarCompensationBeforeFirstLock = root.style.getPropertyValue('--scrollbar-compensation')
     }
     activeScrollLocks += 1
     body.classList.add('body-scroll-locked')
@@ -28,6 +30,7 @@ export function useBodyScrollLock(locked: boolean) {
     }
     const scrollbarWidth = window.innerWidth - root.clientWidth
 
+    root.style.setProperty('--scrollbar-compensation', `${scrollbarWidth}px`)
     root.style.overflow = 'hidden'
     body.style.overflow = 'hidden'
     body.style.position = 'fixed'
@@ -50,6 +53,11 @@ export function useBodyScrollLock(locked: boolean) {
       body.style.paddingRight = previous.bodyPaddingRight
       if (activeScrollLocks === 0 && !hadScrollLockClassBeforeFirstLock) {
         body.classList.remove('body-scroll-locked')
+      }
+      if (activeScrollLocks === 0) {
+        if (scrollbarCompensationBeforeFirstLock) root.style.setProperty('--scrollbar-compensation', scrollbarCompensationBeforeFirstLock)
+        else root.style.removeProperty('--scrollbar-compensation')
+        scrollbarCompensationBeforeFirstLock = ''
       }
       window.scrollTo(scrollX, scrollY)
       root.style.scrollBehavior = previous.rootScrollBehavior
