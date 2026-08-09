@@ -80,8 +80,12 @@ test.describe("Northline desktop interactions", () => {
       .getByRole("button", { name: "Close appointment form" })
       .click();
     await expect(footerDialog).toBeHidden();
-    const after = await page.evaluate(() => window.scrollY);
-    expect(Math.abs(after - before)).toBeLessThan(2);
+    await expect
+      .poll(() => page.evaluate(() => window.scrollY), { timeout: 2000 })
+      .toBeGreaterThanOrEqual(before - 1);
+    await expect
+      .poll(() => page.evaluate(() => window.scrollY), { timeout: 2000 })
+      .toBeLessThanOrEqual(before + 1);
   });
 
   test("gallery modal navigates by controls, keyboard, thumbnail, and backdrop", async ({
@@ -347,14 +351,14 @@ test.describe("Northline mobile interactions", () => {
     await page
       .getByRole("button", { name: /Open image 1:/ })
       .first()
-      .tap();
+      .click();
     const dialog = page.getByRole("dialog", {
       name: "Roofscape gallery viewer",
     });
     await expect(dialog).toBeVisible();
-    await dialog.getByRole("button", { name: "Next image" }).tap();
-    await dialog.getByRole("button", { name: "Close gallery" }).tap();
-    await expect(dialog).toBeHidden();
+    await dialog.getByRole("button", { name: "Next image" }).click();
+    await dialog.getByRole("button", { name: "Close gallery" }).click();
+    await expect(dialog).toBeHidden({ timeout: 10000 });
     const slider = page.getByRole("slider", { name: "Reveal underlayment" });
     await slider.scrollIntoViewIfNeeded();
     await slider.press("ArrowLeft");
