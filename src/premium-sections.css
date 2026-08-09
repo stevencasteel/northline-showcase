@@ -342,8 +342,8 @@
 @keyframes customer-service-skew-b { 0%,42%,100% { opacity: .32; transform: translateX(2.1px) skewX(.27deg); } 50% { opacity: 0; transform: translateX(-2.1px) skewX(-.27deg); } 92% { opacity: 0; transform: translateX(2.1px) skewX(.27deg); } }
 
 @media (max-width: 700px) {
-  .premium-footer { height: 76cqw; }
-  .premium-footer-content { padding-bottom: 28cqw; }
+  .premium-footer { height: 68cqw; }
+  .premium-footer-content { padding-bottom: 22cqw; }
   .customer-service-hologram { right: max(clamp(1.5rem,6vw,2.5rem),calc(env(safe-area-inset-right,0px) + 1.5rem)); width: clamp(5rem,24vw,10.5rem); transform: translateX(calc(100% + 3rem)); }
   .customer-service-hologram.is-active { transform: translateX(0); }
   .customer-service-hologram-minimize { right: -4%; width: 14%; border-width: .5px; box-shadow: inset 0 0 0 1px rgba(3,16,24,.9),inset 0 0 .28rem rgba(86,220,255,.28),0 0 0 .5px rgba(78,205,255,.28),0 0 .35rem rgba(0,111,180,.55),0 0 .7rem rgba(0,54,115,.28); }
