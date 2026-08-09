@@ -10,7 +10,7 @@ const outputPath = path.join(
   "northline-roofing_source_code.txt",
 );
 
-const includedRoots = ["src", "public", "docs", "scripts", "tests", ".github"];
+const includedRoots = ["src", "public", "docs", "scripts", ".github"];
 const includedRootFiles = [
   "README.md",
   "DESIGN.md",
@@ -25,7 +25,6 @@ const includedRootFiles = [
   "tailwind.config.js",
   "wrangler.jsonc",
   "index.html",
-  "playwright.config.ts",
   ".gitignore",
 ];
 
@@ -36,9 +35,6 @@ const ignoredDirectories = new Set([
   "dist",
   "node_modules",
   "coverage",
-  "test-results",
-  "playwright-report",
-  "playwright-browsers",
 ]);
 
 const ignoredNames = new Set([

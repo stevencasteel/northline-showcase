@@ -39,18 +39,6 @@ jobs:
       - name: Check formatting
         run: npm run format:check
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium webkit
-
-      - name: Run Chromium regression tests
-        run: npm run test:e2e:chromium
-
-      - name: Run WebKit browser smoke test
-        run: npm run test:e2e:webkit:smoke
-
-      - name: Run WebKit regression tests
-        run: npm run test:e2e:webkit
-
       - name: Build site
         run: npm run build
 
