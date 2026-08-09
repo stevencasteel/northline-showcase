@@ -18,6 +18,7 @@ export function useComparisonSlider({ initialValue = 54, intentThreshold = 10, r
   const [pointerFocusActive, setPointerFocusActive] = useState(false)
   const isDragging = useRef(false)
   const previousValue = useRef(value)
+  const directionRef = useRef<DragDirection>(null)
   const releaseTimeout = useRef<number | null>(null)
   const pointerMode = useRef<PointerMode>('idle')
   const activePointerId = useRef<number | null>(null)
@@ -32,35 +33,60 @@ export function useComparisonSlider({ initialValue = 54, intentThreshold = 10, r
     if (bounds.width <= 0) return
     const next = clamp(((clientX - bounds.left) / bounds.width) * 100)
     if (next !== previousValue.current) {
-      setDirection(next > previousValue.current ? 'right' : 'left')
+      const nextDirection = next > previousValue.current ? 'right' : 'left'
+      directionRef.current = nextDirection
+      setDirection(nextDirection)
       setIndicatorVisible(true)
     }
     previousValue.current = next
     setValue(next)
   }
 
-  const finish = () => {
-    isDragging.current = false
-    pointerMode.current = 'idle'
-    activePointerId.current = null
-    setIndicatorVisible(false)
+  const scheduleRelease = () => {
     if (releaseTimeout.current !== null) window.clearTimeout(releaseTimeout.current)
+    if (!directionRef.current) {
+      setIndicatorVisible(false)
+      releaseTimeout.current = null
+      return
+    }
+    setIndicatorVisible(true)
     releaseTimeout.current = window.setTimeout(() => {
       setDirection(null)
+      setIndicatorVisible(false)
       releaseTimeout.current = null
     }, releaseDelayMs)
   }
 
+  const finish = (pointerId?: number, preserveFeedback = true) => {
+    if (pointerId !== undefined && activePointerId.current !== pointerId) return
+    isDragging.current = false
+    pointerMode.current = 'idle'
+    activePointerId.current = null
+    if (preserveFeedback) {
+      scheduleRelease()
+      return
+    }
+    directionRef.current = null
+    setDirection(null)
+    setIndicatorVisible(false)
+  }
+
   const onInput = (event: FormEvent<HTMLInputElement>) => {
-    if (isDragging.current) return
+    if (isDragging.current || pointerMode.current === 'pending') return
     const next = clamp(Number(event.currentTarget.value))
     previousValue.current = next
+    directionRef.current = null
+    setDirection(null)
+    setIndicatorVisible(false)
     setValue(next)
   }
 
   const onPointerDown = (event: PointerEvent<HTMLInputElement>) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return
     if (releaseTimeout.current !== null) window.clearTimeout(releaseTimeout.current)
+    directionRef.current = null
+    setDirection(null)
+    setIndicatorVisible(false)
     pointerStart.current = { x: event.clientX, y: event.clientY, value }
     activePointerId.current = event.pointerId
     setIndicatorVisible(false)
@@ -84,7 +110,7 @@ export function useComparisonSlider({ initialValue = 54, intentThreshold = 10, r
       const dx = event.clientX - pointerStart.current.x
       const dy = event.clientY - pointerStart.current.y
       if (Math.abs(dx) < intentThreshold && Math.abs(dy) < intentThreshold) return
-      if (Math.abs(dy) > Math.abs(dx)) { finish(); return }
+      if (Math.abs(dy) > Math.abs(dx)) { finish(event.pointerId); return }
       pointerMode.current = 'dragging'
       isDragging.current = true
       previousValue.current = pointerStart.current.value
@@ -97,16 +123,18 @@ export function useComparisonSlider({ initialValue = 54, intentThreshold = 10, r
     if (activePointerId.current !== event.pointerId) return
     if (pointerMode.current === 'pending' || isDragging.current) updateFromClientX(event.currentTarget, event.clientX)
     const captured = event.currentTarget.hasPointerCapture(event.pointerId)
-    finish()
+    finish(event.pointerId)
     if (captured) event.currentTarget.releasePointerCapture(event.pointerId)
   }
 
   const onPointerCancel = (event: PointerEvent<HTMLInputElement>) => {
     if (activePointerId.current !== event.pointerId) return
     const captured = event.currentTarget.hasPointerCapture(event.pointerId)
-    finish()
+    finish(event.pointerId, false)
     if (captured) event.currentTarget.releasePointerCapture(event.pointerId)
   }
 
-  return { value, direction, indicatorVisible, pointerFocusActive, onInput, onPointerDown, onPointerMove, onPointerUp, onPointerCancel, onLostPointerCapture: finish, onBlur: () => { if (document.hasFocus()) setPointerFocusActive(false) } }
+  const onLostPointerCapture = (event: PointerEvent<HTMLInputElement>) => finish(event.pointerId)
+
+  return { value, direction, indicatorVisible, pointerFocusActive, onInput, onPointerDown, onPointerMove, onPointerUp, onPointerCancel, onLostPointerCapture, onBlur: () => { if (document.hasFocus()) setPointerFocusActive(false) } }
 }
