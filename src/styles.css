@@ -30,7 +30,7 @@ html, body { width: 100%; margin: 0; overflow-x: hidden; overflow-x: clip; }
 html { scroll-behavior: smooth; scroll-padding-top: var(--sticky-header-height); scrollbar-color: #d25f26 #102432; scrollbar-width: auto; }
 body.body-scroll-locked { background: #102432; }
 .scaled-artboard { position: relative; width: 100%; max-width: none; overflow: hidden; overflow: clip; contain: layout paint; }
-.scaled-artboard-inner { position: relative; max-width: none; min-width: 0; overflow: visible; container-type: inline-size; will-change: transform; }
+.scaled-artboard-inner { position: relative; max-width: none; min-width: 0; overflow: visible; container-type: inline-size; }
 .asset-placeholder { display: block; width: 100%; height: 100%; background: transparent; }
 .app { --asset-navbar-underlayment: none; --asset-copper-edge: none; --asset-badge-workshirt: none; --asset-badge-workshirt-hem: none; --asset-services-cover-board: none; --asset-gallery-paper: none; --asset-associations-texture: none; --asset-founder-texture: none; --asset-protection-texture: none; --asset-reviews-texture: none; }
 @media (max-width: 700px) {

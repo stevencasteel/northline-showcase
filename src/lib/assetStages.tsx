@@ -4,6 +4,11 @@ import { responsiveImage, responsiveSource } from './responsiveImage'
 export type AssetStage = 'hero' | 'badges' | 'services' | 'gallery' | 'associations' | 'protection' | 'reviews' | 'founder' | 'footer'
 
 const stageOrder: AssetStage[] = ['hero', 'badges', 'services', 'gallery', 'associations', 'protection', 'reviews', 'founder', 'footer']
+const stageSelectors: Record<AssetStage, string> = {
+  hero: '#top', badges: '#about', services: '#services', gallery: '#work',
+  associations: '#associations', protection: '#protection', reviews: '#reviews',
+  founder: '#founder', footer: '#contact',
+}
 
 // Only assets needed to establish the first complete view of each section belong here.
 // Rotating gallery images, association clones, hover art, and map tiles remain on demand.
@@ -46,14 +51,13 @@ function loadAndDecodeImage(baseOrUrl: string, width: number) {
 export function AssetStageProvider({ children, galleryAssets = [] }: { children: ReactNode; galleryAssets?: string[] }) {
   const initialConstrained = typeof window !== 'undefined' && window.matchMedia('(max-width: 700px)').matches
   const [constrained, setConstrained] = useState(initialConstrained)
-  const [enabledStages, setEnabledStages] = useState<AssetStage[]>(initialConstrained ? ['hero'] : stageOrder)
+  const [enabledStages, setEnabledStages] = useState<AssetStage[]>(['hero'])
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 700px)')
     const update = () => {
       setConstrained(media.matches)
-      if (!media.matches) setEnabledStages(stageOrder)
-      else setEnabledStages(['hero'])
+      setEnabledStages(['hero'])
     }
     update()
     media.addEventListener?.('change', update)
@@ -61,26 +65,44 @@ export function AssetStageProvider({ children, galleryAssets = [] }: { children:
   }, [])
 
   useEffect(() => {
-    if (!constrained) return
     let cancelled = false
-    const run = async () => {
-      for (let index = 0; index < stageOrder.length - 1; index += 1) {
-        const stage = stageOrder[index]
-        const assets = stage === 'gallery' ? [...requiredAssets.gallery, ...galleryAssets] : requiredAssets[stage]
-        await Promise.allSettled(assets.map((base) => loadAndDecodeImage(base, 640)))
-        if (cancelled) return
-        const next = stageOrder[index + 1]
-        setEnabledStages((current) => current.includes(next) ? current : [...current, next])
-      }
+    const enableStage = async (stage: AssetStage) => {
+      const assets = stage === 'gallery' ? [...requiredAssets.gallery, ...galleryAssets] : requiredAssets[stage]
+      await Promise.allSettled(assets.map((base) => loadAndDecodeImage(base, constrained ? 640 : 1440)))
+      if (cancelled) return
+      setEnabledStages((current) => current.includes(stage) ? current : [...current, stage])
     }
-    void run()
-    return () => { cancelled = true }
+
+    if (!('IntersectionObserver' in window)) {
+      stageOrder.slice(1).forEach((stage) => { void enableStage(stage) })
+      return () => { cancelled = true }
+    }
+
+    const pending = new Set<AssetStage>()
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const stage = (entry.target as HTMLElement).dataset.assetStage as AssetStage | undefined
+        if (!stage || pending.has(stage)) return
+        pending.add(stage)
+        void enableStage(stage)
+      })
+    }, { rootMargin: '150% 0px' })
+
+    stageOrder.slice(1).forEach((stage) => {
+      const element = document.querySelector(stageSelectors[stage])
+      if (element) {
+        element.setAttribute('data-asset-stage', stage)
+        observer.observe(element)
+      } else void enableStage(stage)
+    })
+
+    return () => { cancelled = true; observer.disconnect() }
   }, [constrained, galleryAssets])
 
   const value = useMemo<AssetStageContextValue>(() => {
     return {
       constrained,
-      enabled: (stage) => !constrained || enabledStages.includes(stage),
+      enabled: (stage) => enabledStages.includes(stage),
       style: {},
       stageClassName: enabledStages.map((stage) => `asset-stage-${stage}`).join(' '),
     }
@@ -104,7 +126,7 @@ export function StageImage({ base, sizes, defaultWidth = 1440, stage, style, ...
   const { enabled } = useAssetStage()
   const metadata = responsiveImage(base, sizes, defaultWidth)
   if (!enabled(stage)) {
-    return <span className="asset-placeholder" aria-hidden="true" style={{ ...style, aspectRatio: `${metadata.width} / ${metadata.height}` }} />
+    return <span className={`asset-placeholder${props.className ? ` ${props.className}` : ''}`} aria-hidden="true" style={{ ...style, aspectRatio: `${metadata.width} / ${metadata.height}` }} />
   }
   return <img {...metadata} {...props} alt={props.alt ?? ''} style={style} />
 }
