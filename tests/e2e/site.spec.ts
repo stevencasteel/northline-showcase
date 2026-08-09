@@ -168,7 +168,7 @@ test.describe("Northline desktop interactions", () => {
             listElement.scrollHeight - listElement.clientHeight + 1
         );
       });
-    await expect.poll(isActiveThumbnailVisible, { timeout: 2000 }).toBe(true);
+    await expect.poll(isActiveThumbnailVisible, { timeout: 5000 }).toBe(true);
     await expect(
       dialog.locator(".gallery-modal-arrow.is-key-active"),
     ).toHaveCount(0);

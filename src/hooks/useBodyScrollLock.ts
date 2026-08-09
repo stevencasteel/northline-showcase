@@ -40,12 +40,21 @@ function releaseScrollLock() {
     root.style.setProperty("--scrollbar-compensation", previous.compensation);
   else root.style.removeProperty("--scrollbar-compensation");
   baseline = null;
-  window.scrollTo({
-    left: previous.scrollX,
-    top: previous.scrollY,
-    behavior: "auto",
-  });
-  root.style.scrollBehavior = previous.rootScrollBehavior;
+  const restoreScroll = () =>
+    window.scrollTo({
+      left: previous.scrollX,
+      top: previous.scrollY,
+      behavior: "auto",
+    });
+  restoreScroll();
+  if (typeof window.requestAnimationFrame === "function") {
+    window.requestAnimationFrame(() => {
+      restoreScroll();
+      root.style.scrollBehavior = previous.rootScrollBehavior;
+    });
+  } else {
+    root.style.scrollBehavior = previous.rootScrollBehavior;
+  }
 }
 
 export function useBodyScrollLock(locked: boolean) {
