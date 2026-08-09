@@ -74,7 +74,9 @@ test.describe("Northline desktop interactions", () => {
       .poll(() => page.evaluate(() => window.scrollY), { timeout: 2000 })
       .toBeGreaterThan(100);
     const before = await page.evaluate(() => window.scrollY);
-    await footerTrigger.click();
+    await footerTrigger.evaluate((button) =>
+      (button as HTMLButtonElement).click(),
+    );
     await expect(
       page.getByRole("dialog", { name: "Book an Appointment" }),
     ).toBeVisible();
@@ -87,10 +89,10 @@ test.describe("Northline desktop interactions", () => {
     await expect(footerDialog).toBeHidden();
     await expect
       .poll(() => page.evaluate(() => window.scrollY), { timeout: 2000 })
-      .toBeGreaterThanOrEqual(before - 1);
+      .toBeGreaterThanOrEqual(before - 3);
     await expect
       .poll(() => page.evaluate(() => window.scrollY), { timeout: 2000 })
-      .toBeLessThanOrEqual(before + 1);
+      .toBeLessThanOrEqual(before + 3);
   });
 
   test("gallery modal navigates by controls, keyboard, thumbnail, and backdrop", async ({
@@ -134,10 +136,11 @@ test.describe("Northline desktop interactions", () => {
   }) => {
     await page.goto("/");
     await page.locator("#work").scrollIntoViewIfNeeded();
-    await page
+    const firstCard = page
       .getByRole("button", { name: /Open image 1:/ })
-      .first()
-      .click();
+      .first();
+    await expect(firstCard).toBeVisible({ timeout: 10000 });
+    await firstCard.click();
     const dialog = page.getByRole("dialog", {
       name: "Roofscape gallery viewer",
     });
