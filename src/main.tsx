@@ -14,8 +14,9 @@ import { useGalleryPreviewRotation } from './hooks/useGalleryPreviewRotation'
 import { ScaledArtboard } from './components/ScaledArtboard'
 import { RasterStateArt } from './components/RasterStateArt'
 import { siteConfig } from './config/site'
+import { services } from './config/services'
 import { GALLERY_PREVIEW_SLOTS, GALLERY_SWAP_CONFIG } from './config/gallery'
-import { responsiveImage } from './lib/responsiveImage'
+import { asResponsiveAsset, responsiveImage } from './lib/responsiveImage'
 import { AssetStageProvider, StageImage, useAssetStage } from './lib/assetStages'
 import { DialogModal } from './components/DialogModal'
 
@@ -46,10 +47,10 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
         <a className="raster-control" href="#contact" aria-label="Contact"><RasterStateArt defaultAsset={{ file: `${asset}navbar/nav_contact_default.png` }} hoverAsset={{ file: `${asset}navbar/nav_contact_hover.png` }} width={426} height={150} alt="Contact" /></a>
       </nav>
       <a className="header-phone navbar-art-link raster-control" href={siteConfig.phoneHref} aria-label={`Call ${siteConfig.phoneDisplay}`}>
-        <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_phone_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_phone_hover' }} width={1154} height={244} alt={`Call ${siteConfig.phoneDisplay}`} />
+        <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_phone_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_phone_hover' }} width={1154} height={244} sizes="18vw" alt={`Call ${siteConfig.phoneDisplay}`} />
       </a>
       <button className="header-quote navbar-art-button raster-control" type="button" onClick={onBookAppointment} aria-label="Book an appointment">
-        <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_hover' }} width={966} height={180} alt="Book an appointment" />
+        <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_hover' }} width={966} height={180} sizes="16vw" alt="Book an appointment" />
       </button>
     </header>
   )
@@ -239,13 +240,6 @@ function BadgeStrip() {
   )
 }
 
-const services = [
-  { title: 'Residential', image: 'services/residential-roofing', alt: 'In a bright, sunny coastal setting high above a deep blue ocean lined with palm trees and distant islands, a purple-skinned female elf construction worker stands on scaffolding to fit a dark-framed rectangular window into the curved beige stucco wall of a turret. Above her is an elaborate roof of teal-blue patinated standing-seam copper panels with a polished reddish-gold copper edge, alongside light-cream Spanish-style clay roof tiles.' , text: 'Complete roof systems designed for lasting protection and a clean, finished line.' },
-  { title: 'Commercial', image: 'services/commercial-roofing', alt: 'Set atop a grand building framed with polished gold beams and a vast roof of deep red tiles, a diverse crew of fantastical creatures constructs and maintains the structure above a sprawling fantasy metropolis. The crew includes a golden-brown insectoid polishing gold trim, a pink axolotl-headed worker smoothing mortar, purple goblin-like workers arranging shingles, a brass robot welding, a small green lizard inspecting wiring, and a stone giant lifting roofing panels. A golden cupola crowns the building above extensive scaffolding, with colorful domes, ornate spires, and a harbor in the distance.' , text: 'Durable, carefully coordinated systems for commercial properties of every scale.' },
-  { title: 'Custom Fabrication', image: 'services/custom-metal', alt: 'Inside a dimly lit open-air workshop blending traditional blacksmithing with futuristic technology, a sleek humanoid robot craftsman in a dark leather apron forges ornate copper architecture. The gold-visored robot swings a heavy hammer onto polished reddish copper embossed with raised scrollwork, while a completed copper tower finial rests nearby and an intense orange-gold forge burns beneath a metal hood. Through an open window, a sunny landscape shows a grand copper-roofed building, ornate spire, blue sky, and distant green hills.' , text: 'Hand-finished copperwork, flashing, trim, and architectural details built to order.' },
-  { title: 'Repairs & Inspections', image: 'services/repairs-inspections', alt: 'In bright daylight under a cloud-dappled sky, a humanoid dragon and an alien construction worker inspect the steep roof of an old-fashioned building overlooking lush green mountains. The dragon has vivid cobalt-blue scales, pale-gold scales beneath his jaw, ram-like horns fitted through a yellow hard hat, and a dark-clawed hand resting on polished reddish-gold copper flashing. Beside him, a grey-purple alien with four glowing amber eyes reviews a clipboard. Weathered greenish-grey slate shingles, a tall roof spire, copper, and strong sunlight fill the scene.' , text: 'Clear assessments and dependable repairs before a small issue becomes a larger one.' },
-]
-
 function Services() {
   const sectionRef = useRef<HTMLElement>(null)
   const [visible, setVisible] = useState(false)
@@ -278,7 +272,7 @@ function Services() {
               key={service.title}
               style={{ '--service-index': index } as React.CSSProperties}
             >
-              <StageImage base={`${asset}${service.image}`} sizes="44vw" defaultWidth={1440} stage="services" alt={service.alt} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" />
+              <StageImage base={asResponsiveAsset(`${asset}${service.image}`)} sizes="44vw" defaultWidth={1440} stage="services" alt={service.alt} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" />
               <span className="service-slice-shade" />
               <span className="service-slice-number">0{index + 1}</span>
               <span className="service-slice-content">
@@ -631,14 +625,14 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
   useEffect(() => {
     const preloadIndexes = [-1, 0, 1].map((offset) => (activeIndex + offset + images.length) % images.length)
     preloadedImagesRef.current.forEach((image, src) => {
-      const stillWanted = preloadIndexes.some((index) => responsiveImage(`${asset}gallery/${images[index].file}`, '94vw', 960).src === src)
+      const stillWanted = preloadIndexes.some((index) => responsiveImage(asResponsiveAsset(`${asset}gallery/${images[index].file}`), '94vw', 960).src === src)
       if (!stillWanted) {
         image.src = ''
         preloadedImagesRef.current.delete(src)
       }
     })
     preloadIndexes.forEach((index) => {
-      const src = responsiveImage(`${asset}gallery/${images[index].file}`, '94vw', 960).src
+      const src = responsiveImage(asResponsiveAsset(`${asset}gallery/${images[index].file}`), '94vw', 960).src
       if (preloadedImagesRef.current.has(src)) return
       const image = new Image()
       image.decoding = 'async'
@@ -689,13 +683,13 @@ function GalleryModal({ images, activeIndex, onSelect, onClose }: {
               <span>Roofscape</span>
               <strong>{String(activeIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}</strong>
             </div>
-            <img {...responsiveImage(`${asset}gallery/${activeImage.file}`, '94vw', 960)} alt={activeImage.alt} loading="eager" decoding="async" />
+            <img {...responsiveImage(asResponsiveAsset(`${asset}gallery/${activeImage.file}`), '94vw', 960)} alt={activeImage.alt} loading="eager" decoding="async" />
           </div>
           <aside className="gallery-sequence" aria-label="All gallery images">
             <div className="gallery-sequence-list" ref={sequenceListRef}>
               {images.map((image, imageIndex) => (
                 <button className={activeIndex === imageIndex ? 'is-active' : ''} type="button" onClick={() => onSelect(imageIndex)} key={image.file} aria-label={`View image ${imageIndex + 1}: ${image.alt}`} aria-current={activeIndex === imageIndex ? 'true' : undefined}>
-                  <img {...responsiveImage(`${asset}gallery/${image.file}`, '112px', 640)} alt="" loading="lazy" decoding="async" />
+                  <img {...responsiveImage(asResponsiveAsset(`${asset}gallery/${image.file}`), '112px', 640)} alt="" loading="lazy" decoding="async" />
                   <span>{String(imageIndex + 1).padStart(2, '0')}</span>
                 </button>
               ))}
@@ -772,10 +766,10 @@ function GalleryCard({ image, imageIndex, slot, slideDirections, onOpen, onHover
       aria-label={`Open image ${displayed.imageIndex + 1}: ${displayed.image.alt}`}
       style={{ '--gallery-index': slot } as React.CSSProperties}
     >
-      <StageImage base={`${asset}gallery/${displayed.image.file}`} sizes={cardSizes} defaultWidth={960} stage="gallery" className={`gallery-card-image gallery-card-image-current${incoming ? ` gallery-card-image-outgoing gallery-card-image-out-${incomingDirection}` : ''}`} alt={displayed.image.alt} loading={slot < 3 ? 'eager' : 'lazy'} />
+        <StageImage base={asResponsiveAsset(`${asset}gallery/${displayed.image.file}`)} sizes={cardSizes} defaultWidth={960} stage="gallery" className={`gallery-card-image gallery-card-image-current${incoming ? ` gallery-card-image-outgoing gallery-card-image-out-${incomingDirection}` : ''}`} alt={displayed.image.alt} loading={slot < 3 ? 'eager' : 'lazy'} />
       {incoming && (
         <StageImage
-          base={`${asset}gallery/${incoming.image.file}`}
+          base={asResponsiveAsset(`${asset}gallery/${incoming.image.file}`)}
           sizes={cardSizes}
           defaultWidth={960}
           stage="gallery"

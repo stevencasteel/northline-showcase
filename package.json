@@ -12,7 +12,9 @@
     "typecheck": "tsc -b",
     "check": "npm run typecheck && npm run lint && prettier --check package.json eslint.config.js",
     "format": "prettier --write package.json eslint.config.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "validate:assets": "node scripts/validate-responsive-assets.js",
+    "format:check": "prettier --check src/components/DialogModal.tsx src/components/RasterStateArt.tsx src/config/services.ts src/hooks/useReducedMotion.ts src/lib/responsiveImage.ts scripts/validate-responsive-assets.js vite.config.ts"
   },
   "engines": {
     "node": ">=22.14.0"

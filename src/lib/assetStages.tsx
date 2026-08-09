@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
-import { responsiveImage, responsiveSource } from './responsiveImage'
+import { asResponsiveAsset, responsiveImage, responsiveSource, type ResponsiveAssetBase } from './responsiveImage'
 
 export type AssetStage = 'hero' | 'badges' | 'services' | 'gallery' | 'associations' | 'protection' | 'reviews' | 'founder' | 'footer'
 
@@ -37,7 +37,7 @@ function loadAndDecodeImage(baseOrUrl: string, width: number) {
   const image = new Image()
   const source = baseOrUrl.endsWith('.jpg') || baseOrUrl.endsWith('.jpeg') || baseOrUrl.endsWith('.png')
     ? baseOrUrl
-    : responsiveSource(baseOrUrl, width)
+    : responsiveSource(asResponsiveAsset(baseOrUrl), width)
   return new Promise<void>((resolve) => {
     image.onload = () => {
       if (typeof image.decode === 'function') void image.decode().catch(() => undefined).finally(resolve)
@@ -116,7 +116,7 @@ export function useAssetStage() {
 }
 
 type StageImageProps = React.ImgHTMLAttributes<HTMLImageElement> & {
-  base: string
+  base: ResponsiveAssetBase
   sizes: string
   defaultWidth?: number
   stage: AssetStage

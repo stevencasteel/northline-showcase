@@ -6,7 +6,7 @@ import { useRevealOnce } from './hooks/useRevealOnce'
 import { useComparisonSlider } from './hooks/useComparisonSlider'
 import { siteConfig } from './config/site'
 import { HOLOGRAM } from './config/hologram'
-import { responsiveImage, responsiveSource } from './lib/responsiveImage'
+import { asResponsiveAsset, responsiveImage, responsiveSource } from './lib/responsiveImage'
 import { StageImage } from './lib/assetStages'
 import { RasterStateArt } from './components/RasterStateArt'
 
@@ -285,7 +285,7 @@ export function AssociationsMarquee() {
         <div className="association-badge-cell" data-kind={badge.kind} key={`${badge.file}-${clone ? 'clone' : 'original'}`}>
           <span className="association-badge-effects">
             <StageImage
-              base={`/assets/associations/${badge.file}`}
+              base={asResponsiveAsset(`/assets/associations/${badge.file}`)}
               sizes={`${Math.ceil((badge.width / badge.height) * 12)}vw`}
               defaultWidth={640}
               stage="associations"
@@ -335,10 +335,10 @@ export function PremiumFooter({ onBook }: BookHandler) {
             </div>
             <div className="premium-footer-contact-rack" aria-label="Contact Northline Roofing">
               <button className="premium-footer-raster-control raster-control" type="button" onClick={onBook} aria-label="Book an appointment">
-                <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_hover' }} width={966} height={180} alt="Book an appointment" />
+                <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_book-appt_hover' }} width={966} height={180} sizes="12vw" alt="Book an appointment" />
               </button>
               <a className="premium-footer-raster-control raster-control" href={siteConfig.phoneHref} aria-label={`Call ${siteConfig.phoneDisplay}`}>
-                <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_phone_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_phone_hover' }} width={1154} height={244} alt={`Call ${siteConfig.phoneDisplay}`} />
+                <RasterStateArt defaultAsset={{ responsiveBase: '/assets/navbar/nav_phone_default' }} hoverAsset={{ responsiveBase: '/assets/navbar/nav_phone_hover' }} width={1154} height={244} sizes="12vw" alt={`Call ${siteConfig.phoneDisplay}`} />
               </a>
               <EmailCopyButton />
             </div>
@@ -401,6 +401,7 @@ function EmailCopyButton() {
         stateAsset={{ responsiveBase: '/assets/navbar/nav_email_copied' }}
         width={1825}
         height={458}
+        sizes="12vw"
         alt={`Copy ${siteConfig.email}`}
       />
       <span className="visually-hidden" aria-live="polite">{copied ? 'Email address copied to clipboard.' : ''}</span>
