@@ -2,7 +2,7 @@
 
 ## Current status
 
-The Phase 4 corrections are committed on `main`. This follow-up adds CI-focused browser separation so local macOS Chromium remains convenient while GitHub Actions Linux is authoritative for WebKit.
+The Phase 4 corrections and the CI-focused browser separation are committed and pushed on `main`. Local macOS Chromium remains convenient while GitHub Actions Linux is authoritative for WebKit.
 
 ## Completed work
 
@@ -64,10 +64,19 @@ Local checks passed:
 - `npm run format:check`
 - `npm run build`
 - `git diff --check`
-- `npm run test:e2e:chromium` — 15 passed, 15 skipped, 0 failed
+- `npm run test:e2e:chromium` — the final focused appointment regression passed; the full suite was also exercised during the correction pass
 - `npm run test:e2e:webkit:smoke` remains blocked locally by macOS 14.4.1’s frozen WebKit runtime, as expected
 
-The first GitHub Actions run for commit `d276ca6` successfully installed WebKit and reached Northline assertions on Ubuntu. It reported 22 passed, 32 skipped, 1 flaky, and 5 failed across the combined matrix. The failures were actionable test-environment issues: Darwin-only screenshots ran on Linux, the appointment close test measured before modal cleanup settled in WebKit, the repeated-thumbnail assertion sampled before smooth scrolling settled, and the hologram check sampled during its entrance transition. The follow-up changes address those four issues without modifying production behavior. The requested browser geometries remain 1280×800 and 390×844.
+The first GitHub Actions run for commit `d276ca6` successfully installed WebKit and reached Northline assertions on Ubuntu. It reported 22 passed, 32 skipped, 1 flaky, and 5 failed across the combined matrix. The follow-up changes separated the browser suites, skipped Darwin-only snapshots in CI, stabilized the affected assertions, and corrected modal focus/scroll restoration. The requested browser geometries remain 1280×800 and 390×844.
+
+Final GitHub Actions run for commit `22df2db` passed on Ubuntu:
+
+- Chromium projects (`chromium-desktop` = Chromium, `chromium-mobile` = Chromium): 13 passed, 17 skipped, 0 failed
+- WebKit projects (`webkit-desktop` = WebKit, `webkit-mobile` = WebKit): 13 passed, 17 skipped, 0 failed
+- WebKit smoke: passed; `browserContext.newPage()` and `about:blank` succeeded
+- Build and artifact upload: passed
+
+The appointment backdrop, focus trap, opener focus restoration, repeated gallery-keyboard regression, desktop/mobile pointer-drag slider coverage, and mobile customer-service bounds check all passed in their applicable Linux projects. The source context was regenerated and contains the current project files.
 
 The source context was regenerated at `docs/northline-roofing_source_code.txt` and contains 48 readable project files.
 
@@ -88,10 +97,10 @@ The source context was regenerated at `docs/northline-roofing_source_code.txt` a
 1. Review the staged-image placeholder strategy in the context of the site’s existing image selectors and browser loading behavior.
 2. Confirm the shared scroll-lock baseline is appropriate if additional modal or drawer types are introduced.
 3. Review the reduced-motion rules visually on service sections, hero transitions, and gallery modals.
-4. Push the CI-focused changes and inspect the separate GitHub Actions Chromium, WebKit smoke, and WebKit regression steps.
-5. If Linux WebKit reports a remaining assertion, fix only the demonstrated browser-specific behavior.
+4. Keep the separate GitHub Actions Chromium, WebKit smoke, and WebKit regression steps intact.
+5. Treat local macOS WebKit failure as an environment limitation unless the runtime is upgraded; do not patch Playwright internals or the OS.
 6. Consider adding an explicit nested-lock regression test if another independently mounted modal/drawer component is introduced.
 
 ## Git state
 
-The CI-focused follow-up is currently uncommitted locally. The optional production-preview E2E change was not made; the existing Vite dev-server workflow remains in place to avoid unnecessary local/CI workflow complexity. No destructive git operations were performed.
+The CI-focused follow-up is committed and pushed on `main` in `22df2db` (following `806c158`, `cd2928b`, and `3a4641c`). The optional production-preview E2E change was not made; the existing Vite dev-server workflow remains in place to avoid unnecessary local/CI workflow complexity. No destructive git operations were performed.
