@@ -1349,6 +1349,37 @@ function GalleryArrowButton({
   );
 }
 
+const galleryImagePreloadCache = new Map<string, Promise<void>>();
+
+function preloadGalleryImage(image: GalleryImage) {
+  const props = responsiveImage(
+    asResponsiveAsset(`${asset}gallery/${image.file}`),
+    "94vw",
+    960,
+  );
+  const srcSet = "srcSet" in props ? props.srcSet : undefined;
+  const cacheKey = `${props.src}|${srcSet ?? ""}|${props.sizes}`;
+  const cached = galleryImagePreloadCache.get(cacheKey);
+  if (cached) return cached;
+
+  const promise = new Promise<void>((resolve) => {
+    const element = new Image();
+    element.decoding = "async";
+    element.loading = "eager";
+    element.sizes = props.sizes;
+    if (srcSet) element.srcset = srcSet;
+    element.onload = () => {
+      if (typeof element.decode === "function") {
+        void element.decode().catch(() => undefined).finally(resolve);
+      } else resolve();
+    };
+    element.onerror = () => resolve();
+    element.src = props.src;
+  });
+  galleryImagePreloadCache.set(cacheKey, promise);
+  return promise;
+}
+
 function GalleryModal({
   images,
   activeIndex,
@@ -1374,40 +1405,27 @@ function GalleryModal({
   const [closeShockwave, setCloseShockwave] = useState(0);
   const [closePressed, setClosePressed] = useState(false);
   const reducedMotion = useReducedMotion();
-  const activeImage = images[activeIndex];
-  const preloadedImagesRef = useRef(new Map<string, HTMLImageElement>());
+  const [displayedIndex, setDisplayedIndex] = useState(activeIndex);
+
+  const activeImage = images[displayedIndex];
 
   useEffect(() => {
     const preloadIndexes = [-1, 0, 1].map(
       (offset) => (activeIndex + offset + images.length) % images.length,
     );
-    preloadedImagesRef.current.forEach((image, src) => {
-      const stillWanted = preloadIndexes.some(
-        (index) =>
-          responsiveImage(
-            asResponsiveAsset(`${asset}gallery/${images[index].file}`),
-            "94vw",
-            960,
-          ).src === src,
-      );
-      if (!stillWanted) {
-        image.src = "";
-        preloadedImagesRef.current.delete(src);
-      }
-    });
-    preloadIndexes.forEach((index) => {
-      const src = responsiveImage(
-        asResponsiveAsset(`${asset}gallery/${images[index].file}`),
-        "94vw",
-        960,
-      ).src;
-      if (preloadedImagesRef.current.has(src)) return;
-      const image = new Image();
-      image.decoding = "async";
-      image.src = src;
-      preloadedImagesRef.current.set(src, image);
-    });
+    preloadIndexes.forEach((index) => void preloadGalleryImage(images[index]));
   }, [activeIndex, images]);
+
+  useEffect(() => {
+    if (activeIndex === displayedIndex) return;
+    let cancelled = false;
+    void preloadGalleryImage(images[activeIndex]).then(() => {
+      if (!cancelled) setDisplayedIndex(activeIndex);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeIndex, displayedIndex, images]);
 
   const handleClose = useCallback(() => {
     if (isClosingRef.current) return;
@@ -1736,6 +1754,15 @@ function Gallery() {
       }))
     : [];
 
+  const openGallery = useCallback(
+    (imageIndex: number) => {
+      void preloadGalleryImage(images[imageIndex]).then(() =>
+        setActiveIndex(imageIndex),
+      );
+    },
+    [images],
+  );
+
   const renderGalleryCard = ({
     image,
     imageIndex,
@@ -1750,7 +1777,7 @@ function Gallery() {
       imageIndex={imageIndex}
       slot={slot}
       slideDirections={gallerySlideDirections[slot]}
-      onOpen={() => setActiveIndex(imageIndex)}
+      onOpen={() => openGallery(imageIndex)}
       onHoverChange={(hoveredSlot) => {
         hoveredSlotRef.current = hoveredSlot;
       }}
