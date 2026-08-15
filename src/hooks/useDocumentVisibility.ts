@@ -1,15 +1,13 @@
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+const subscribe = (onStoreChange: () => void) => {
+  if (typeof document === "undefined") return () => undefined;
+  document.addEventListener("visibilitychange", onStoreChange);
+  return () => document.removeEventListener("visibilitychange", onStoreChange);
+};
+const getSnapshot = () => typeof document === "undefined" || !document.hidden;
+const getServerSnapshot = () => true;
 
 export function useDocumentVisibility() {
-  const [visible, setVisible] = useState(
-    () => typeof document === "undefined" || !document.hidden,
-  );
-
-  useEffect(() => {
-    const update = () => setVisible(!document.hidden);
-    document.addEventListener("visibilitychange", update);
-    return () => document.removeEventListener("visibilitychange", update);
-  }, []);
-
-  return visible;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

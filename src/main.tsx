@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   AlertCircle,
@@ -39,7 +39,11 @@ import {
   GALLERY_PREVIEW_SLOTS,
   GALLERY_PREVIEW_CYCLE_CONFIG,
 } from "./config/gallery";
-import { asResponsiveAsset, responsiveImage } from "./lib/responsiveImage";
+import {
+  asResponsiveAsset,
+  preloadResponsiveImage,
+  responsiveImage,
+} from "./lib/responsiveImage";
 import {
   SectionAssetProvider,
   SectionImage,
@@ -265,9 +269,15 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
 
 function useNavbarScrollState() {
   const [scrolled, setScrolled] = useState(false);
+  const scrolledRef = useRef(false);
 
   useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 4);
+    const update = () => {
+      const next = window.scrollY > 4;
+      if (next === scrolledRef.current) return;
+      scrolledRef.current = next;
+      setScrolled(next);
+    };
     update();
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
@@ -1399,39 +1409,47 @@ function GalleryArrowButton({
   );
 }
 
-const galleryImagePreloadCache = new Map<string, Promise<void>>();
-
 function preloadGalleryImage(image: GalleryImage) {
-  const props = responsiveImage(
-    asResponsiveAsset(`${asset}gallery/${image.assetBase}`),
-    "94vw",
-    960,
-  );
-  const srcSet = "srcSet" in props ? props.srcSet : undefined;
-  const cacheKey = `${props.src}|${srcSet ?? ""}|${props.sizes}`;
-  const cached = galleryImagePreloadCache.get(cacheKey);
-  if (cached) return cached;
-
-  const promise = new Promise<void>((resolve) => {
-    const element = new Image();
-    element.decoding = "async";
-    element.loading = "eager";
-    element.sizes = props.sizes;
-    if (srcSet) element.srcset = srcSet;
-    element.onload = () => {
-      if (typeof element.decode === "function") {
-        void element
-          .decode()
-          .catch(() => undefined)
-          .finally(resolve);
-      } else resolve();
-    };
-    element.onerror = () => resolve();
-    element.src = props.src;
+  return preloadResponsiveImage({
+    base: asResponsiveAsset(`${asset}gallery/${image.assetBase}`),
+    sizes: "94vw",
+    defaultWidth: 960,
   });
-  galleryImagePreloadCache.set(cacheKey, promise);
-  return promise;
 }
+
+const GallerySequenceThumbnail = memo(function GallerySequenceThumbnail({
+  image,
+  imageIndex,
+  active,
+  onSelect,
+}: {
+  image: GalleryImage;
+  imageIndex: number;
+  active: boolean;
+  onSelect: (index: number) => void;
+}) {
+  return (
+    <button
+      className={active ? "is-active" : ""}
+      type="button"
+      onClick={() => onSelect(imageIndex)}
+      aria-label={`View image ${imageIndex + 1}: ${image.alt}`}
+      aria-current={active ? "true" : undefined}
+    >
+      <img
+        {...responsiveImage(
+          asResponsiveAsset(`${asset}gallery/${image.assetBase}`),
+          "112px",
+          640,
+        )}
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
+      <span>{String(imageIndex + 1).padStart(2, "0")}</span>
+    </button>
+  );
+});
 
 function GalleryModal({
   images,
@@ -1453,6 +1471,7 @@ function GalleryModal({
     next: 0,
   });
   const [suppressArrowHover, setSuppressArrowHover] = useState(false);
+  const suppressArrowHoverRef = useRef(false);
   const [isClosing, setIsClosing] = useState(false);
   const isClosingRef = useRef(false);
   const [closeShockwave, setCloseShockwave] = useState(0);
@@ -1508,6 +1527,7 @@ function GalleryModal({
             current[direction === 1 ? "next" : "previous"] + 1,
         }));
       }
+      suppressArrowHoverRef.current = true;
       setSuppressArrowHover(true);
       navigate(direction);
     },
@@ -1564,7 +1584,11 @@ function GalleryModal({
       <div className="gallery-modal-content">
         <div
           className="gallery-modal-stage"
-          onPointerMove={() => setSuppressArrowHover(false)}
+          onPointerMove={() => {
+            if (!suppressArrowHoverRef.current) return;
+            suppressArrowHoverRef.current = false;
+            setSuppressArrowHover(false);
+          }}
         >
           <div className="gallery-modal-meta">
             <span>Roofscape</span>
@@ -1587,26 +1611,13 @@ function GalleryModal({
         <aside className="gallery-sequence" aria-label="All gallery images">
           <div className="gallery-sequence-list" ref={sequenceListRef}>
             {images.map((image, imageIndex) => (
-              <button
-                className={activeIndex === imageIndex ? "is-active" : ""}
-                type="button"
-                onClick={() => onSelect(imageIndex)}
+              <GallerySequenceThumbnail
+                image={image}
+                imageIndex={imageIndex}
+                active={activeIndex === imageIndex}
+                onSelect={onSelect}
                 key={image.assetBase}
-                aria-label={`View image ${imageIndex + 1}: ${image.alt}`}
-                aria-current={activeIndex === imageIndex ? "true" : undefined}
-              >
-                <img
-                  {...responsiveImage(
-                    asResponsiveAsset(`${asset}gallery/${image.assetBase}`),
-                    "112px",
-                    640,
-                  )}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                />
-                <span>{String(imageIndex + 1).padStart(2, "0")}</span>
-              </button>
+              />
             ))}
           </div>
         </aside>
@@ -1780,7 +1791,9 @@ function GalleryCard({
 }
 
 function Gallery() {
-  const galleryReveal = useRevealOnce<HTMLElement>(galleryObserverOptions);
+  const galleryReveal = useRevealOnce<HTMLElement>(galleryObserverOptions, {
+    live: true,
+  });
   const sectionRef = galleryReveal.ref;
   const inView = galleryReveal.inView;
   const revealed = galleryReveal.revealed;

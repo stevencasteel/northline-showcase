@@ -14,6 +14,12 @@ const assetMetadata = RESPONSIVE_ASSETS as Record<
   ResponsiveAssetMetadata
 >;
 
+const responsiveImageCache = new Map<
+  string,
+  ReturnType<typeof createResponsiveImage>
+>();
+const responsivePreloadCache = new Map<string, Promise<void>>();
+
 export function responsiveAssetMetadata(
   base: ResponsiveAssetBase,
 ): ResponsiveAssetMetadata {
@@ -37,7 +43,7 @@ export function asResponsiveAsset(base: string): ResponsiveAssetBase {
   return base as ResponsiveAssetBase;
 }
 
-export function responsiveImage(
+function createResponsiveImage(
   base: ResponsiveAssetBase,
   sizes: string,
   defaultWidth?: number,
@@ -64,6 +70,55 @@ export function responsiveImage(
           .join(", "),
       }
     : props;
+}
+
+export function responsiveImage(
+  base: ResponsiveAssetBase,
+  sizes: string,
+  defaultWidth?: number,
+) {
+  const key = `${base}|${sizes}|${defaultWidth ?? ""}`;
+  const cached = responsiveImageCache.get(key);
+  if (cached) return cached;
+  const props = createResponsiveImage(base, sizes, defaultWidth);
+  responsiveImageCache.set(key, props);
+  return props;
+}
+
+export function preloadResponsiveImage({
+  base,
+  sizes,
+  defaultWidth,
+}: {
+  base: ResponsiveAssetBase;
+  sizes: string;
+  defaultWidth?: number;
+}) {
+  const props = responsiveImage(base, sizes, defaultWidth);
+  const srcSet = "srcSet" in props ? props.srcSet : undefined;
+  const cacheKey = `${props.src}|${srcSet ?? ""}|${props.sizes}`;
+  const cached = responsivePreloadCache.get(cacheKey);
+  if (cached) return cached;
+
+  const promise = new Promise<void>((resolve) => {
+    const image = new Image();
+    image.decoding = "async";
+    image.loading = "eager";
+    image.sizes = props.sizes;
+    if (srcSet) image.srcset = srcSet;
+    image.onload = () => {
+      if (typeof image.decode === "function") {
+        void image
+          .decode()
+          .catch(() => undefined)
+          .finally(resolve);
+      } else resolve();
+    };
+    image.onerror = () => resolve();
+    image.src = props.src;
+  });
+  responsivePreloadCache.set(cacheKey, promise);
+  return promise;
 }
 
 export function responsiveSource(

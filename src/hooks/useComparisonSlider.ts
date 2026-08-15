@@ -34,6 +34,7 @@ export function useComparisonSlider({
   const pointerMode = useRef<PointerMode>("idle");
   const activePointerId = useRef<number | null>(null);
   const pointerStart = useRef({ x: 0, y: 0, value });
+  const dragBounds = useRef<{ left: number; width: number } | null>(null);
 
   useEffect(
     () => () => {
@@ -44,7 +45,7 @@ export function useComparisonSlider({
   );
 
   const updateFromClientX = (input: HTMLInputElement, clientX: number) => {
-    const bounds = input.getBoundingClientRect();
+    const bounds = dragBounds.current ?? input.getBoundingClientRect();
     if (bounds.width <= 0) return;
     const next = clamp(((clientX - bounds.left) / bounds.width) * 100);
     if (next !== previousValue.current) {
@@ -77,6 +78,7 @@ export function useComparisonSlider({
     if (pointerId !== undefined && activePointerId.current !== pointerId)
       return;
     isDragging.current = false;
+    dragBounds.current = null;
     pointerMode.current = "idle";
     activePointerId.current = null;
     if (preserveFeedback) {
@@ -106,6 +108,8 @@ export function useComparisonSlider({
     setDirection(null);
     setIndicatorVisible(false);
     pointerStart.current = { x: event.clientX, y: event.clientY, value };
+    const bounds = event.currentTarget.getBoundingClientRect();
+    dragBounds.current = { left: bounds.left, width: bounds.width };
     activePointerId.current = event.pointerId;
     setIndicatorVisible(false);
     setPointerFocusActive(true);

@@ -5,11 +5,13 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
 } from "react";
 import {
   asResponsiveAsset,
+  preloadResponsiveImage,
   responsiveImage,
   responsiveSource,
   type ResponsiveAssetBase,
@@ -51,6 +53,23 @@ export const sections = {
 } as const;
 
 const sectionSelector = (section: SectionKey) => `#${sections[section].id}`;
+
+const sectionActivationListeners = new Map<SectionKey, Set<() => void>>();
+let activatedSectionSet = new Set<SectionKey>(["hero"]);
+
+function subscribeToSectionActivation(
+  section: SectionKey,
+  listener: () => void,
+) {
+  const listeners = sectionActivationListeners.get(section) ?? new Set();
+  listeners.add(listener);
+  sectionActivationListeners.set(section, listeners);
+  return () => listeners.delete(listener);
+}
+
+function sectionActivationSnapshot(section: SectionKey) {
+  return activatedSectionSet.has(section);
+}
 
 // Only assets needed to establish the first complete view of each section belong here.
 // Rotating gallery images, association clones, hover art, and map tiles remain on demand.
@@ -134,6 +153,8 @@ const sectionBackgroundAssets = {
   },
 } as const satisfies Partial<Record<SectionKey, Record<string, string>>>;
 
+const fixedPreloadCache = new Map<string, Promise<void>>();
+
 type SectionAssetContextValue = {
   isNarrowViewport: boolean;
   isSectionActivated: (section: SectionKey) => boolean;
@@ -145,15 +166,11 @@ const SectionAssetContext = createContext<SectionAssetContextValue | null>(
   null,
 );
 
-function preloadImageBestEffort(baseOrUrl: string, width: number) {
+function preloadFixedImage(baseOrUrl: string) {
+  const cached = fixedPreloadCache.get(baseOrUrl);
+  if (cached) return cached;
   const image = new Image();
-  const source =
-    baseOrUrl.endsWith(".jpg") ||
-    baseOrUrl.endsWith(".jpeg") ||
-    baseOrUrl.endsWith(".png")
-      ? baseOrUrl
-      : responsiveSource(asResponsiveAsset(baseOrUrl), width);
-  return new Promise<void>((resolve) => {
+  const promise = new Promise<void>((resolve) => {
     image.onload = () => {
       if (typeof image.decode === "function")
         void image
@@ -163,7 +180,47 @@ function preloadImageBestEffort(baseOrUrl: string, width: number) {
       else resolve();
     };
     image.onerror = () => resolve();
-    image.src = source;
+    image.src = baseOrUrl;
+  });
+  fixedPreloadCache.set(baseOrUrl, promise);
+  return promise;
+}
+
+function preloadSectionImage(
+  baseOrUrl: string,
+  section: SectionKey,
+  defaultWidth: number,
+) {
+  if (/[.]([a-z]+)$/i.test(baseOrUrl)) return preloadFixedImage(baseOrUrl);
+  const base = asResponsiveAsset(baseOrUrl);
+  const isBackgroundAsset = Object.values(
+    (
+      sectionBackgroundAssets as Partial<
+        Record<SectionKey, Record<string, string>>
+      >
+    )[section] ?? {},
+  ).includes(baseOrUrl);
+  if (isBackgroundAsset)
+    return preloadFixedImage(responsiveSource(base, defaultWidth));
+  const sizes =
+    section === "services"
+      ? "44vw"
+      : section === "badges"
+        ? "91vw"
+        : section === "reviews"
+          ? "8vw"
+          : section === "founder"
+            ? "30vw"
+            : section === "gallery"
+              ? baseOrUrl.endsWith("material-library")
+                ? "32vw"
+                : "66.7vw"
+              : "100vw";
+  return preloadResponsiveImage({
+    base,
+    sizes,
+    defaultWidth:
+      section === "reviews" || section === "associations" ? 640 : 1440,
   });
 }
 
@@ -204,7 +261,7 @@ export function SectionAssetProvider({
           : sectionPreloadAssets[section];
       await Promise.allSettled(
         assets.map((base) =>
-          preloadImageBestEffort(base, isNarrowViewport ? 640 : 1440),
+          preloadSectionImage(base, section, isNarrowViewport ? 640 : 1440),
         ),
       );
       if (cancelled) return;
@@ -212,6 +269,10 @@ export function SectionAssetProvider({
         if (current.includes(section)) return current;
         const next = [...current, section];
         activatedSectionsRef.current = next;
+        activatedSectionSet = new Set(next);
+        sectionActivationListeners
+          .get(section)
+          ?.forEach((listener) => listener());
         return next;
       });
     };
@@ -330,6 +391,14 @@ export function useSectionAssets() {
   );
 }
 
+function useSectionActivation(section: SectionKey) {
+  return useSyncExternalStore(
+    (listener) => subscribeToSectionActivation(section, listener),
+    () => sectionActivationSnapshot(section),
+    () => section === "hero",
+  );
+}
+
 type SectionImageProps = React.ImgHTMLAttributes<HTMLImageElement> & {
   base: ResponsiveAssetBase;
   sizes: string;
@@ -345,9 +414,9 @@ export function SectionImage({
   style,
   ...props
 }: SectionImageProps) {
-  const { isSectionActivated } = useSectionAssets();
+  const isSectionActivated = useSectionActivation(section);
   const metadata = responsiveImage(base, sizes, defaultWidth);
-  if (!isSectionActivated(section)) {
+  if (!isSectionActivated) {
     return (
       <img
         className={`asset-placeholder${props.className ? ` ${props.className}` : ""}`}
