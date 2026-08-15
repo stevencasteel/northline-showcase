@@ -14,9 +14,9 @@ import {
   responsiveSource,
   type ResponsiveAssetBase,
 } from "./responsiveImage";
-import { CONSTRAINED_MEDIA_QUERY } from "../config/layout";
+import { NARROW_VIEWPORT_MEDIA_QUERY } from "../config/layout";
 
-export type AssetStage =
+export type SectionKey =
   | "hero"
   | "badges"
   | "services"
@@ -27,7 +27,7 @@ export type AssetStage =
   | "founder"
   | "footer";
 
-const stageOrder: AssetStage[] = [
+const sectionLoadOrder: SectionKey[] = [
   "hero",
   "badges",
   "services",
@@ -40,9 +40,9 @@ const stageOrder: AssetStage[] = [
 ];
 export const sections = {
   hero: { id: "top" },
-  badges: { id: "about" },
+  badges: { id: "qualifications" },
   services: { id: "services", navLabel: "Services" },
-  gallery: { id: "work", navLabel: "Gallery" },
+  gallery: { id: "gallery", navLabel: "Gallery" },
   associations: { id: "associations", navLabel: "Associations" },
   protection: { id: "protection", navLabel: "Protection" },
   reviews: { id: "reviews", navLabel: "Reviews" },
@@ -50,12 +50,11 @@ export const sections = {
   footer: { id: "contact", navLabel: "Contact" },
 } as const;
 
-export type SectionKey = keyof typeof sections;
-const sectionSelector = (stage: AssetStage) => `#${sections[stage].id}`;
+const sectionSelector = (section: SectionKey) => `#${sections[section].id}`;
 
 // Only assets needed to establish the first complete view of each section belong here.
 // Rotating gallery images, association clones, hover art, and map tiles remain on demand.
-const requiredAssets: Record<AssetStage, string[]> = {
+const sectionPreloadAssets: Record<SectionKey, string[]> = {
   hero: ["/assets/hero/sky", "/assets/hero/foreground"],
   badges: [
     "/assets/badges/banner",
@@ -84,7 +83,7 @@ const requiredAssets: Record<AssetStage, string[]> = {
     "/assets/protection/copper_background_texture.jpg",
     "/assets/protection/protection-finished-roof",
     "/assets/protection/protection-underlayment",
-    "/assets/ui/copper-sphere-etched-large-generated",
+    "/assets/ui/copper-sphere-etched-large-default",
   ],
   reviews: [
     "/assets/reviews/leaf_background_texture.jpg",
@@ -105,7 +104,7 @@ const requiredAssets: Record<AssetStage, string[]> = {
   ],
 };
 
-const stageBackgroundAssets = {
+const sectionBackgroundAssets = {
   hero: {
     "--asset-navbar-underlayment": "/assets/navbar/navbar-underlayment",
     "--asset-copper-edge": "/assets/ui/copper-edge",
@@ -133,18 +132,20 @@ const stageBackgroundAssets = {
   founder: {
     "--asset-founder-texture": "/assets/founder/founder-jean-texture",
   },
-} as const satisfies Partial<Record<AssetStage, Record<string, string>>>;
+} as const satisfies Partial<Record<SectionKey, Record<string, string>>>;
 
-type AssetStageContextValue = {
-  constrained: boolean;
-  enabled: (stage: AssetStage) => boolean;
+type SectionAssetContextValue = {
+  isNarrowViewport: boolean;
+  isSectionActivated: (section: SectionKey) => boolean;
   style: CSSProperties;
-  stageClassName: string;
+  sectionClassName: string;
 };
 
-const AssetStageContext = createContext<AssetStageContextValue | null>(null);
+const SectionAssetContext = createContext<SectionAssetContextValue | null>(
+  null,
+);
 
-function loadAndDecodeImage(baseOrUrl: string, width: number) {
+function preloadImageBestEffort(baseOrUrl: string, width: number) {
   const image = new Image();
   const source =
     baseOrUrl.endsWith(".jpg") ||
@@ -166,24 +167,28 @@ function loadAndDecodeImage(baseOrUrl: string, width: number) {
   });
 }
 
-export function AssetStageProvider({
+export function SectionAssetProvider({
   children,
   galleryAssets = [],
 }: {
   children: ReactNode;
   galleryAssets?: string[];
 }) {
-  const initialConstrained =
+  const initialIsNarrowViewport =
     typeof window !== "undefined" &&
-    window.matchMedia(CONSTRAINED_MEDIA_QUERY).matches;
-  const [constrained, setConstrained] = useState(initialConstrained);
-  const [enabledStages, setEnabledStages] = useState<AssetStage[]>(["hero"]);
-  const enabledStagesRef = useRef<AssetStage[]>(["hero"]);
+    window.matchMedia(NARROW_VIEWPORT_MEDIA_QUERY).matches;
+  const [isNarrowViewport, setIsNarrowViewport] = useState(
+    initialIsNarrowViewport,
+  );
+  const [activatedSections, setActivatedSections] = useState<SectionKey[]>([
+    "hero",
+  ]);
+  const activatedSectionsRef = useRef<SectionKey[]>(["hero"]);
 
   useEffect(() => {
-    const media = window.matchMedia(CONSTRAINED_MEDIA_QUERY);
+    const media = window.matchMedia(NARROW_VIEWPORT_MEDIA_QUERY);
     const update = () => {
-      setConstrained(media.matches);
+      setIsNarrowViewport(media.matches);
     };
     update();
     media.addEventListener?.("change", update);
@@ -192,41 +197,41 @@ export function AssetStageProvider({
 
   useEffect(() => {
     let cancelled = false;
-    const enableStage = async (stage: AssetStage) => {
+    const activateSectionAssets = async (section: SectionKey) => {
       const assets =
-        stage === "gallery"
-          ? [...requiredAssets.gallery, ...galleryAssets]
-          : requiredAssets[stage];
+        section === "gallery"
+          ? [...sectionPreloadAssets.gallery, ...galleryAssets]
+          : sectionPreloadAssets[section];
       await Promise.allSettled(
         assets.map((base) =>
-          loadAndDecodeImage(base, constrained ? 640 : 1440),
+          preloadImageBestEffort(base, isNarrowViewport ? 640 : 1440),
         ),
       );
       if (cancelled) return;
-      setEnabledStages((current) => {
-        if (current.includes(stage)) return current;
-        const next = [...current, stage];
-        enabledStagesRef.current = next;
+      setActivatedSections((current) => {
+        if (current.includes(section)) return current;
+        const next = [...current, section];
+        activatedSectionsRef.current = next;
         return next;
       });
     };
 
     if (!("IntersectionObserver" in window)) {
-      stageOrder.slice(1).forEach((stage) => {
-        void enableStage(stage);
+      sectionLoadOrder.slice(1).forEach((section) => {
+        void activateSectionAssets(section);
       });
       return () => {
         cancelled = true;
       };
     }
 
-    const pending = new Set<AssetStage>();
-    const observedStages = stageOrder.slice(1).flatMap((stage) => {
-      const element = document.querySelector(sectionSelector(stage));
+    const pending = new Set<SectionKey>();
+    const observedSections = sectionLoadOrder.slice(1).flatMap((section) => {
+      const element = document.querySelector(sectionSelector(section));
       if (element) {
-        return [{ stage, element }];
+        return [{ section, element }];
       }
-      void enableStage(stage);
+      void activateSectionAssets(section);
       return [];
     });
 
@@ -242,23 +247,23 @@ export function AssetStageProvider({
         (entries) => {
           entries.forEach((entry) => {
             if (!entry.isIntersecting) return;
-            const stage = observedStages.find(
+            const section = observedSections.find(
               ({ element }) => element === entry.target,
-            )?.stage;
+            )?.section;
             if (
-              !stage ||
-              pending.has(stage) ||
-              enabledStagesRef.current.includes(stage)
+              !section ||
+              pending.has(section) ||
+              activatedSectionsRef.current.includes(section)
             )
               return;
-            pending.add(stage);
+            pending.add(section);
             observer?.unobserve(entry.target);
-            void enableStage(stage);
+            void activateSectionAssets(section);
           });
         },
         { rootMargin: `${margin}px 0px` },
       );
-      observedStages.forEach(({ element }) => observer?.observe(element));
+      observedSections.forEach(({ element }) => observer?.observe(element));
     };
     rebuildObserver();
 
@@ -279,18 +284,18 @@ export function AssetStageProvider({
       window.removeEventListener("resize", handleResize);
       window.cancelAnimationFrame(resizeFrame);
     };
-  }, [constrained, galleryAssets]);
+  }, [isNarrowViewport, galleryAssets]);
 
-  const value = useMemo<AssetStageContextValue>(() => {
-    const width = constrained ? 640 : 1440;
+  const value = useMemo<SectionAssetContextValue>(() => {
+    const width = isNarrowViewport ? 640 : 1440;
     const style = Object.fromEntries(
-      enabledStages.flatMap((stage) =>
+      activatedSections.flatMap((section) =>
         Object.entries(
           (
-            stageBackgroundAssets as Partial<
-              Record<AssetStage, Record<string, string>>
+            sectionBackgroundAssets as Partial<
+              Record<SectionKey, Record<string, string>>
             >
-          )[stage] ?? {},
+          )[section] ?? {},
         ).map(([property, base]) => [
           property,
           `url("${responsiveSource(asResponsiveAsset(base), width)}")`,
@@ -298,51 +303,51 @@ export function AssetStageProvider({
       ),
     ) as CSSProperties;
     return {
-      constrained,
-      enabled: (stage) => enabledStages.includes(stage),
+      isNarrowViewport,
+      isSectionActivated: (section) => activatedSections.includes(section),
       style,
-      stageClassName: enabledStages
-        .map((stage) => `asset-stage-${stage}`)
+      sectionClassName: activatedSections
+        .map((section) => `asset-section-${section}`)
         .join(" "),
     };
-  }, [constrained, enabledStages]);
+  }, [isNarrowViewport, activatedSections]);
 
   return (
-    <AssetStageContext.Provider value={value}>
+    <SectionAssetContext.Provider value={value}>
       {children}
-    </AssetStageContext.Provider>
+    </SectionAssetContext.Provider>
   );
 }
 
-export function useAssetStage() {
+export function useSectionAssets() {
   return (
-    useContext(AssetStageContext) ?? {
-      constrained: false,
-      enabled: () => true,
+    useContext(SectionAssetContext) ?? {
+      isNarrowViewport: false,
+      isSectionActivated: () => true,
       style: {},
-      stageClassName: "",
+      sectionClassName: "",
     }
   );
 }
 
-type StageImageProps = React.ImgHTMLAttributes<HTMLImageElement> & {
+type SectionImageProps = React.ImgHTMLAttributes<HTMLImageElement> & {
   base: ResponsiveAssetBase;
   sizes: string;
   defaultWidth?: number;
-  stage: AssetStage;
+  section: SectionKey;
 };
 
-export function StageImage({
+export function SectionImage({
   base,
   sizes,
   defaultWidth = 1440,
-  stage,
+  section,
   style,
   ...props
-}: StageImageProps) {
-  const { enabled } = useAssetStage();
+}: SectionImageProps) {
+  const { isSectionActivated } = useSectionAssets();
   const metadata = responsiveImage(base, sizes, defaultWidth);
-  if (!enabled(stage)) {
+  if (!isSectionActivated(section)) {
     return (
       <img
         className={`asset-placeholder${props.className ? ` ${props.className}` : ""}`}

@@ -13,7 +13,7 @@ const manifestPath = path.join(
   "src/config/generatedResponsiveAssets.ts",
 );
 const sourcePattern =
-  /(?:responsiveBase|responsiveImage|responsiveSource|<StageImage[^>]*base=)[^'"`]*['"`]([^'"`]+)['"`]/g;
+  /(?:responsiveBase|responsiveImage|responsiveSource|<SectionImage[^>]*base=)[^'"`]*['"`]([^'"`]+)['"`]/g;
 const manifestSource = fs.readFileSync(manifestPath, "utf8");
 const manifest = JSON.parse(
   manifestSource

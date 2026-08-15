@@ -29,18 +29,21 @@ import { useRevealOnce } from "./hooks/useRevealOnce";
 import { useInView } from "./hooks/useInView";
 import { useGalleryKeyboardNavigation } from "./hooks/useGalleryKeyboardNavigation";
 import { useActiveThumbnailScroll } from "./hooks/useActiveThumbnailScroll";
-import { useGalleryPreviewRotation } from "./hooks/useGalleryPreviewRotation";
+import { useGalleryPreviewCycle } from "./hooks/useGalleryPreviewCycle";
 import { ScaledArtboard } from "./components/ScaledArtboard";
 import { RasterStateArt } from "./components/RasterStateArt";
 import { siteConfig } from "./config/site";
 import { appointmentConfig, appointmentHoursLabel } from "./config/appointment";
 import { services } from "./config/services";
-import { GALLERY_PREVIEW_SLOTS, GALLERY_SWAP_CONFIG } from "./config/gallery";
+import {
+  GALLERY_PREVIEW_SLOTS,
+  GALLERY_PREVIEW_CYCLE_CONFIG,
+} from "./config/gallery";
 import { asResponsiveAsset, responsiveImage } from "./lib/responsiveImage";
 import {
-  AssetStageProvider,
-  StageImage,
-  useAssetStage,
+  SectionAssetProvider,
+  SectionImage,
+  useSectionAssets,
 } from "./lib/assetStages";
 import { DialogModal } from "./components/DialogModal";
 import { CopperEdgeSeam } from "./components/CopperEdgeSeam";
@@ -108,7 +111,7 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
             alt="Services"
           />
         </a>
-        <a className="raster-control" href="#work" aria-label="Gallery">
+        <a className="raster-control" href="#gallery" aria-label="Gallery">
           <RasterStateArt
             defaultAsset={{
               kind: "static",
@@ -238,7 +241,7 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
         />
       </a>
       <button
-        className="header-quote navbar-art-button raster-control"
+        className="header-appointment navbar-art-button raster-control"
         type="button"
         onClick={onBookAppointment}
         aria-label="Book an appointment"
@@ -484,7 +487,7 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
           onSubmit={(event) => {
             event.preventDefault();
             setError(
-              `This appointment form is not connected yet. Please call ${siteConfig.phoneDisplay} to schedule your inspection.`,
+              `This appointment form is not connected yet. Please call ${siteConfig.phoneDisplay} to schedule your appointment.`,
             );
           }}
         >
@@ -641,7 +644,7 @@ function BadgeStrip() {
   return (
     <section
       className="badge-strip"
-      id="about"
+      id="qualifications"
       aria-label="Northline Roofing qualifications"
     >
       <div className="badge-sprite-canvas" aria-hidden="true">
@@ -655,22 +658,22 @@ function BadgeStrip() {
           "badge-slice-four",
         ].map((className) => (
           <div className={`badge-slice ${className}`} key={className}>
-            <StageImage
+            <SectionImage
               base="/assets/badges/banner"
               sizes="91vw"
               defaultWidth={1440}
-              stage="badges"
+              section="badges"
               alt=""
             />
           </div>
         ))}
       </div>
-      <StageImage
+      <SectionImage
         className="badge-banner visually-hidden"
         base="/assets/badges/banner"
         sizes="91vw"
         defaultWidth={1440}
-        stage="badges"
+        section="badges"
         alt="Northline Roofing promotional banner divided into four sections by copper divider bars: a copper award medal with 300 YEARS EXPERIENCE; a copper palm tree with TROPICS LICENSED; a copper cityscape with RESIDENTIAL & COMMERCIAL; and a copper anvil and hammer with CUSTOM METAL FABRICATION."
       />
       <p className="visually-hidden">
@@ -704,11 +707,11 @@ function Services() {
               key={service.title}
               style={{ "--service-index": index } as React.CSSProperties}
             >
-              <StageImage
+              <SectionImage
                 base={service.image}
                 sizes="44vw"
                 defaultWidth={1440}
-                stage="services"
+                section="services"
                 alt={service.alt}
                 loading={index < 3 ? "eager" : "lazy"}
                 decoding="async"
@@ -742,311 +745,311 @@ function Services() {
   );
 }
 
-type GalleryImage = { file: string; alt: string };
+type GalleryImage = { assetBase: string; alt: string };
 
 const galleryImageCatalog: GalleryImage[] = [
   {
-    file: "01-gothic-mountain-house-copper-trim",
+    assetBase: "01-gothic-mountain-house-copper-trim",
     alt: "Stone mountain house with steep slate roofs and copper trim.",
   },
   {
-    file: "02-curved-copper-coastal-roof",
+    assetBase: "02-curved-copper-coastal-roof",
     alt: "Modern coastal house with a wide curved copper roof.",
   },
   {
-    file: "03-white-metal-roof-gold-trim",
+    assetBase: "03-white-metal-roof-gold-trim",
     alt: "White sculptural metal roof with polished gold trim.",
   },
   {
-    file: "04-butterfly-copper-roof-house",
+    assetBase: "04-butterfly-copper-roof-house",
     alt: "Modern house with a butterfly-shaped copper and white roof.",
   },
   {
-    file: "05-patina-copper-fantasy-villa",
+    assetBase: "05-patina-copper-fantasy-villa",
     alt: "Ornate fantasy villa with sweeping green patina copper roofs.",
   },
   {
-    file: "06-tiered-dark-metal-roof-house",
+    assetBase: "06-tiered-dark-metal-roof-house",
     alt: "Modern house with layered dark metal roofs and copper edging.",
   },
   {
-    file: "07-coastal-tile-and-patina-roof",
+    assetBase: "07-coastal-tile-and-patina-roof",
     alt: "Coastal home with clay tiles and green patina roof accents.",
   },
   {
-    file: "08-iridescent-curved-slate-roof",
+    assetBase: "08-iridescent-curved-slate-roof",
     alt: "Curved fantasy house roof covered in iridescent slate tiles.",
   },
   {
-    file: "09-desert-mixed-metal-tile-roof",
+    assetBase: "09-desert-mixed-metal-tile-roof",
     alt: "Desert home with layered metal and tile roofing.",
   },
   {
-    file: "10-flared-copper-roof-house",
+    assetBase: "10-flared-copper-roof-house",
     alt: "Contemporary house with a dramatic flared copper roof.",
   },
   {
-    file: "11-mountain-lodge-slate-copper-roof",
+    assetBase: "11-mountain-lodge-slate-copper-roof",
     alt: "Mountain lodge with layered slate roofs and copper trim.",
   },
   {
-    file: "12-weathered-patina-copper-roof",
+    assetBase: "12-weathered-patina-copper-roof",
     alt: "Stone house with a weathered green patina copper roof.",
   },
   {
-    file: "13-turquoise-tile-copper-trim-roof",
+    assetBase: "13-turquoise-tile-copper-trim-roof",
     alt: "Curved turquoise tile roofs outlined with copper trim.",
   },
   {
-    file: "14-lakeside-multicolor-slate-roof",
+    assetBase: "14-lakeside-multicolor-slate-roof",
     alt: "Lakeside house with multicolor slate roofs and copper edging.",
   },
   {
-    file: "15-ornate-green-tile-copper-roof",
+    assetBase: "15-ornate-green-tile-copper-roof",
     alt: "Ornate villa with green tile roofs and bright copper trim.",
   },
   {
-    file: "16-coastal-curved-shingle-roof",
+    assetBase: "16-coastal-curved-shingle-roof",
     alt: "Coastal house with curved gray shingles and copper details.",
   },
   {
-    file: "17-desert-standing-seam-copper-roof",
+    assetBase: "17-desert-standing-seam-copper-roof",
     alt: "Desert house with sculpted standing-seam copper roofing.",
   },
   {
-    file: "18-curved-dark-shingle-lake-house",
+    assetBase: "18-curved-dark-shingle-lake-house",
     alt: "Lake house with dark curved shingle roofs and copper trim.",
   },
   {
-    file: "19-sunset-coastal-curved-roof-home",
+    assetBase: "19-sunset-coastal-curved-roof-home",
     alt: "Coastal home at sunset with layered curved roofs.",
   },
   {
-    file: "20-ornate-copper-slate-arched-roof",
+    assetBase: "20-ornate-copper-slate-arched-roof",
     alt: "Ornate house with arched slate roofs and copper framing.",
   },
   {
-    file: "21-purple-curved-metal-coastal-roof",
+    assetBase: "21-purple-curved-metal-coastal-roof",
     alt: "Coastal home with a glossy purple curved metal roof.",
   },
   {
-    file: "22-desert-copper-tile-estate",
+    assetBase: "22-desert-copper-tile-estate",
     alt: "Large desert estate with layered copper-colored tile roofs.",
   },
   {
-    file: "23-purple-slate-copper-mansion",
+    assetBase: "23-purple-slate-copper-mansion",
     alt: "Fantasy mansion with purple slate roofs and copper trim.",
   },
   {
-    file: "24-angular-white-metal-roof",
+    assetBase: "24-angular-white-metal-roof",
     alt: "Modern white house with sharp angular metal roofs.",
   },
   {
-    file: "25-red-copper-slate-gothic-house",
+    assetBase: "25-red-copper-slate-gothic-house",
     alt: "Gothic house with steep slate roofs and red copper accents.",
   },
   {
-    file: "26-copper-turret-gothic-mansion",
+    assetBase: "26-copper-turret-gothic-mansion",
     alt: "Gothic mansion with copper roofs and tall pointed turrets.",
   },
   {
-    file: "27-white-metal-gold-trim-coastal-roof",
+    assetBase: "27-white-metal-gold-trim-coastal-roof",
     alt: "Coastal building with layered white metal roofs and gold trim.",
   },
   {
-    file: "28-cobalt-blue-tile-coastal-estate",
+    assetBase: "28-cobalt-blue-tile-coastal-estate",
     alt: "Coastal estate with cobalt blue tile roofs and layered gables.",
   },
   {
-    file: "29-terracotta-tile-desert-estate",
+    assetBase: "29-terracotta-tile-desert-estate",
     alt: "Desert estate with warm terracotta tile roofs and courtyards.",
   },
   {
-    file: "30-sunset-lakeside-standing-seam-lodge",
+    assetBase: "30-sunset-lakeside-standing-seam-lodge",
     alt: "Lakeside lodge at sunset with clean standing-seam metal roofs.",
   },
   {
-    file: "31-tiered-dark-standing-seam-roof",
+    assetBase: "31-tiered-dark-standing-seam-roof",
     alt: "Large home with tiered dark standing-seam roofs.",
   },
   {
-    file: "32-sunset-lakeside-copper-shingle-estate",
+    assetBase: "32-sunset-lakeside-copper-shingle-estate",
     alt: "Lakeside estate at sunset with layered copper shingle roofs.",
   },
   {
-    file: "33-dark-slate-lakeside-estate",
+    assetBase: "33-dark-slate-lakeside-estate",
     alt: "Lakeside estate with steep dark slate roofs.",
   },
   {
-    file: "34-iridescent-teal-tile-coastal-hotel",
+    assetBase: "34-iridescent-teal-tile-coastal-hotel",
     alt: "Coastal hotel with iridescent teal tile roofs.",
   },
   {
-    file: "35-green-tile-copper-trim-lakeside-mansion",
+    assetBase: "35-green-tile-copper-trim-lakeside-mansion",
     alt: "Lakeside mansion with green tile roofs and copper trim.",
   },
   {
-    file: "36-tan-tile-vineyard-estate",
+    assetBase: "36-tan-tile-vineyard-estate",
     alt: "Vineyard estate with broad tan tile roofs.",
   },
   {
-    file: "37-silver-metal-tile-coastal-home",
+    assetBase: "37-silver-metal-tile-coastal-home",
     alt: "Coastal home with sculpted silver metal tile roofs.",
   },
   {
-    file: "38-gold-hexagonal-tile-coastal-resort",
+    assetBase: "38-gold-hexagonal-tile-coastal-resort",
     alt: "Coastal resort with geometric gold hexagonal tile roofs.",
   },
   {
-    file: "39-cedar-shake-mountain-lodge",
+    assetBase: "39-cedar-shake-mountain-lodge",
     alt: "Mountain lodge with layered cedar shake roofs.",
   },
   {
-    file: "40-modern-solar-panel-roof-building",
+    assetBase: "40-modern-solar-panel-roof-building",
     alt: "Modern building with an integrated solar panel roof.",
   },
   {
-    file: "41-dark-slate-turret-coastal-estate",
+    assetBase: "41-dark-slate-turret-coastal-estate",
     alt: "Coastal estate with dark slate roofs and pointed turrets.",
   },
   {
-    file: "42-tropical-thatch-oceanfront-villa",
+    assetBase: "42-tropical-thatch-oceanfront-villa",
     alt: "Oceanfront villa with layered tropical thatch roofs.",
   },
   {
-    file: "43-modern-green-living-roof-building",
+    assetBase: "43-modern-green-living-roof-building",
     alt: "Modern building with a lush green living roof.",
   },
   {
-    file: "44-curved-green-living-roof-building",
+    assetBase: "44-curved-green-living-roof-building",
     alt: "Contemporary building with curved green living roofs.",
   },
   {
-    file: "45-cobalt-blue-tile-coastal-villa",
+    assetBase: "45-cobalt-blue-tile-coastal-villa",
     alt: "Coastal villa with vivid cobalt blue tile roofs.",
   },
   {
-    file: "46-indigo-tile-coastal-estate",
+    assetBase: "46-indigo-tile-coastal-estate",
     alt: "Coastal estate with layered indigo tile roofs.",
   },
   {
-    file: "47-red-terracotta-tile-coastal-estate",
+    assetBase: "47-red-terracotta-tile-coastal-estate",
     alt: "Coastal estate with red terracotta tile roofs.",
   },
   {
-    file: "48-terracotta-tile-mountain-estate",
+    assetBase: "48-terracotta-tile-mountain-estate",
     alt: "Mountain estate with sweeping terracotta tile roofs.",
   },
   {
-    file: "49-grey-metal-standing-seam-lakeside-estate",
+    assetBase: "49-grey-metal-standing-seam-lakeside-estate",
     alt: "Lakeside estate with cool grey standing-seam metal roofs.",
   },
   {
-    file: "50-patina-metal-standing-seam-coastal-lodge",
+    assetBase: "50-patina-metal-standing-seam-coastal-lodge",
     alt: "Coastal lodge with patina metal standing-seam roofs.",
   },
   {
-    file: "51-charcoal-standing-seam-lakeside-home",
+    assetBase: "51-charcoal-standing-seam-lakeside-home",
     alt: "Lakeside home with charcoal standing-seam roofing.",
   },
   {
-    file: "52-dark-metal-standing-seam-mountain-home",
+    assetBase: "52-dark-metal-standing-seam-mountain-home",
     alt: "Mountain home with dark metal standing-seam roofs.",
   },
   {
-    file: "53-copper-shingle-turret-coastal-estate",
+    assetBase: "53-copper-shingle-turret-coastal-estate",
     alt: "Coastal estate with copper shingle roofs and a turret.",
   },
   {
-    file: "54-copper-shingle-oceanfront-estate",
+    assetBase: "54-copper-shingle-oceanfront-estate",
     alt: "Oceanfront estate with layered copper shingle roofs.",
   },
   {
-    file: "55-charcoal-slate-lakeside-mansion",
+    assetBase: "55-charcoal-slate-lakeside-mansion",
     alt: "Lakeside mansion with charcoal slate roofs.",
   },
   {
-    file: "56-dark-slate-coastal-stone-estate",
+    assetBase: "56-dark-slate-coastal-stone-estate",
     alt: "Coastal stone estate with broad dark slate roofs.",
   },
   {
-    file: "57-patina-scalloped-tile-lakeside-mansion",
+    assetBase: "57-patina-scalloped-tile-lakeside-mansion",
     alt: "Lakeside mansion with patina scalloped tile roofs.",
   },
   {
-    file: "58-iridescent-teal-diamond-tile-coastal-mansion",
+    assetBase: "58-iridescent-teal-diamond-tile-coastal-mansion",
     alt: "Coastal mansion with iridescent teal diamond tile roofs.",
   },
   {
-    file: "59-patina-scalloped-tile-coastal-chateau",
+    assetBase: "59-patina-scalloped-tile-coastal-chateau",
     alt: "Coastal chateau with layered patina scalloped tile roofs.",
   },
   {
-    file: "60-green-scalloped-tile-copper-trim-mansion",
+    assetBase: "60-green-scalloped-tile-copper-trim-mansion",
     alt: "Mansion with green scalloped tile roofs and copper trim.",
   },
   {
-    file: "61-sand-tile-coastal-estate",
+    assetBase: "61-sand-tile-coastal-estate",
     alt: "Coastal estate with softly colored sand tile roofs.",
   },
   {
-    file: "62-cream-tile-waterfront-estate",
+    assetBase: "62-cream-tile-waterfront-estate",
     alt: "Waterfront mansion with elegant cream tile roofs.",
   },
   {
-    file: "63-slate-grey-tile-coastal-home",
+    assetBase: "63-slate-grey-tile-coastal-home",
     alt: "Coastal home with slate grey tile roofs.",
   },
   {
-    file: "64-light-grey-tile-coastal-villa",
+    assetBase: "64-light-grey-tile-coastal-villa",
     alt: "Coastal villa with layered light grey tile roofs.",
   },
   {
-    file: "65-gold-hexagonal-tile-waterfront-mansion",
+    assetBase: "65-gold-hexagonal-tile-waterfront-mansion",
     alt: "Waterfront mansion with ornate gold hexagonal tile roofs.",
   },
   {
-    file: "66-gold-scalloped-tile-tropical-estate",
+    assetBase: "66-gold-scalloped-tile-tropical-estate",
     alt: "Tropical estate with gleaming gold scalloped tile roofs.",
   },
   {
-    file: "67-cedar-shake-lakeside-lodge",
+    assetBase: "67-cedar-shake-lakeside-lodge",
     alt: "Lakeside lodge with warm cedar shake roofs.",
   },
   {
-    file: "68-cedar-shake-lakeside-estate",
+    assetBase: "68-cedar-shake-lakeside-estate",
     alt: "Lakeside estate with expansive cedar shake roofs.",
   },
   {
-    file: "69-dark-solar-tile-lakeside-villa",
+    assetBase: "69-dark-solar-tile-lakeside-villa",
     alt: "Lakeside villa with integrated dark solar tile roofs.",
   },
   {
-    file: "70-solar-tile-lakeside-stone-home",
+    assetBase: "70-solar-tile-lakeside-stone-home",
     alt: "Stone lakeside home with solar tile roofing.",
   },
   {
-    file: "71-slate-blue-scalloped-tile-coastal-mansion",
+    assetBase: "71-slate-blue-scalloped-tile-coastal-mansion",
     alt: "Coastal mansion with slate blue scalloped tile roofs.",
   },
   {
-    file: "72-slate-blue-scalloped-tile-coastal-mansion",
+    assetBase: "72-slate-blue-scalloped-tile-coastal-mansion",
     alt: "Coastal mansion with layered slate blue scalloped tile roofs.",
   },
   {
-    file: "73-tropical-thatch-cliffside-villa",
+    assetBase: "73-tropical-thatch-cliffside-villa",
     alt: "Cliffside villa with sweeping tropical thatch roofs.",
   },
   {
-    file: "74-thatch-roof-tropical-pool-villa",
+    assetBase: "74-thatch-roof-tropical-pool-villa",
     alt: "Tropical pool villa with layered thatch roofs.",
   },
   {
-    file: "75-living-green-roof-coastal-retreat",
+    assetBase: "75-living-green-roof-coastal-retreat",
     alt: "Coastal retreat with a lush living green roof.",
   },
   {
-    file: "76-angular-green-living-roof-coastal-villa",
+    assetBase: "76-angular-green-living-roof-coastal-villa",
     alt: "Coastal villa with angular green living roofs.",
   },
 ];
@@ -1086,7 +1089,7 @@ const roofMaterials = [
 
 // Keep the preview curated while the modal remains the complete gallery.
 const galleryPreviewIndices = GALLERY_PREVIEW_SLOTS.map(
-  ({ initialImage }) => initialImage,
+  ({ initialImageIndex }) => initialImageIndex,
 );
 const galleryObserverOptions: IntersectionObserverInit = {
   rootMargin: "20% 0px",
@@ -1400,7 +1403,7 @@ const galleryImagePreloadCache = new Map<string, Promise<void>>();
 
 function preloadGalleryImage(image: GalleryImage) {
   const props = responsiveImage(
-    asResponsiveAsset(`${asset}gallery/${image.file}`),
+    asResponsiveAsset(`${asset}gallery/${image.assetBase}`),
     "94vw",
     960,
   );
@@ -1572,7 +1575,7 @@ function GalleryModal({
           </div>
           <img
             {...responsiveImage(
-              asResponsiveAsset(`${asset}gallery/${activeImage.file}`),
+              asResponsiveAsset(`${asset}gallery/${activeImage.assetBase}`),
               "94vw",
               960,
             )}
@@ -1588,13 +1591,13 @@ function GalleryModal({
                 className={activeIndex === imageIndex ? "is-active" : ""}
                 type="button"
                 onClick={() => onSelect(imageIndex)}
-                key={image.file}
+                key={image.assetBase}
                 aria-label={`View image ${imageIndex + 1}: ${image.alt}`}
                 aria-current={activeIndex === imageIndex ? "true" : undefined}
               >
                 <img
                   {...responsiveImage(
-                    asResponsiveAsset(`${asset}gallery/${image.file}`),
+                    asResponsiveAsset(`${asset}gallery/${image.assetBase}`),
                     "112px",
                     640,
                   )}
@@ -1702,22 +1705,24 @@ function GalleryCard({
       aria-label={`Open image ${displayed.imageIndex + 1}: ${displayed.image.alt}`}
       style={{ "--gallery-index": slot } as React.CSSProperties}
     >
-      <StageImage
-        base={asResponsiveAsset(`${asset}gallery/${displayed.image.file}`)}
+      <SectionImage
+        base={asResponsiveAsset(`${asset}gallery/${displayed.image.assetBase}`)}
         sizes={cardSizes}
         defaultWidth={960}
-        stage="gallery"
+        section="gallery"
         className={`gallery-card-image gallery-card-image-current${incoming ? ` gallery-card-image-outgoing gallery-card-image-out-${incomingDirection}` : ""}`}
         alt={displayed.image.alt}
         loading={slot === 0 ? "eager" : "lazy"}
         decoding="async"
       />
       {incoming && (
-        <StageImage
-          base={asResponsiveAsset(`${asset}gallery/${incoming.image.file}`)}
+        <SectionImage
+          base={asResponsiveAsset(
+            `${asset}gallery/${incoming.image.assetBase}`,
+          )}
           sizes={cardSizes}
           defaultWidth={960}
-          stage="gallery"
+          section="gallery"
           className={`gallery-card-image gallery-card-image-incoming gallery-card-image-from-${incomingDirection}`}
           alt=""
           onAnimationEnd={() => {
@@ -1788,11 +1793,11 @@ function Gallery() {
   );
   const hoveredSlotRef = useRef<number | null>(null);
   const closeGallery = useCallback(() => setActiveIndex(null), []);
-  const previewIndices = useGalleryPreviewRotation(
+  const previewIndices = useGalleryPreviewCycle(
     images.length,
     galleryPreviewIndices.filter((imageIndex) => galleryImages[imageIndex]),
     GALLERY_PREVIEW_SLOTS,
-    GALLERY_SWAP_CONFIG,
+    GALLERY_PREVIEW_CYCLE_CONFIG,
     !inView || !documentVisible || reducedMotion || activeIndex !== null,
     hoveredSlotRef,
   );
@@ -1839,7 +1844,7 @@ function Gallery() {
   return (
     <section
       className={`gallery-section${revealed ? " is-visible" : ""}`}
-      id="work"
+      id="gallery"
       aria-label="Gallery"
       ref={sectionRef}
     >
@@ -1863,11 +1868,11 @@ function Gallery() {
             </div>
             <div className="gallery-material-art">
               <div className="gallery-material-clip">
-                <StageImage
+                <SectionImage
                   base="/assets/gallery/material-library"
                   sizes="32vw"
                   defaultWidth={960}
-                  stage="gallery"
+                  section="gallery"
                   alt="A front-facing display of sixteen fantasy roofing material samples arranged in two columns like a premium architectural showroom library."
                 />
                 <div className="gallery-material-labels">
@@ -1914,10 +1919,10 @@ function App() {
   const stickyHeaderShellRef = useRef<HTMLDivElement>(null);
   const navbarScrolled = useNavbarScrollState();
   useNavbarScrollOffset(stickyHeaderShellRef);
-  const { constrained, style, stageClassName } = useAssetStage();
+  const { isNarrowViewport, style, sectionClassName } = useSectionAssets();
   return (
     <div
-      className={`app${constrained ? " asset-constrained" : ""} ${stageClassName}`}
+      className={`app${isNarrowViewport ? " asset-narrow-viewport" : ""} ${sectionClassName}`}
       style={style}
     >
       <div
@@ -1947,12 +1952,12 @@ function App() {
 
 function Root() {
   const galleryAssets = galleryPreviewIndices.map(
-    (index) => `/assets/gallery/${galleryImages[index].file}`,
+    (index) => `/assets/gallery/${galleryImages[index].assetBase}`,
   );
   return (
-    <AssetStageProvider galleryAssets={galleryAssets}>
+    <SectionAssetProvider galleryAssets={galleryAssets}>
       <App />
-    </AssetStageProvider>
+    </SectionAssetProvider>
   );
 }
 

@@ -5,7 +5,7 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
-import { CONSTRAINED_MEDIA_QUERY } from "../config/layout";
+import { NARROW_VIEWPORT_MEDIA_QUERY } from "../config/layout";
 
 const DESKTOP_ARTBOARD_REFERENCE_WIDTH_PX = 1440;
 const MOBILE_ARTBOARD_REFERENCE_WIDTH_PX = 720;
@@ -38,7 +38,8 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
         host.getBoundingClientRect().width,
         MIN_MEASURABLE_WIDTH_PX,
       );
-      const referenceWidth = window.matchMedia(CONSTRAINED_MEDIA_QUERY).matches
+      const referenceWidth = window.matchMedia(NARROW_VIEWPORT_MEDIA_QUERY)
+        .matches
         ? MOBILE_ARTBOARD_REFERENCE_WIDTH_PX
         : DESKTOP_ARTBOARD_REFERENCE_WIDTH_PX;
       const artboardWidth = Math.max(referenceWidth, hostWidth);
@@ -66,7 +67,7 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
       resizeObserver.observe(inner);
     }
     window.addEventListener("resize", scheduleUpdate);
-    const referenceMedia = window.matchMedia(CONSTRAINED_MEDIA_QUERY);
+    const referenceMedia = window.matchMedia(NARROW_VIEWPORT_MEDIA_QUERY);
     referenceMedia.addEventListener?.("change", scheduleUpdate);
     const imageListeners: HTMLImageElement[] = [];
     inner.querySelectorAll<HTMLImageElement>("img").forEach((image) => {

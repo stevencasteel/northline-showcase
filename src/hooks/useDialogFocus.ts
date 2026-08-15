@@ -1,6 +1,6 @@
 import { useEffect, type RefObject } from "react";
 
-export function useDialogFocus(
+export function useDialogFocusManagement(
   ref: RefObject<HTMLElement | null>,
   onClose: () => void,
 ) {

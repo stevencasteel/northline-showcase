@@ -19,14 +19,14 @@ import {
   responsiveImage,
   responsiveSource,
 } from "./lib/responsiveImage";
-import { StageImage } from "./lib/assetStages";
+import { SectionImage } from "./lib/assetStages";
 import { CopperEdgeSeam } from "./components/CopperEdgeSeam";
 import { RasterStateArt } from "./components/RasterStateArt";
 
 type BookHandler = { onBook: () => void };
 
 const underlaymentImage = "/assets/protection/protection-underlayment";
-const protectionSphereImage = "/assets/ui/copper-sphere-etched-large-generated";
+const protectionSphereImage = "/assets/ui/copper-sphere-etched-large-default";
 const protectionSphereLeftImage =
   "/assets/ui/copper-sphere-etched-large-hover-left";
 const protectionSphereRightImage =
@@ -36,10 +36,7 @@ const protectionHoverTransitionMs = 240;
 type AssociationBadgeKind = "standard" | "landscape" | "wide" | "ultrawide";
 
 type AssociationBadge = {
-  file: string;
-  /** Deprecated presentation overrides are retained only for migration; asset facts come from the manifest. */
-  width?: number;
-  height?: number;
+  assetBase: string;
   kind: AssociationBadgeKind;
   scale?: number;
   hoverScale?: number;
@@ -47,240 +44,164 @@ type AssociationBadge = {
 
 const associationRows: AssociationBadge[][] = [
   [
-    { file: "badge_row-1_01_high_vale_roof_tile", kind: "standard" },
+    { assetBase: "badge_row-1_01_high_vale_roof_tile", kind: "standard" },
     {
-      file: "badge_row-1_02_century_seal_roof_assurance",
-      width: 600,
-      height: 598,
+      assetBase: "badge_row-1_02_century_seal_roof_assurance",
       kind: "standard",
     },
     {
-      file: "badge_row-1_03_united_roofwrights",
-      width: 563,
-      height: 600,
+      assetBase: "badge_row-1_03_united_roofwrights",
       kind: "standard",
     },
     {
-      file: "badge_row-1_04_aurelian_slate_council",
-      width: 498,
-      height: 600,
+      assetBase: "badge_row-1_04_aurelian_slate_council",
       kind: "standard",
     },
     {
-      file: "badge_row-1_05_royal_sheet_and_slate",
-      width: 434,
-      height: 600,
+      assetBase: "badge_row-1_05_royal_sheet_and_slate",
       kind: "standard",
     },
     {
-      file: "badge_row-1_06_crownwatch",
-      width: 542,
-      height: 600,
+      assetBase: "badge_row-1_06_crownwatch",
       kind: "standard",
     },
     {
-      file: "badge_row-1_07_skyseer",
-      width: 492,
-      height: 600,
+      assetBase: "badge_row-1_07_skyseer",
       kind: "standard",
     },
     {
-      file: "badge_row-1_08_tempest",
-      width: 544,
-      height: 600,
+      assetBase: "badge_row-1_08_tempest",
       kind: "standard",
     },
     {
-      file: "badge_row-1_09_emberward",
-      width: 518,
-      height: 600,
+      assetBase: "badge_row-1_09_emberward",
       kind: "standard",
     },
     {
-      file: "badge_row-1_10_windmark",
-      width: 507,
-      height: 600,
+      assetBase: "badge_row-1_10_windmark",
       kind: "standard",
     },
     {
-      file: "badge_row-1_11_hammerfall",
-      width: 574,
-      height: 600,
+      assetBase: "badge_row-1_11_hammerfall",
       kind: "standard",
     },
     {
-      file: "badge_row-1_12_evergreen",
-      width: 567,
-      height: 600,
+      assetBase: "badge_row-1_12_evergreen",
       kind: "standard",
     },
     {
-      file: "badge_row-1_13_oldstone",
-      width: 551,
-      height: 600,
+      assetBase: "badge_row-1_13_oldstone",
       kind: "standard",
     },
     {
-      file: "badge_row-1_14_sunscale",
-      width: 509,
-      height: 600,
+      assetBase: "badge_row-1_14_sunscale",
       kind: "standard",
     },
     {
-      file: "badge_row-1_15_ironclad",
-      width: 600,
-      height: 573,
+      assetBase: "badge_row-1_15_ironclad",
       kind: "standard",
     },
     {
-      file: "badge_row-1_16_valeward",
-      width: 546,
-      height: 600,
+      assetBase: "badge_row-1_16_valeward",
       kind: "standard",
     },
     {
-      file: "badge_row-1_17_verdant_peak",
-      width: 586,
-      height: 600,
+      assetBase: "badge_row-1_17_verdant_peak",
       kind: "standard",
     },
     {
-      file: "badge_row-1_18_everlight",
-      width: 506,
-      height: 600,
+      assetBase: "badge_row-1_18_everlight",
       kind: "standard",
     },
     {
-      file: "badge_row-1_19_gildharbor",
-      width: 600,
-      height: 442,
+      assetBase: "badge_row-1_19_gildharbor",
       kind: "landscape",
     },
     {
-      file: "badge_row-1_20_cinderpeak",
-      width: 600,
-      height: 597,
+      assetBase: "badge_row-1_20_cinderpeak",
       kind: "standard",
     },
     {
-      file: "badge_row-1_21_highspire",
-      width: 580,
-      height: 600,
+      assetBase: "badge_row-1_21_highspire",
       kind: "standard",
     },
     {
-      file: "badge_row-1_22_highmere",
-      width: 600,
-      height: 597,
+      assetBase: "badge_row-1_22_highmere",
       kind: "standard",
     },
     {
-      file: "badge_row-1_23_embercrest",
-      width: 599,
-      height: 600,
+      assetBase: "badge_row-1_23_embercrest",
       kind: "standard",
     },
   ],
   [
     {
-      file: "badge_row-2_01_ironmere",
-      width: 600,
-      height: 392,
+      assetBase: "badge_row-2_01_ironmere",
       kind: "landscape",
     },
     {
-      file: "badge_row-2_02_stormglass",
-      width: 600,
-      height: 333,
+      assetBase: "badge_row-2_02_stormglass",
       kind: "landscape",
       hoverScale: 1.1,
     },
     {
-      file: "badge_row-2_03_stonewake",
-      width: 600,
-      height: 195,
+      assetBase: "badge_row-2_03_stonewake",
       kind: "wide",
       hoverScale: 1.1,
     },
     {
-      file: "badge_row-2_04_ironpeak",
-      width: 600,
-      height: 590,
+      assetBase: "badge_row-2_04_ironpeak",
       kind: "standard",
     },
     {
-      file: "badge_row-2_05_skyforge",
-      width: 600,
-      height: 465,
+      assetBase: "badge_row-2_05_skyforge",
       kind: "standard",
     },
     {
-      file: "badge_row-2_06_northreach",
-      width: 600,
-      height: 148,
+      assetBase: "badge_row-2_06_northreach",
       kind: "ultrawide",
       hoverScale: 1.1,
     },
     {
-      file: "badge_row-2_07_celestial_canopy_co-op",
-      width: 597,
-      height: 600,
+      assetBase: "badge_row-2_07_celestial_canopy_co-op",
       kind: "standard",
     },
     {
-      file: "badge_row-2_08_wyverns_nest",
-      width: 543,
-      height: 600,
+      assetBase: "badge_row-2_08_wyverns_nest",
       kind: "standard",
     },
     {
-      file: "badge_row-2_09_aegis",
-      width: 600,
-      height: 257,
+      assetBase: "badge_row-2_09_aegis",
       kind: "wide",
       hoverScale: 1.1,
     },
     {
-      file: "badge_row-2_10_stoneweather",
-      width: 600,
-      height: 571,
+      assetBase: "badge_row-2_10_stoneweather",
       kind: "standard",
     },
     {
-      file: "badge_row-2_11_skyreach",
-      width: 600,
-      height: 428,
+      assetBase: "badge_row-2_11_skyreach",
       kind: "landscape",
     },
     {
-      file: "badge_row-2_12_thornwall",
-      width: 600,
-      height: 436,
+      assetBase: "badge_row-2_12_thornwall",
       kind: "landscape",
     },
     {
-      file: "badge_row-2_13_aurelian",
-      width: 600,
-      height: 192,
+      assetBase: "badge_row-2_13_aurelian",
       kind: "wide",
       hoverScale: 1.1,
     },
     {
-      file: "badge_row-2_14_eldercape",
-      width: 526,
-      height: 600,
+      assetBase: "badge_row-2_14_eldercape",
       kind: "standard",
     },
     {
-      file: "badge_row-2_15_gryphon",
-      width: 600,
-      height: 477,
+      assetBase: "badge_row-2_15_gryphon",
       kind: "standard",
     },
     {
-      file: "badge_row-2_16_moonkeep",
-      width: 599,
-      height: 600,
+      assetBase: "badge_row-2_16_moonkeep",
       kind: "standard",
     },
   ],
@@ -369,18 +290,18 @@ function HowWeProtectSection() {
               { "--premium-split": `${comparison.value}%` } as CSSProperties
             }
           >
-            <StageImage
+            <SectionImage
               className="premium-protection-image"
               base="/assets/protection/protection-finished-roof"
               sizes="100vw"
-              stage="protection"
+              section="protection"
               alt="A completed premium slate and copper roof"
             />
-            <StageImage
+            <SectionImage
               className="premium-protection-image premium-protection-layer"
               base={underlaymentImage}
               sizes="100vw"
-              stage="protection"
+              section="protection"
               alt="The same roof with its underlayment construction exposed"
             />
             <input
@@ -406,30 +327,30 @@ function HowWeProtectSection() {
             <div className="premium-protection-divider" aria-hidden="true">
               <span className="premium-protection-thumb">
                 <span className="premium-protection-thumb-surface">
-                  <StageImage
+                  <SectionImage
                     className="premium-protection-sphere premium-protection-sphere-default"
                     base={protectionSphereImage}
                     sizes="8vw"
                     defaultWidth={640}
-                    stage="protection"
+                    section="protection"
                     alt=""
                     aria-hidden="true"
                   />
-                  <StageImage
+                  <SectionImage
                     className="premium-protection-sphere premium-protection-sphere-left"
                     base={protectionSphereLeftImage}
                     sizes="8vw"
                     defaultWidth={640}
-                    stage="protection"
+                    section="protection"
                     alt=""
                     aria-hidden="true"
                   />
-                  <StageImage
+                  <SectionImage
                     className="premium-protection-sphere premium-protection-sphere-right"
                     base={protectionSphereRightImage}
                     sizes="8vw"
                     defaultWidth={640}
-                    stage="protection"
+                    section="protection"
                     alt=""
                     aria-hidden="true"
                   />
@@ -467,11 +388,11 @@ function GoogleReviewsSection() {
                 <i />
               </div>
               <header>
-                <StageImage
+                <SectionImage
                   base={review.portrait}
                   sizes="8vw"
                   defaultWidth={640}
-                  stage="reviews"
+                  section="reviews"
                   alt={`${review.name}, ${review.role}`}
                 />
                 <div>
@@ -524,11 +445,11 @@ function FounderSection() {
     >
       <div className="premium-founder-texture" aria-hidden="true" />
 
-      <StageImage
+      <SectionImage
         className="premium-founder-art premium-founder-art-left"
         base="/assets/founder/founder_left_frame"
         sizes="30vw"
-        stage="founder"
+        section="founder"
         alt="Northline Roofing founder in his metalworking workshop"
         decoding="async"
         loading="lazy"
@@ -572,11 +493,11 @@ function FounderSection() {
         </div>
       </div>
 
-      <StageImage
+      <SectionImage
         className="premium-founder-art premium-founder-art-right"
         base="/assets/founder/founder_right_frame"
         sizes="50vw"
-        stage="founder"
+        section="founder"
         alt="Northline Roofing founder working on a tile roof"
         decoding="async"
         loading="lazy"
@@ -658,7 +579,7 @@ export function AssociationsMarquee() {
         <div
           className="association-badge-cell"
           data-kind={badge.kind}
-          key={`${badge.file}-${clone ? "clone" : "original"}`}
+          key={`${badge.assetBase}-${clone ? "clone" : "original"}`}
         >
           <span className="association-badge-effects">
             <AssociationBadgeImage badge={badge} clone={clone} />
@@ -675,15 +596,15 @@ export function AssociationsMarquee() {
     badge: AssociationBadge;
     clone: boolean;
   }) {
-    const base = asResponsiveAsset(`/assets/associations/${badge.file}`);
+    const base = asResponsiveAsset(`/assets/associations/${badge.assetBase}`);
     const metadata = responsiveAssetMetadata(base);
     return (
-      <StageImage
+      <SectionImage
         base={base}
         sizes={`${Math.ceil((metadata.sourceWidth / metadata.sourceHeight) * 12)}vw`}
         defaultWidth={640}
-        stage="associations"
-        alt={clone ? "" : associationLabel(badge.file)}
+        section="associations"
+        alt={clone ? "" : associationLabel(badge.assetBase)}
         aria-hidden={clone || undefined}
         decoding="async"
         loading="lazy"
@@ -747,18 +668,18 @@ export function PremiumFooter({ onBook }: BookHandler) {
       ref={reveal.ref}
     >
       <div className="premium-footer-matte" aria-hidden="true">
-        <StageImage
+        <SectionImage
           className="premium-footer-back"
           base="/assets/footer/footer-roofscape-backdrop"
           sizes="100vw"
-          stage="footer"
+          section="footer"
           alt=""
         />
-        <StageImage
+        <SectionImage
           className="premium-footer-front"
           base="/assets/footer/footer-eaves-foreground"
           sizes="100vw"
-          stage="footer"
+          section="footer"
           alt=""
         />
       </div>
@@ -766,12 +687,12 @@ export function PremiumFooter({ onBook }: BookHandler) {
         <div className="premium-footer-primary">
           <div className="premium-footer-brand" data-premium-reveal>
             <div className="premium-footer-brand-plaque">
-              <StageImage
+              <SectionImage
                 className="premium-footer-brand-frame"
                 base="/assets/footer/brand-plaque"
                 sizes="36vw"
                 defaultWidth={960}
-                stage="footer"
+                section="footer"
                 alt=""
                 aria-hidden="true"
               />
@@ -844,11 +765,11 @@ export function PremiumFooter({ onBook }: BookHandler) {
               </a>
             </div>
             <div className="premium-footer-map-frame">
-              <StageImage
+              <SectionImage
                 base="/assets/footer/map-frame"
                 sizes="60vw"
                 defaultWidth={960}
-                stage="footer"
+                section="footer"
                 alt=""
                 aria-hidden="true"
               />
@@ -963,7 +884,7 @@ export function CustomerServiceHologram({
 
   useEffect(() => {
     const image = new Image();
-    image.src = responsiveSource(HOLOGRAM.image, 640);
+    image.src = responsiveSource(HOLOGRAM.imageBase, 640);
     const canvas = document.createElement("canvas");
     canvas.width = HOLOGRAM.width;
     canvas.height = HOLOGRAM.height;
@@ -988,7 +909,7 @@ export function CustomerServiceHologram({
   useEffect(() => {
     const reviews = document.getElementById("reviews");
     const founder = document.getElementById("founder");
-    const gallery = document.getElementById("work");
+    const gallery = document.getElementById("gallery");
     if (!reviews && !founder && !gallery) return;
     if (!("IntersectionObserver" in window)) {
       setActive(true);
@@ -1123,7 +1044,7 @@ export function CustomerServiceHologram({
         <span aria-hidden="true" />
       </button>
       <span className="customer-service-hologram-reveal" aria-hidden="true">
-        <img {...responsiveImage(HOLOGRAM.image, "160px", 640)} alt="" />
+        <img {...responsiveImage(HOLOGRAM.imageBase, "160px", 640)} alt="" />
         <svg
           className="customer-service-hologram-effects"
           viewBox={`0 0 ${HOLOGRAM.width} ${HOLOGRAM.height}`}
@@ -1466,8 +1387,8 @@ export function CustomerServiceHologram({
               y="0"
               width={HOLOGRAM.width}
               height={HOLOGRAM.height}
-              href={responsiveSource(HOLOGRAM.image, 640)}
-              xlinkHref={responsiveSource(HOLOGRAM.image, 640)}
+              href={responsiveSource(HOLOGRAM.imageBase, 640)}
+              xlinkHref={responsiveSource(HOLOGRAM.imageBase, 640)}
               preserveAspectRatio="xMidYMid meet"
             />
           </g>
@@ -1481,8 +1402,8 @@ export function CustomerServiceHologram({
               y="0"
               width={HOLOGRAM.width}
               height={HOLOGRAM.height}
-              href={responsiveSource(HOLOGRAM.image, 640)}
-              xlinkHref={responsiveSource(HOLOGRAM.image, 640)}
+              href={responsiveSource(HOLOGRAM.imageBase, 640)}
+              xlinkHref={responsiveSource(HOLOGRAM.imageBase, 640)}
               preserveAspectRatio="xMidYMid meet"
             />
           </g>
@@ -1496,8 +1417,8 @@ export function CustomerServiceHologram({
               y="0"
               width={HOLOGRAM.width}
               height={HOLOGRAM.height}
-              href={responsiveSource(HOLOGRAM.image, 640)}
-              xlinkHref={responsiveSource(HOLOGRAM.image, 640)}
+              href={responsiveSource(HOLOGRAM.imageBase, 640)}
+              xlinkHref={responsiveSource(HOLOGRAM.imageBase, 640)}
               preserveAspectRatio="xMidYMid meet"
             />
           </g>
@@ -1511,8 +1432,8 @@ export function CustomerServiceHologram({
               y="0"
               width={HOLOGRAM.width}
               height={HOLOGRAM.height}
-              href={responsiveSource(HOLOGRAM.image, 640)}
-              xlinkHref={responsiveSource(HOLOGRAM.image, 640)}
+              href={responsiveSource(HOLOGRAM.imageBase, 640)}
+              xlinkHref={responsiveSource(HOLOGRAM.imageBase, 640)}
               preserveAspectRatio="xMidYMid meet"
             />
           </g>

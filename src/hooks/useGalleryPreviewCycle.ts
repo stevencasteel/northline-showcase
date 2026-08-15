@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 
-type Slot = { readonly neighbors: readonly number[] };
+type PreviewSlot = { readonly neighbors: readonly number[] };
 type Config = {
   minimumGlobalIntervalMs: number;
-  neighboringCellCooldownMs: number;
+  neighborSlotCooldownMs: number;
   minimumDelayMs: number;
   randomDelayRangeMs: number;
   idleRetryMs: number;
@@ -11,31 +11,31 @@ type Config = {
 };
 
 export function selectEligibleSlot(
-  slots: readonly Slot[],
-  dueTimes: number[],
-  lastFired: number[],
+  slots: readonly PreviewSlot[],
+  nextSwapAt: number[],
+  lastSwapAt: number[],
   now: number,
   hoveredSlot: number | null,
   cooldown: number,
 ) {
   return slots
-    .map((slot, index) => ({ dueTime: dueTimes[index], slot: index }))
+    .map((slot, index) => ({ dueTime: nextSwapAt[index], slot: index }))
     .filter(
       ({ dueTime, slot }) =>
         slot !== hoveredSlot &&
         dueTime <= now &&
-        now - lastFired[slot] >= cooldown &&
+        now - lastSwapAt[slot] >= cooldown &&
         slots[slot].neighbors.every(
-          (neighbor) => now - lastFired[neighbor] >= cooldown,
+          (neighbor) => now - lastSwapAt[neighbor] >= cooldown,
         ),
     )
     .sort((a, b) => a.dueTime - b.dueTime)[0]?.slot;
 }
 
-export function useGalleryPreviewRotation(
+export function useGalleryPreviewCycle(
   imagesLength: number,
   initialIndices: readonly number[],
-  slots: readonly Slot[],
+  slots: readonly PreviewSlot[],
   config: Config,
   paused: boolean,
   hoveredSlotRef: { current: number | null },
@@ -44,8 +44,8 @@ export function useGalleryPreviewRotation(
   const cursorRef = useRef(initialIndices.length);
   useEffect(() => {
     if (paused || imagesLength <= indices.length) return;
-    const lastFired = Array(slots.length).fill(-Infinity) as number[];
-    const dueTimes = slots.map(
+    const lastSwapAt = Array(slots.length).fill(-Infinity) as number[];
+    const nextSwapAt = slots.map(
       () =>
         performance.now() +
         config.minimumDelayMs +
@@ -61,19 +61,19 @@ export function useGalleryPreviewRotation(
       }
       const slot = selectEligibleSlot(
         slots,
-        dueTimes,
-        lastFired,
+        nextSwapAt,
+        lastSwapAt,
         now,
         hoveredSlotRef.current,
-        config.neighboringCellCooldownMs,
+        config.neighborSlotCooldownMs,
       );
       if (slot === undefined) {
         timer = window.setTimeout(schedule, config.idleRetryMs);
         return;
       }
-      lastFired[slot] = now;
+      lastSwapAt[slot] = now;
       lastGlobalFire = now;
-      dueTimes[slot] =
+      nextSwapAt[slot] =
         now + config.minimumDelayMs + Math.random() * config.randomDelayRangeMs;
       setIndices((current) => {
         const next = [...current];
@@ -92,7 +92,7 @@ export function useGalleryPreviewRotation(
         schedule,
         Math.max(
           config.schedulerFloorMs,
-          Math.min(...dueTimes) - performance.now(),
+          Math.min(...nextSwapAt) - performance.now(),
         ),
       );
     };
@@ -100,7 +100,7 @@ export function useGalleryPreviewRotation(
       schedule,
       Math.max(
         config.schedulerFloorMs,
-        Math.min(...dueTimes) - performance.now(),
+        Math.min(...nextSwapAt) - performance.now(),
       ),
     );
     return () => window.clearTimeout(timer);

@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 import { useRef, type ReactNode } from "react";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
-import { useDialogFocus } from "../hooks/useDialogFocus";
+import { useDialogFocusManagement } from "../hooks/useDialogFocus";
 
 type DialogLabel =
   | { ariaLabel: string; ariaLabelledBy?: never }
@@ -30,7 +30,7 @@ export function DialogModal({
 }: DialogModalProps) {
   const dialogRef = useRef<HTMLElement>(null);
   useBodyScrollLock(true);
-  useDialogFocus(dialogRef, onClose);
+  useDialogFocusManagement(dialogRef, onClose);
 
   return createPortal(
     <div

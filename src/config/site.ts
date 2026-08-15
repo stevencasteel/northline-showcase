@@ -4,7 +4,7 @@ export const siteConfig = {
   phoneHref: "tel:+15555555555",
   email: "hello@northlineroofing.com",
   hours: "Mon–Fri, 8am–6pm",
-  appointmentSummary: "Free roof inspection — Mon–Fri, 8am–6pm",
+  appointmentSummary: "Appointments available — Mon–Fri, 8am–6pm",
   location: {
     name: "The Garden",
     embedUrl:

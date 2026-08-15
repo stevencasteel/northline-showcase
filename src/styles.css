@@ -82,14 +82,14 @@ body.body-scroll-locked {
   --asset-protection-texture: none;
   --asset-reviews-texture: none;
 }
-.app.asset-constrained .raster-art,
-.app.asset-constrained .association-badge-effects {
+.app.asset-narrow-viewport .raster-art,
+.app.asset-narrow-viewport .association-badge-effects {
   filter: none;
 }
-.app.asset-constrained .gallery-modal-backdrop,
-.app.asset-constrained .gallery-modal-frame,
-.app.asset-constrained .gallery-modal-arrow,
-.app.asset-constrained .gallery-modal-close {
+.app.asset-narrow-viewport .gallery-modal-backdrop,
+.app.asset-narrow-viewport .gallery-modal-frame,
+.app.asset-narrow-viewport .gallery-modal-arrow,
+.app.asset-narrow-viewport .gallery-modal-close {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
@@ -166,13 +166,13 @@ a {
   animation-delay: 0.72s;
 }
 .site-header > .header-phone,
-.site-header > .header-quote {
+.site-header > .header-appointment {
   animation-duration: 0.32s;
 }
 .site-header > .header-phone {
   animation-delay: 1.2s;
 }
-.site-header > .header-quote {
+.site-header > .header-appointment {
   animation-delay: 1.28s;
 }
 .brand {
@@ -255,7 +255,7 @@ a {
   opacity: 1 !important;
 }
 .header-phone,
-.header-quote {
+.header-appointment {
   display: inline-flex;
   flex: 0 0 auto;
   height: var(--nav-art-height);
@@ -306,7 +306,7 @@ a {
   transform: skewX(-20deg) translateX(-220%);
   pointer-events: none;
 }
-.header-quote {
+.header-appointment {
   color: inherit;
   background: transparent;
   font: inherit;
@@ -326,7 +326,7 @@ a {
   transform: translateY(0);
   box-shadow: 0 0.12cqw 0.25cqw rgba(4, 20, 33, 0.22);
 }
-.header-quote:focus-visible,
+.header-appointment:focus-visible,
 .button-primary:focus-visible {
   outline: 0.14cqw solid #e5dcd2;
   outline-offset: 0.18cqw;
@@ -602,11 +602,11 @@ a {
   height: 1.45cqw;
   flex: none;
 }
-.header-quote:hover svg:last-child,
-.header-quote:focus-visible svg:last-child,
+.header-appointment:hover svg:last-child,
+.header-appointment:focus-visible svg:last-child,
 .button-primary:hover svg:last-child,
 .button-primary:focus-visible svg:last-child {
-  animation: quote-arrow-nudge 0.75s ease-in-out infinite;
+  animation: cta-arrow-nudge 0.75s ease-in-out infinite;
 }
 .header-phone:hover svg,
 .header-phone:focus-visible svg,
@@ -1120,7 +1120,7 @@ a {
     transform: translateY(0);
   }
 }
-@keyframes quote-arrow-nudge {
+@keyframes cta-arrow-nudge {
   0%,
   100% {
     transform: translateX(0);
