@@ -263,7 +263,7 @@ function HowWeProtectSection() {
 
   return (
     <section
-      className="premium-protection"
+      className="protection-section"
       id="protection"
       aria-label="Roof layers: finished roof and exposed underlayment"
       style={
@@ -272,14 +272,14 @@ function HowWeProtectSection() {
         } as CSSProperties
       }
     >
-      <div className="premium-shell">
+      <div className="section-shell">
         <div
-          className={`premium-protection-console${reveal.revealed ? " is-visible" : ""}`}
-          data-premium-reveal
+          className={`protection-section-console${reveal.revealed ? " is-visible" : ""}`}
+          data-section-reveal
           ref={reveal.ref}
         >
           <div
-            className="premium-protection-stage"
+            className="protection-section-stage"
             data-drag-direction={comparison.direction ?? undefined}
             data-drag-indicator={
               comparison.indicatorVisible && comparison.direction
@@ -287,25 +287,25 @@ function HowWeProtectSection() {
                 : undefined
             }
             style={
-              { "--premium-split": `${comparison.value}%` } as CSSProperties
+              { "--protection-split": `${comparison.value}%` } as CSSProperties
             }
           >
             <SectionImage
-              className="premium-protection-image"
+              className="protection-section-image"
               base="/assets/protection/protection-finished-roof"
               sizes="100vw"
               section="protection"
               alt="A completed premium slate and copper roof"
             />
             <SectionImage
-              className="premium-protection-image premium-protection-layer"
+              className="protection-section-image protection-section-layer"
               base={underlaymentImage}
               sizes="100vw"
               section="protection"
               alt="The same roof with its underlayment construction exposed"
             />
             <input
-              className="premium-protection-range"
+              className="protection-section-range"
               type="range"
               min="0"
               max="100"
@@ -324,11 +324,11 @@ function HowWeProtectSection() {
               aria-label="Reveal underlayment"
               aria-valuetext={`${comparison.value}% finished roof, ${100 - comparison.value}% underlayment`}
             />
-            <div className="premium-protection-divider" aria-hidden="true">
-              <span className="premium-protection-thumb">
-                <span className="premium-protection-thumb-surface">
+            <div className="protection-section-divider" aria-hidden="true">
+              <span className="protection-section-thumb">
+                <span className="protection-section-thumb-surface">
                   <SectionImage
-                    className="premium-protection-sphere premium-protection-sphere-default"
+                    className="protection-section-sphere protection-section-sphere-default"
                     base={protectionSphereImage}
                     sizes="8vw"
                     defaultWidth={640}
@@ -337,7 +337,7 @@ function HowWeProtectSection() {
                     aria-hidden="true"
                   />
                   <SectionImage
-                    className="premium-protection-sphere premium-protection-sphere-left"
+                    className="protection-section-sphere protection-section-sphere-left"
                     base={protectionSphereLeftImage}
                     sizes="8vw"
                     defaultWidth={640}
@@ -346,7 +346,7 @@ function HowWeProtectSection() {
                     aria-hidden="true"
                   />
                   <SectionImage
-                    className="premium-protection-sphere premium-protection-sphere-right"
+                    className="protection-section-sphere protection-section-sphere-right"
                     base={protectionSphereRightImage}
                     sizes="8vw"
                     defaultWidth={640}
@@ -368,20 +368,20 @@ function GoogleReviewsSection() {
   const reveal = useRevealOnce<HTMLElement>({ threshold: 0.12 });
   return (
     <section
-      className={`premium-reviews${reveal.revealed ? " is-visible" : ""}`}
+      className={`reviews-section${reveal.revealed ? " is-visible" : ""}`}
       id="reviews"
       ref={reveal.ref}
     >
-      <div className="premium-shell">
-        <div className="premium-review-grid">
+      <div className="section-shell">
+        <div className="review-grid">
           {reviews.map((review, index) => (
             <article
-              className="premium-review-card"
-              data-premium-reveal
+              className="review-card"
+              data-section-reveal
               key={review.name}
-              style={{ "--premium-review-index": index } as CSSProperties}
+              style={{ "--review-index": index } as CSSProperties}
             >
-              <div className="premium-review-fasteners" aria-hidden="true">
+              <div className="review-fasteners" aria-hidden="true">
                 <i />
                 <i />
                 <i />
@@ -400,7 +400,7 @@ function GoogleReviewsSection() {
                   <p>{review.role}</p>
                 </div>
                 <span
-                  className="premium-review-rating"
+                  className="review-rating"
                   aria-label="Rated five out of five"
                 >
                   <span>5</span>
@@ -411,7 +411,7 @@ function GoogleReviewsSection() {
               <blockquote>“{review.quote}”</blockquote>
               <footer>
                 <a
-                  className="premium-review-google-link"
+                  className="review-google-link"
                   href={review.googleUrl}
                   target="_blank"
                   rel="noreferrer"
@@ -438,15 +438,15 @@ function FounderSection() {
 
   return (
     <section
-      className={`premium-founder${reveal.revealed ? " is-visible" : ""}`}
+      className={`founder-section${reveal.revealed ? " is-visible" : ""}`}
       id="founder"
       ref={reveal.ref}
-      aria-labelledby="premium-founder-title"
+      aria-labelledby="founder-section-title"
     >
-      <div className="premium-founder-texture" aria-hidden="true" />
+      <div className="founder-section-texture" aria-hidden="true" />
 
       <SectionImage
-        className="premium-founder-art premium-founder-art-left"
+        className="founder-section-art founder-section-art-left"
         base="/assets/founder/founder_left_frame"
         sizes="30vw"
         section="founder"
@@ -455,13 +455,13 @@ function FounderSection() {
         loading="lazy"
       />
 
-      <div className="premium-founder-copy">
-        <h2 id="premium-founder-title" data-premium-reveal>
+      <div className="founder-section-copy">
+        <h2 id="founder-section-title" data-section-reveal>
           From the Bench
           <span>to the Roofline.</span>
         </h2>
 
-        <div className="premium-founder-body" data-premium-reveal>
+        <div className="founder-section-body" data-section-reveal>
           <p>
             Roofing is a trade of details. Northline was built on a simple
             standard:
@@ -475,15 +475,15 @@ function FounderSection() {
           </p>
         </div>
 
-        <blockquote className="premium-founder-quote" data-premium-reveal>
+        <blockquote className="founder-section-quote" data-section-reveal>
           <p>“Craft is what remains after the crew leaves.”</p>
         </blockquote>
 
-        <div className="premium-founder-signoff" data-premium-reveal>
+        <div className="founder-section-signoff" data-section-reveal>
           <strong>Don Rafael Montoya</strong>
           <span>Founder &amp; Master Roofer</span>
           <img
-            className="premium-founder-signature"
+            className="founder-section-signature"
             src="/assets/founder/don-rafael-montoya-signature.png"
             alt="Don Rafael Montoya signature"
             width="1774"
@@ -494,7 +494,7 @@ function FounderSection() {
       </div>
 
       <SectionImage
-        className="premium-founder-art premium-founder-art-right"
+        className="founder-section-art founder-section-art-right"
         base="/assets/founder/founder_right_frame"
         sizes="50vw"
         section="founder"
@@ -506,9 +506,9 @@ function FounderSection() {
   );
 }
 
-export function PremiumSections() {
+export function SiteSections() {
   return (
-    <div className="premium-sections">
+    <div className="site-sections">
       <HowWeProtectSection />
       <CopperEdgeSeam />
       <GoogleReviewsSection />
@@ -663,32 +663,32 @@ export function PremiumFooter({ onBook }: BookHandler) {
   const reveal = useRevealOnce<HTMLElement>({ threshold: 0.12 });
   return (
     <footer
-      className={`premium-footer${reveal.revealed ? " is-visible" : ""}`}
+      className={`site-footer${reveal.revealed ? " is-visible" : ""}`}
       id="contact"
       ref={reveal.ref}
     >
-      <div className="premium-footer-matte" aria-hidden="true">
+      <div className="site-footer-matte" aria-hidden="true">
         <SectionImage
-          className="premium-footer-back"
+          className="site-footer-back"
           base="/assets/footer/footer-roofscape-backdrop"
           sizes="100vw"
           section="footer"
           alt=""
         />
         <SectionImage
-          className="premium-footer-front"
+          className="site-footer-front"
           base="/assets/footer/footer-eaves-foreground"
           sizes="100vw"
           section="footer"
           alt=""
         />
       </div>
-      <div className="premium-footer-content premium-shell">
-        <div className="premium-footer-primary">
-          <div className="premium-footer-brand" data-premium-reveal>
-            <div className="premium-footer-brand-plaque">
+      <div className="site-footer-content section-shell">
+        <div className="site-footer-primary">
+          <div className="site-footer-brand" data-section-reveal>
+            <div className="site-footer-brand-plaque">
               <SectionImage
-                className="premium-footer-brand-frame"
+                className="site-footer-brand-frame"
                 base="/assets/footer/brand-plaque"
                 sizes="36vw"
                 defaultWidth={960}
@@ -696,7 +696,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
                 alt=""
                 aria-hidden="true"
               />
-              <div className="premium-footer-brand-surface">
+              <div className="site-footer-brand-surface">
                 <img
                   src="/assets/brand/combination-mark.svg"
                   alt="Northline Roofing"
@@ -704,11 +704,11 @@ export function PremiumFooter({ onBook }: BookHandler) {
               </div>
             </div>
             <div
-              className="premium-footer-contact-rack"
+              className="site-footer-contact-rack"
               aria-label="Contact Northline Roofing"
             >
               <button
-                className="premium-footer-raster-control raster-control"
+                className="site-footer-raster-control raster-control"
                 type="button"
                 onClick={onBook}
                 aria-label="Book an appointment"
@@ -727,7 +727,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
                 />
               </button>
               <a
-                className="premium-footer-raster-control raster-control"
+                className="site-footer-raster-control raster-control"
                 href={siteConfig.phoneHref}
                 aria-label={`Call ${siteConfig.phoneDisplay}`}
               >
@@ -749,13 +749,13 @@ export function PremiumFooter({ onBook }: BookHandler) {
           </div>
 
           <section
-            className="premium-footer-map"
+            className="site-footer-map"
             id="location"
-            aria-labelledby="premium-footer-map-title"
-            data-premium-reveal
+            aria-labelledby="site-footer-map-title"
+            data-section-reveal
           >
-            <div className="premium-footer-map-heading">
-              <span id="premium-footer-map-title">Main Office</span>
+            <div className="site-footer-map-heading">
+              <span id="site-footer-map-title">Main Office</span>
               <a
                 href={siteConfig.location.mapsUrl}
                 target="_blank"
@@ -764,7 +764,7 @@ export function PremiumFooter({ onBook }: BookHandler) {
                 Open in Google Maps ↗
               </a>
             </div>
-            <div className="premium-footer-map-frame">
+            <div className="site-footer-map-frame">
               <SectionImage
                 base="/assets/footer/map-frame"
                 sizes="60vw"
@@ -827,7 +827,7 @@ function EmailCopyButton() {
 
   return (
     <button
-      className="premium-footer-raster-control raster-control"
+      className="site-footer-raster-control raster-control"
       type="button"
       onClick={() => void copyEmail()}
       data-raster-state={copied ? "copied" : undefined}

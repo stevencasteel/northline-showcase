@@ -16,13 +16,13 @@ import {
   X,
 } from "lucide-react";
 import "./styles.css";
-import "./premium-sections.css";
+import "./site-sections.css";
 import {
   AssociationsMarquee,
   CustomerServiceHologram,
   PremiumFooter,
-  PremiumSections,
-} from "./PremiumSections";
+  SiteSections,
+} from "./SiteSections";
 import { useDocumentVisibility } from "./hooks/useDocumentVisibility";
 import { useReducedMotion } from "./hooks/useReducedMotion";
 import { useRevealOnce } from "./hooks/useRevealOnce";
@@ -1940,7 +1940,7 @@ function App() {
           <CopperEdgeSeam />
           <AssociationsMarquee />
           <CopperEdgeSeam />
-          <PremiumSections />
+          <SiteSections />
         </main>
         <PremiumFooter onBook={openAppointment} />
       </ScaledArtboard>

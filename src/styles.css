@@ -369,7 +369,7 @@ a {
   .gallery-card,
   .gallery-material-heading,
   .gallery-material-art,
-  [data-premium-reveal] {
+  [data-section-reveal] {
     opacity: 1 !important;
   }
   .hero-content > *,
@@ -380,7 +380,7 @@ a {
   .badge-slice,
   .service-slice,
   .gallery-card,
-  [data-premium-reveal] {
+  [data-section-reveal] {
     transform: none !important;
   }
   .hero-actions > * {
