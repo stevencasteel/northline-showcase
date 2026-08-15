@@ -213,6 +213,36 @@ const associationLabel = (filename: string) =>
     .replace(/[-_]/g, " ")
     .replace(/\b\w/g, (character) => character.toUpperCase());
 
+function AssociationBadgeImage({
+  badge,
+  clone,
+}: {
+  badge: AssociationBadge;
+  clone: boolean;
+}) {
+  const base = asResponsiveAsset(`/assets/associations/${badge.assetBase}`);
+  const metadata = responsiveAssetMetadata(base);
+  return (
+    <SectionImage
+      base={base}
+      sizes={`${Math.ceil((metadata.sourceWidth / metadata.sourceHeight) * 12)}vw`}
+      defaultWidth={640}
+      section="associations"
+      alt={clone ? "" : associationLabel(badge.assetBase)}
+      aria-hidden={clone || undefined}
+      decoding="async"
+      loading="lazy"
+      style={
+        {
+          "--association-scale": badge.scale ?? 1,
+          "--association-hover-scale":
+            badge.hoverScale ?? (badge.scale ?? 1) * 1.14,
+        } as CSSProperties
+      }
+    />
+  );
+}
+
 const associationRowsConfig = [
   { direction: -1, durationSeconds: 145, initialProgress: 0.27 },
   { direction: 1, durationSeconds: 155, initialProgress: 0.61 },
@@ -588,36 +618,6 @@ export function AssociationsMarquee() {
       ))}
     </div>
   );
-
-  function AssociationBadgeImage({
-    badge,
-    clone,
-  }: {
-    badge: AssociationBadge;
-    clone: boolean;
-  }) {
-    const base = asResponsiveAsset(`/assets/associations/${badge.assetBase}`);
-    const metadata = responsiveAssetMetadata(base);
-    return (
-      <SectionImage
-        base={base}
-        sizes={`${Math.ceil((metadata.sourceWidth / metadata.sourceHeight) * 12)}vw`}
-        defaultWidth={640}
-        section="associations"
-        alt={clone ? "" : associationLabel(badge.assetBase)}
-        aria-hidden={clone || undefined}
-        decoding="async"
-        loading="lazy"
-        style={
-          {
-            "--association-scale": badge.scale ?? 1,
-            "--association-hover-scale":
-              badge.hoverScale ?? (badge.scale ?? 1) * 1.14,
-          } as CSSProperties
-        }
-      />
-    );
-  }
 
   return (
     <section
