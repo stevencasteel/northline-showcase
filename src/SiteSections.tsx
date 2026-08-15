@@ -12,7 +12,7 @@ import { useInView } from "./hooks/useInView";
 import { useRevealOnce } from "./hooks/useRevealOnce";
 import { useComparisonSlider } from "./hooks/useComparisonSlider";
 import { siteConfig } from "./config/site";
-import { HOLOGRAM } from "./config/hologram";
+import { HOLOGRAM, HOLOGRAM_SOURCE_GEOMETRY } from "./config/hologram";
 import { responsiveAssetMetadata } from "./lib/responsiveImage";
 import {
   asResponsiveAsset,
@@ -32,6 +32,20 @@ const protectionSphereLeftImage =
 const protectionSphereRightImage =
   "/assets/ui/copper-sphere-etched-large-hover-right";
 const protectionHoverTransitionMs = 240;
+const PROTECTION_POINTER_INTENT_THRESHOLD_PX = 10;
+const ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT = 50;
+
+const hologramAssetMetadata = responsiveAssetMetadata(
+  asResponsiveAsset(HOLOGRAM.imageBase),
+);
+const hologramSourceWidthPx = hologramAssetMetadata.sourceWidth;
+const hologramSourceHeightPx = hologramAssetMetadata.sourceHeight;
+const footerBrandPlaqueMetadata = responsiveAssetMetadata(
+  asResponsiveAsset("/assets/footer/brand-plaque"),
+);
+const footerMapFrameMetadata = responsiveAssetMetadata(
+  asResponsiveAsset("/assets/footer/map-frame"),
+);
 
 type AssociationBadgeKind = "standard" | "landscape" | "wide" | "ultrawide";
 
@@ -248,8 +262,6 @@ const associationRowsConfig = [
   { direction: 1, durationSeconds: 155, initialProgress: 0.61 },
 ] as const;
 
-const protectionIntentThreshold = 10;
-
 const reviews = [
   {
     name: "Seris Rhuke",
@@ -286,8 +298,8 @@ const reviews = [
 function HowWeProtectSection() {
   const reveal = useRevealOnce<HTMLDivElement>({ threshold: 0.12 });
   const comparison = useComparisonSlider({
-    initialValue: 54,
-    intentThreshold: protectionIntentThreshold,
+    initialPercent: 54,
+    intentThresholdPx: PROTECTION_POINTER_INTENT_THRESHOLD_PX,
     releaseDelayMs: protectionHoverTransitionMs,
   });
 
@@ -317,7 +329,9 @@ function HowWeProtectSection() {
                 : undefined
             }
             style={
-              { "--protection-split": `${comparison.value}%` } as CSSProperties
+              {
+                "--protection-split": `${comparison.percent}%`,
+              } as CSSProperties
             }
           >
             <SectionImage
@@ -340,7 +354,7 @@ function HowWeProtectSection() {
               min="0"
               max="100"
               step="0.1"
-              value={comparison.value}
+              value={comparison.percent}
               data-pointer-focus={
                 comparison.pointerFocusActive ? "true" : undefined
               }
@@ -352,7 +366,7 @@ function HowWeProtectSection() {
               onLostPointerCapture={comparison.onLostPointerCapture}
               onBlur={comparison.onBlur}
               aria-label="Reveal underlayment"
-              aria-valuetext={`${comparison.value}% finished roof, ${100 - comparison.value}% underlayment`}
+              aria-valuetext={`${comparison.percent}% finished roof, ${100 - comparison.percent}% underlayment`}
             />
             <div className="protection-section-divider" aria-hidden="true">
               <span className="protection-section-thumb">
@@ -584,10 +598,12 @@ export function AssociationsMarquee() {
               1000) %
           1;
         marqueeProgress.current[rowIndex] = nextProgress;
+        // The track contains two equal groups, so 50% of its width is one loop.
         const translate =
           rowConfig.direction < 0
-            ? -nextProgress * 50
-            : -50 + nextProgress * 50;
+            ? -nextProgress * ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT
+            : -ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT +
+              nextProgress * ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT;
         trackRefs.current[rowIndex]?.style.setProperty(
           "transform",
           `translate3d(${translate}%,0,0)`,
@@ -645,7 +661,7 @@ export function AssociationsMarquee() {
                   trackRefs.current[rowIndex] = element;
                 }}
                 style={{
-                  transform: `translate3d(${-50 + associationRowsConfig[rowIndex].initialProgress * 50}%,0,0)`,
+                  transform: `translate3d(${-ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT + associationRowsConfig[rowIndex].initialProgress * ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT}%,0,0)`,
                 }}
               >
                 {renderGroup(row, false)}
@@ -686,7 +702,14 @@ export function PremiumFooter({ onBook }: BookHandler) {
       <div className="site-footer-content section-shell">
         <div className="site-footer-primary">
           <div className="site-footer-brand" data-section-reveal>
-            <div className="site-footer-brand-plaque">
+            <div
+              className="site-footer-brand-plaque"
+              style={
+                {
+                  "--footer-brand-plaque-aspect-ratio": `${footerBrandPlaqueMetadata.sourceWidth} / ${footerBrandPlaqueMetadata.sourceHeight}`,
+                } as CSSProperties
+              }
+            >
               <SectionImage
                 className="site-footer-brand-frame"
                 base="/assets/footer/brand-plaque"
@@ -764,7 +787,14 @@ export function PremiumFooter({ onBook }: BookHandler) {
                 Open in Google Maps ↗
               </a>
             </div>
-            <div className="site-footer-map-frame">
+            <div
+              className="site-footer-map-frame"
+              style={
+                {
+                  "--footer-map-frame-aspect-ratio": `${footerMapFrameMetadata.sourceWidth} / ${footerMapFrameMetadata.sourceHeight}`,
+                } as CSSProperties
+              }
+            >
               <SectionImage
                 base="/assets/footer/map-frame"
                 sizes="60vw"
@@ -886,8 +916,8 @@ export function CustomerServiceHologram({
     const image = new Image();
     image.src = responsiveSource(HOLOGRAM.imageBase, 640);
     const canvas = document.createElement("canvas");
-    canvas.width = HOLOGRAM.width;
-    canvas.height = HOLOGRAM.height;
+    canvas.width = hologramSourceWidthPx;
+    canvas.height = hologramSourceHeightPx;
     const context = canvas.getContext("2d", { willReadFrequently: true });
     if (!context) return;
 
@@ -964,11 +994,11 @@ export function CustomerServiceHologram({
       const phaseB = (phaseA + HOLOGRAM.phaseOffset) % 1;
       rippleOffsetARef.current?.setAttribute(
         "dy",
-        String(HOLOGRAM.rippleStartY + HOLOGRAM.rippleTravelY * phaseA),
+        String(HOLOGRAM.rippleStartYPx + HOLOGRAM.rippleTravelYPx * phaseA),
       );
       rippleOffsetBRef.current?.setAttribute(
         "dy",
-        String(HOLOGRAM.rippleStartY + HOLOGRAM.rippleTravelY * phaseB),
+        String(HOLOGRAM.rippleStartYPx + HOLOGRAM.rippleTravelYPx * phaseB),
       );
       rippleAlphaARef.current?.setAttribute(
         "slope",
@@ -990,21 +1020,26 @@ export function CustomerServiceHologram({
     const bounds = hologramRef.current?.getBoundingClientRect();
     if (!alpha || !bounds) return;
     const x = Math.min(
-      HOLOGRAM.width - 1,
+      hologramSourceWidthPx - 1,
       Math.max(
         0,
-        Math.floor(((clientX - bounds.left) / bounds.width) * HOLOGRAM.width),
+        Math.floor(
+          ((clientX - bounds.left) / bounds.width) * hologramSourceWidthPx,
+        ),
       ),
     );
     const y = Math.min(
-      HOLOGRAM.height - 1,
+      hologramSourceHeightPx - 1,
       Math.max(
         0,
-        Math.floor(((clientY - bounds.top) / bounds.height) * HOLOGRAM.height),
+        Math.floor(
+          ((clientY - bounds.top) / bounds.height) * hologramSourceHeightPx,
+        ),
       ),
     );
     setHovered(
-      alpha[(y * HOLOGRAM.width + x) * 4 + 3] > HOLOGRAM.alphaHitThreshold,
+      alpha[(y * hologramSourceWidthPx + x) * 4 + 3] >
+        HOLOGRAM.alphaHitThreshold,
     );
   };
 
@@ -1019,6 +1054,12 @@ export function CustomerServiceHologram({
       ref={hologramRef}
       className={`customer-service-hologram${showEffect ? " is-active" : ""}${hidden ? " is-obscured" : ""}${hovered ? " is-hovered" : ""}`}
       aria-hidden={!showEffect}
+      style={
+        {
+          "--hologram-period": `${HOLOGRAM.periodMs}ms`,
+          "--hologram-aspect-ratio": `${hologramSourceWidthPx} / ${hologramSourceHeightPx}`,
+        } as CSSProperties
+      }
     >
       <img
         className="customer-service-hologram-puck"
@@ -1047,7 +1088,7 @@ export function CustomerServiceHologram({
         <img {...responsiveImage(HOLOGRAM.imageBase, "160px", 640)} alt="" />
         <svg
           className="customer-service-hologram-effects"
-          viewBox={`0 0 ${HOLOGRAM.width} ${HOLOGRAM.height}`}
+          viewBox={`0 0 ${hologramSourceWidthPx} ${hologramSourceHeightPx}`}
           preserveAspectRatio="xMidYMid meet"
           xmlnsXlink="http://www.w3.org/1999/xlink"
           aria-hidden="true"
@@ -1059,7 +1100,7 @@ export function CustomerServiceHologram({
               x1="0"
               y1="0"
               x2="0"
-              y2={HOLOGRAM.height}
+              y2={hologramSourceHeightPx}
             >
               <stop offset="0%" stopColor="#fff" stopOpacity=".12" />
               <stop offset="15%" stopColor="#fff" stopOpacity=".12" />
@@ -1077,7 +1118,7 @@ export function CustomerServiceHologram({
               x1="0"
               y1="0"
               x2="0"
-              y2={HOLOGRAM.height}
+              y2={hologramSourceHeightPx}
             >
               <stop offset="0%" stopColor="#fff" stopOpacity="0" />
               <stop offset="22%" stopColor="#fff" stopOpacity="0" />
@@ -1093,13 +1134,13 @@ export function CustomerServiceHologram({
               maskUnits="userSpaceOnUse"
               x="0"
               y="0"
-              width={HOLOGRAM.width}
-              height={HOLOGRAM.height}
+              width={hologramSourceWidthPx}
+              height={hologramSourceHeightPx}
               mask-type="luminance"
             >
               <rect
-                width={HOLOGRAM.width}
-                height={HOLOGRAM.height}
+                width={hologramSourceWidthPx}
+                height={hologramSourceHeightPx}
                 fill={`url(#${skewGradientId})`}
               />
             </mask>
@@ -1108,13 +1149,13 @@ export function CustomerServiceHologram({
               maskUnits="userSpaceOnUse"
               x="0"
               y="0"
-              width={HOLOGRAM.width}
-              height={HOLOGRAM.height}
+              width={hologramSourceWidthPx}
+              height={hologramSourceHeightPx}
               mask-type="luminance"
             >
               <rect
-                width={HOLOGRAM.width}
-                height={HOLOGRAM.height}
+                width={hologramSourceWidthPx}
+                height={hologramSourceHeightPx}
                 fill={`url(#${rippleGradientId})`}
               />
             </mask>
@@ -1122,10 +1163,10 @@ export function CustomerServiceHologram({
               id={rippleAId}
               filterUnits="userSpaceOnUse"
               primitiveUnits="userSpaceOnUse"
-              x="-58"
-              y="-66"
-              width="836"
-              height="1758"
+              x={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.x}
+              y={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.y}
+              width={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.width}
+              height={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.height}
               colorInterpolationFilters="sRGB"
             >
               <feTurbulence
@@ -1139,19 +1180,19 @@ export function CustomerServiceHologram({
               <feOffset
                 ref={rippleOffsetARef}
                 in="tiled-ripple"
-                dy={HOLOGRAM.rippleStartY}
+                dy={HOLOGRAM.rippleStartYPx}
                 result="moving-ripple"
               />
               <feMorphology
                 in="SourceAlpha"
                 operator="dilate"
-                radius="5"
+                radius={HOLOGRAM_SOURCE_GEOMETRY.rippleOuterDilateRadiusPx}
                 result="outer-edge"
               />
               <feMorphology
                 in="SourceAlpha"
                 operator="erode"
-                radius="9"
+                radius={HOLOGRAM_SOURCE_GEOMETRY.rippleInnerErodeRadiusPx}
                 result="inner-edge"
               />
               <feComposite
@@ -1161,10 +1202,10 @@ export function CustomerServiceHologram({
                 result="edge-band"
               />
               <feFlood
-                x="122"
-                y="797"
-                width="79"
-                height="114"
+                x={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.x}
+                y={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.y}
+                width={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.width}
+                height={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.height}
                 floodColor="#fff"
                 result="armpit-exclusion"
               />
@@ -1177,7 +1218,7 @@ export function CustomerServiceHologram({
               <feDisplacementMap
                 in="SourceGraphic"
                 in2="moving-ripple"
-                scale="12"
+                scale={HOLOGRAM_SOURCE_GEOMETRY.rippleDisplacementScalePx}
                 xChannelSelector="R"
                 yChannelSelector="B"
                 result="distorted-hologram"
@@ -1196,10 +1237,10 @@ export function CustomerServiceHologram({
               id={rippleBId}
               filterUnits="userSpaceOnUse"
               primitiveUnits="userSpaceOnUse"
-              x="-58"
-              y="-66"
-              width="836"
-              height="1758"
+              x={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.x}
+              y={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.y}
+              width={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.width}
+              height={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.height}
               colorInterpolationFilters="sRGB"
             >
               <feTurbulence
@@ -1213,19 +1254,19 @@ export function CustomerServiceHologram({
               <feOffset
                 ref={rippleOffsetBRef}
                 in="tiled-ripple"
-                dy={HOLOGRAM.rippleStartY}
+                dy={HOLOGRAM.rippleStartYPx}
                 result="moving-ripple"
               />
               <feMorphology
                 in="SourceAlpha"
                 operator="dilate"
-                radius="5"
+                radius={HOLOGRAM_SOURCE_GEOMETRY.rippleOuterDilateRadiusPx}
                 result="outer-edge"
               />
               <feMorphology
                 in="SourceAlpha"
                 operator="erode"
-                radius="9"
+                radius={HOLOGRAM_SOURCE_GEOMETRY.rippleInnerErodeRadiusPx}
                 result="inner-edge"
               />
               <feComposite
@@ -1235,10 +1276,10 @@ export function CustomerServiceHologram({
                 result="edge-band"
               />
               <feFlood
-                x="122"
-                y="797"
-                width="79"
-                height="114"
+                x={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.x}
+                y={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.y}
+                width={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.width}
+                height={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.height}
                 floodColor="#fff"
                 result="armpit-exclusion"
               />
@@ -1251,7 +1292,7 @@ export function CustomerServiceHologram({
               <feDisplacementMap
                 in="SourceGraphic"
                 in2="moving-ripple"
-                scale="12"
+                scale={HOLOGRAM_SOURCE_GEOMETRY.rippleDisplacementScalePx}
                 xChannelSelector="R"
                 yChannelSelector="B"
                 result="distorted-hologram"
@@ -1270,10 +1311,10 @@ export function CustomerServiceHologram({
               id={skewAId}
               filterUnits="userSpaceOnUse"
               primitiveUnits="userSpaceOnUse"
-              x="-58"
-              y="-66"
-              width="836"
-              height="1758"
+              x={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.x}
+              y={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.y}
+              width={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.width}
+              height={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.height}
               colorInterpolationFilters="sRGB"
             >
               <feTurbulence
@@ -1288,16 +1329,16 @@ export function CustomerServiceHologram({
               <feDisplacementMap
                 in="SourceGraphic"
                 in2="moving-skew"
-                scale="13"
+                scale={HOLOGRAM_SOURCE_GEOMETRY.skewDisplacementScalePx}
                 xChannelSelector="R"
                 yChannelSelector="G"
                 result="skewed-hologram"
               />
               <feFlood
-                x="122"
-                y="797"
-                width="79"
-                height="114"
+                x={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.x}
+                y={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.y}
+                width={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.width}
+                height={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.height}
                 floodColor="#fff"
                 result="armpit-exclusion"
               />
@@ -1308,10 +1349,10 @@ export function CustomerServiceHologram({
                 result="clean-skew"
               />
               <feFlood
-                x="209"
-                y="114"
-                width="310"
-                height="407"
+                x={HOLOGRAM_SOURCE_GEOMETRY.faceExclusionPx.x}
+                y={HOLOGRAM_SOURCE_GEOMETRY.faceExclusionPx.y}
+                width={HOLOGRAM_SOURCE_GEOMETRY.faceExclusionPx.width}
+                height={HOLOGRAM_SOURCE_GEOMETRY.faceExclusionPx.height}
                 floodColor="#fff"
                 result="face-exclusion"
               />
@@ -1325,10 +1366,10 @@ export function CustomerServiceHologram({
               id={skewBId}
               filterUnits="userSpaceOnUse"
               primitiveUnits="userSpaceOnUse"
-              x="-58"
-              y="-66"
-              width="836"
-              height="1758"
+              x={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.x}
+              y={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.y}
+              width={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.width}
+              height={HOLOGRAM_SOURCE_GEOMETRY.filterBoundsPx.height}
               colorInterpolationFilters="sRGB"
             >
               <feTurbulence
@@ -1343,16 +1384,16 @@ export function CustomerServiceHologram({
               <feDisplacementMap
                 in="SourceGraphic"
                 in2="moving-skew"
-                scale="13"
+                scale={HOLOGRAM_SOURCE_GEOMETRY.skewDisplacementScalePx}
                 xChannelSelector="R"
                 yChannelSelector="G"
                 result="skewed-hologram"
               />
               <feFlood
-                x="122"
-                y="797"
-                width="79"
-                height="114"
+                x={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.x}
+                y={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.y}
+                width={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.width}
+                height={HOLOGRAM_SOURCE_GEOMETRY.armpitExclusionPx.height}
                 floodColor="#fff"
                 result="armpit-exclusion"
               />
@@ -1363,10 +1404,10 @@ export function CustomerServiceHologram({
                 result="clean-skew"
               />
               <feFlood
-                x="209"
-                y="114"
-                width="310"
-                height="407"
+                x={HOLOGRAM_SOURCE_GEOMETRY.faceExclusionPx.x}
+                y={HOLOGRAM_SOURCE_GEOMETRY.faceExclusionPx.y}
+                width={HOLOGRAM_SOURCE_GEOMETRY.faceExclusionPx.width}
+                height={HOLOGRAM_SOURCE_GEOMETRY.faceExclusionPx.height}
                 floodColor="#fff"
                 result="face-exclusion"
               />
@@ -1385,8 +1426,8 @@ export function CustomerServiceHologram({
             <image
               x="0"
               y="0"
-              width={HOLOGRAM.width}
-              height={HOLOGRAM.height}
+              width={hologramSourceWidthPx}
+              height={hologramSourceHeightPx}
               href={responsiveSource(HOLOGRAM.imageBase, 640)}
               xlinkHref={responsiveSource(HOLOGRAM.imageBase, 640)}
               preserveAspectRatio="xMidYMid meet"
@@ -1400,8 +1441,8 @@ export function CustomerServiceHologram({
             <image
               x="0"
               y="0"
-              width={HOLOGRAM.width}
-              height={HOLOGRAM.height}
+              width={hologramSourceWidthPx}
+              height={hologramSourceHeightPx}
               href={responsiveSource(HOLOGRAM.imageBase, 640)}
               xlinkHref={responsiveSource(HOLOGRAM.imageBase, 640)}
               preserveAspectRatio="xMidYMid meet"
@@ -1415,8 +1456,8 @@ export function CustomerServiceHologram({
             <image
               x="0"
               y="0"
-              width={HOLOGRAM.width}
-              height={HOLOGRAM.height}
+              width={hologramSourceWidthPx}
+              height={hologramSourceHeightPx}
               href={responsiveSource(HOLOGRAM.imageBase, 640)}
               xlinkHref={responsiveSource(HOLOGRAM.imageBase, 640)}
               preserveAspectRatio="xMidYMid meet"
@@ -1430,8 +1471,8 @@ export function CustomerServiceHologram({
             <image
               x="0"
               y="0"
-              width={HOLOGRAM.width}
-              height={HOLOGRAM.height}
+              width={hologramSourceWidthPx}
+              height={hologramSourceHeightPx}
               href={responsiveSource(HOLOGRAM.imageBase, 640)}
               xlinkHref={responsiveSource(HOLOGRAM.imageBase, 640)}
               preserveAspectRatio="xMidYMid meet"
@@ -1441,7 +1482,7 @@ export function CustomerServiceHologram({
       </span>
       <svg
         className="customer-service-hologram-hover-target"
-        viewBox={`0 0 ${HOLOGRAM.width} ${HOLOGRAM.height}`}
+        viewBox={`0 0 ${hologramSourceWidthPx} ${hologramSourceHeightPx}`}
         preserveAspectRatio="xMidYMid meet"
         xmlnsXlink="http://www.w3.org/1999/xlink"
         pointerEvents="auto"
@@ -1453,8 +1494,8 @@ export function CustomerServiceHologram({
         onPointerCancel={() => setHovered(false)}
       >
         <rect
-          width={HOLOGRAM.width}
-          height={HOLOGRAM.height}
+          width={hologramSourceWidthPx}
+          height={hologramSourceHeightPx}
           fill="transparent"
         />
       </svg>

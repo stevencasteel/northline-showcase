@@ -43,7 +43,12 @@ import {
   asResponsiveAsset,
   preloadResponsiveImage,
   responsiveImage,
+  responsiveAssetMetadata,
 } from "./lib/responsiveImage";
+import {
+  percentFromPixels,
+  sourceRectToPercentVariables,
+} from "./lib/geometry";
 import {
   SectionAssetProvider,
   SectionImage,
@@ -53,6 +58,9 @@ import { DialogModal } from "./components/DialogModal";
 import { CopperEdgeSeam } from "./components/CopperEdgeSeam";
 
 const asset = "/assets/";
+const heroSkyMetadata = responsiveAssetMetadata(
+  asResponsiveAsset("/assets/hero/sky"),
+);
 
 function AnimatedHeroLine({
   text,
@@ -365,23 +373,33 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
       return;
 
     let frame = 0;
-    let offset = 0;
-    let travelDistance = 0;
+    let transformOffsetLocalPx = 0;
+    let travelDistanceVisualPx = 0;
     const speed = 13;
 
     const measure = () => {
-      const imageWidth = image.getBoundingClientRect().width;
-      const viewportWidth =
+      const imageWidthVisualPx = image.getBoundingClientRect().width;
+      const viewportWidthVisualPx =
         track.parentElement?.getBoundingClientRect().width ?? 0;
-      travelDistance = Math.max(0, imageWidth - viewportWidth);
-      offset = travelDistance > 0 ? offset % travelDistance : 0;
+      // Compatibility: these visual-pixel measurements intentionally feed a
+      // pre-artboard CSS-pixel transform until a motion change is approved.
+      travelDistanceVisualPx = Math.max(
+        0,
+        imageWidthVisualPx - viewportWidthVisualPx,
+      );
+      transformOffsetLocalPx =
+        travelDistanceVisualPx > 0
+          ? transformOffsetLocalPx % travelDistanceVisualPx
+          : 0;
     };
     const animate = (time: number) => {
       const elapsed = time - previousTime;
       previousTime = time;
-      if (travelDistance > 0) {
-        offset = (offset + (speed * elapsed) / 1000) % travelDistance;
-        track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+      if (travelDistanceVisualPx > 0) {
+        transformOffsetLocalPx =
+          (transformOffsetLocalPx + (speed * elapsed) / 1000) %
+          travelDistanceVisualPx;
+        track.style.transform = `translate3d(${-transformOffsetLocalPx}px, 0, 0)`;
       }
       frame = window.requestAnimationFrame(animate);
     };
@@ -415,6 +433,11 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
             className="hero-sky"
             ref={skyImageRef}
             {...responsiveImage("/assets/hero/sky", "100vw", 1440)}
+            style={
+              {
+                "--hero-sky-aspect-ratio": `${heroSkyMetadata.sourceWidth} / ${heroSkyMetadata.sourceHeight}`,
+              } as React.CSSProperties
+            }
             alt="Bright blue sky with fluffy white cumulus clouds over distant mountain ranges, designed as a seamless background layer for the Northline Roofing hero image."
           />
         </div>
@@ -650,6 +673,82 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+const BADGE_BANNER_BASE = "/assets/badges/banner" as const;
+const badgeBannerMetadata = responsiveAssetMetadata(
+  asResponsiveAsset(BADGE_BANNER_BASE),
+);
+const badgeSliceConfigs = [
+  {
+    destinationLeftPercent: 3.06,
+    destinationWidthPercent: 17.4,
+    sourceXpx: 65,
+    sourceWidthPx: 380,
+    animationDelaySeconds: 0.08,
+  },
+  {
+    destinationLeftPercent: 22.8,
+    destinationWidthPercent: 1.65,
+    sourceXpx: 485,
+    sourceWidthPx: 35,
+    animationDelaySeconds: 0.2,
+  },
+  {
+    destinationLeftPercent: 25.86,
+    destinationWidthPercent: 17.4,
+    sourceXpx: 550,
+    sourceWidthPx: 370,
+    animationDelaySeconds: 0.31,
+  },
+  {
+    destinationLeftPercent: 45.13,
+    destinationWidthPercent: 1.65,
+    sourceXpx: 960,
+    sourceWidthPx: 35,
+    animationDelaySeconds: 0.42,
+  },
+  {
+    destinationLeftPercent: 48.19,
+    destinationWidthPercent: 23.51,
+    sourceXpx: 1025,
+    sourceWidthPx: 500,
+    animationDelaySeconds: 0.53,
+  },
+  {
+    destinationLeftPercent: 73.11,
+    destinationWidthPercent: 1.65,
+    sourceXpx: 1555,
+    sourceWidthPx: 35,
+    animationDelaySeconds: 0.64,
+  },
+  {
+    destinationLeftPercent: 76.16,
+    destinationWidthPercent: 21.63,
+    sourceXpx: 1620,
+    sourceWidthPx: 460,
+    animationDelaySeconds: 0.75,
+  },
+] as const;
+
+function badgeSliceStyle(
+  config: (typeof badgeSliceConfigs)[number],
+): React.CSSProperties {
+  return {
+    "--badge-destination-left": `${config.destinationLeftPercent}%`,
+    "--badge-destination-width": `${config.destinationWidthPercent}%`,
+    "--badge-image-left": percentFromPixels(
+      -config.sourceXpx,
+      config.sourceWidthPx,
+      2,
+    ),
+    "--badge-image-width": percentFromPixels(
+      badgeBannerMetadata.sourceWidth,
+      config.sourceWidthPx,
+      2,
+    ),
+    "--badge-animation-delay": `${config.animationDelaySeconds}s`,
+  } as React.CSSProperties;
+}
+
 function BadgeStrip() {
   return (
     <section
@@ -657,19 +756,23 @@ function BadgeStrip() {
       id="qualifications"
       aria-label="Northline Roofing qualifications"
     >
-      <div className="badge-sprite-canvas" aria-hidden="true">
-        {[
-          "badge-slice-one",
-          "badge-divider-one",
-          "badge-slice-two",
-          "badge-divider-two",
-          "badge-slice-three",
-          "badge-divider-three",
-          "badge-slice-four",
-        ].map((className) => (
-          <div className={`badge-slice ${className}`} key={className}>
+      <div
+        className="badge-sprite-canvas"
+        aria-hidden="true"
+        style={
+          {
+            "--badge-sprite-aspect-ratio": `${badgeBannerMetadata.sourceWidth} / ${badgeBannerMetadata.sourceHeight}`,
+          } as React.CSSProperties
+        }
+      >
+        {badgeSliceConfigs.map((config) => (
+          <div
+            className="badge-slice"
+            key={`${config.sourceXpx}-${config.sourceWidthPx}`}
+            style={badgeSliceStyle(config)}
+          >
             <SectionImage
-              base="/assets/badges/banner"
+              base={BADGE_BANNER_BASE}
               sizes="91vw"
               defaultWidth={1440}
               section="badges"
@@ -680,7 +783,7 @@ function BadgeStrip() {
       </div>
       <SectionImage
         className="badge-banner visually-hidden"
-        base="/assets/badges/banner"
+        base={BADGE_BANNER_BASE}
         sizes="91vw"
         defaultWidth={1440}
         section="badges"
@@ -1078,23 +1181,137 @@ function shuffleGalleryImages(images: GalleryImage[]) {
 // Shuffle once per app load so every refresh presents a new gallery sequence.
 const galleryImages = shuffleGalleryImages(galleryImageCatalog);
 
+const MATERIAL_LIBRARY_BASE = "/assets/gallery/material-library" as const;
+const materialLibraryMetadata = responsiveAssetMetadata(
+  asResponsiveAsset(MATERIAL_LIBRARY_BASE),
+);
+const materialRowsPx = [
+  { yPx: 72, heightPx: 160 },
+  { yPx: 244, heightPx: 155 },
+  { yPx: 415, heightPx: 157 },
+  { yPx: 585, heightPx: 156 },
+  { yPx: 755, heightPx: 159 },
+  { yPx: 928, heightPx: 160 },
+  { yPx: 1103, heightPx: 162 },
+  { yPx: 1280, heightPx: 167 },
+] as const;
+const materialColumnsPx = {
+  left: { xPx: 56, widthPx: 450.5 },
+  right: { xPx: 506.5, widthPx: 454.5 },
+} as const;
 const roofMaterials = [
-  ["01", "Terracotta barrel tile", "Burnt orange / rounded profile"],
-  ["02", "Patinated copper seam", "Blue-green / vertical panel"],
-  ["03", "Riven slate tile", "Blue-gray / rugged split face"],
-  ["04", "Iridescent scale tile", "Silver blue / fish-scale profile"],
-  ["05", "Translucent polycarbonate", "Clear / corrugated panel"],
-  ["06", "Gilded hex tile", "Amber gold / geometric relief"],
-  ["07", "Blue scallop tile", "Deep teal / glazed scale"],
-  ["08", "Thatch roofing", "Natural straw / layered fiber"],
-  ["09", "Indigo barrel tile", "Cobalt violet / fired gloss"],
-  ["10", "Silver standing seam", "Cool gray / vertical rib"],
-  ["11", "Copper diamond shingle", "Warm copper / geometric scale"],
-  ["12", "Verdigris scallop tile", "Emerald teal / aged copper"],
-  ["13", "Ivory barrel tile", "Cream / embossed pattern"],
-  ["14", "Cedar shakes", "Weathered wood / natural grain"],
-  ["15", "Solar slate panel", "Blue-gray / photovoltaic grid"],
-  ["16", "Living roof membrane", "Moss green / planted system"],
+  {
+    number: "01",
+    name: "Terracotta barrel tile",
+    detail: "Burnt orange / rounded profile",
+    rowIndex: 0,
+    column: "left",
+  },
+  {
+    number: "02",
+    name: "Patinated copper seam",
+    detail: "Blue-green / vertical panel",
+    rowIndex: 1,
+    column: "left",
+  },
+  {
+    number: "03",
+    name: "Riven slate tile",
+    detail: "Blue-gray / rugged split face",
+    rowIndex: 2,
+    column: "left",
+  },
+  {
+    number: "04",
+    name: "Iridescent scale tile",
+    detail: "Silver blue / fish-scale profile",
+    rowIndex: 3,
+    column: "left",
+  },
+  {
+    number: "05",
+    name: "Translucent polycarbonate",
+    detail: "Clear / corrugated panel",
+    rowIndex: 4,
+    column: "left",
+  },
+  {
+    number: "06",
+    name: "Gilded hex tile",
+    detail: "Amber gold / geometric relief",
+    rowIndex: 5,
+    column: "left",
+  },
+  {
+    number: "07",
+    name: "Blue scallop tile",
+    detail: "Deep teal / glazed scale",
+    rowIndex: 6,
+    column: "left",
+  },
+  {
+    number: "08",
+    name: "Thatch roofing",
+    detail: "Natural straw / layered fiber",
+    rowIndex: 7,
+    column: "left",
+  },
+  {
+    number: "09",
+    name: "Indigo barrel tile",
+    detail: "Cobalt violet / fired gloss",
+    rowIndex: 0,
+    column: "right",
+  },
+  {
+    number: "10",
+    name: "Silver standing seam",
+    detail: "Cool gray / vertical rib",
+    rowIndex: 1,
+    column: "right",
+  },
+  {
+    number: "11",
+    name: "Copper diamond shingle",
+    detail: "Warm copper / geometric scale",
+    rowIndex: 2,
+    column: "right",
+  },
+  {
+    number: "12",
+    name: "Verdigris scallop tile",
+    detail: "Emerald teal / aged copper",
+    rowIndex: 3,
+    column: "right",
+  },
+  {
+    number: "13",
+    name: "Ivory barrel tile",
+    detail: "Cream / embossed pattern",
+    rowIndex: 4,
+    column: "right",
+  },
+  {
+    number: "14",
+    name: "Cedar shakes",
+    detail: "Weathered wood / natural grain",
+    rowIndex: 5,
+    column: "right",
+  },
+  {
+    number: "15",
+    name: "Solar slate panel",
+    detail: "Blue-gray / photovoltaic grid",
+    rowIndex: 6,
+    column: "right",
+  },
+  {
+    number: "16",
+    name: "Living roof membrane",
+    detail: "Moss green / planted system",
+    rowIndex: 7,
+    column: "right",
+  },
 ] as const;
 
 // Keep the preview curated while the modal remains the complete gallery.
@@ -1879,34 +2096,64 @@ function Gallery() {
               <h2 id="materials-title">Material library</h2>
               <span className="gallery-material-rule" />
             </div>
-            <div className="gallery-material-art">
+            <div
+              className="gallery-material-art"
+              style={
+                {
+                  "--gallery-material-aspect-ratio": `${materialLibraryMetadata.sourceWidth} / ${materialLibraryMetadata.sourceHeight}`,
+                } as React.CSSProperties
+              }
+            >
               <div className="gallery-material-clip">
                 <SectionImage
-                  base="/assets/gallery/material-library"
+                  base={MATERIAL_LIBRARY_BASE}
                   sizes="32vw"
                   defaultWidth={960}
                   section="gallery"
                   alt="A front-facing display of sixteen fantasy roofing material samples arranged in two columns like a premium architectural showroom library."
                 />
                 <div className="gallery-material-labels">
-                  {roofMaterials.map(([number, name, detail], index) => (
-                    <button
-                      className={`gallery-material-label${activeMaterialIndex === index ? " is-active" : ""}`}
-                      type="button"
-                      onClick={() =>
-                        setActiveMaterialIndex((current) =>
-                          current === index ? null : index,
-                        )
-                      }
-                      key={number}
-                      aria-label={`${number}: ${name}. ${detail}`}
-                      aria-pressed={activeMaterialIndex === index}
-                    >
-                      <span>{number}</span>
-                      <strong>{name}</strong>
-                      <small>{detail}</small>
-                    </button>
-                  ))}
+                  {roofMaterials.map(
+                    ({ number, name, detail, rowIndex, column }, index) => {
+                      const row = materialRowsPx[rowIndex];
+                      const columnGeometry = materialColumnsPx[column];
+                      const geometry = sourceRectToPercentVariables(
+                        {
+                          xPx: columnGeometry.xPx,
+                          yPx: row.yPx,
+                          widthPx: columnGeometry.widthPx,
+                          heightPx: row.heightPx,
+                        },
+                        materialLibraryMetadata,
+                      );
+                      return (
+                        <button
+                          className={`gallery-material-label gallery-material-label-${column}${activeMaterialIndex === index ? " is-active" : ""}`}
+                          type="button"
+                          style={
+                            {
+                              "--material-label-top": geometry.top,
+                              "--material-label-left": geometry.left,
+                              "--material-label-width": geometry.width,
+                              "--material-label-height": geometry.height,
+                            } as React.CSSProperties
+                          }
+                          onClick={() =>
+                            setActiveMaterialIndex((current) =>
+                              current === index ? null : index,
+                            )
+                          }
+                          key={number}
+                          aria-label={`${number}: ${name}. ${detail}`}
+                          aria-pressed={activeMaterialIndex === index}
+                        >
+                          <span>{number}</span>
+                          <strong>{name}</strong>
+                          <small>{detail}</small>
+                        </button>
+                      );
+                    },
+                  )}
                 </div>
               </div>
             </div>

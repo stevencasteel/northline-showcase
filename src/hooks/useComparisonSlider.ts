@@ -10,30 +10,30 @@ type DragDirection = "left" | "right" | null;
 type PointerMode = "idle" | "pending" | "dragging";
 
 type ComparisonSliderOptions = {
-  initialValue?: number;
-  intentThreshold?: number;
+  initialPercent?: number;
+  intentThresholdPx?: number;
   releaseDelayMs?: number;
 };
 
-const clamp = (value: number) =>
+const clampPercent = (value: number) =>
   Math.min(100, Math.max(0, Number(value.toFixed(1))));
 
 export function useComparisonSlider({
-  initialValue = 54,
-  intentThreshold = 10,
+  initialPercent = 54,
+  intentThresholdPx = 10,
   releaseDelayMs = 240,
 }: ComparisonSliderOptions = {}) {
-  const [value, setValue] = useState(initialValue);
+  const [percent, setPercent] = useState(initialPercent);
   const [direction, setDirection] = useState<DragDirection>(null);
   const [indicatorVisible, setIndicatorVisible] = useState(false);
   const [pointerFocusActive, setPointerFocusActive] = useState(false);
   const isDragging = useRef(false);
-  const previousValue = useRef(value);
+  const previousPercent = useRef(percent);
   const directionRef = useRef<DragDirection>(null);
   const releaseTimeout = useRef<number | null>(null);
   const pointerMode = useRef<PointerMode>("idle");
   const activePointerId = useRef<number | null>(null);
-  const pointerStart = useRef({ x: 0, y: 0, value });
+  const pointerStart = useRef({ x: 0, y: 0, percent });
   const dragBounds = useRef<{ left: number; width: number } | null>(null);
 
   useEffect(
@@ -47,15 +47,15 @@ export function useComparisonSlider({
   const updateFromClientX = (input: HTMLInputElement, clientX: number) => {
     const bounds = dragBounds.current ?? input.getBoundingClientRect();
     if (bounds.width <= 0) return;
-    const next = clamp(((clientX - bounds.left) / bounds.width) * 100);
-    if (next !== previousValue.current) {
-      const nextDirection = next > previousValue.current ? "right" : "left";
+    const next = clampPercent(((clientX - bounds.left) / bounds.width) * 100);
+    if (next !== previousPercent.current) {
+      const nextDirection = next > previousPercent.current ? "right" : "left";
       directionRef.current = nextDirection;
       setDirection(nextDirection);
       setIndicatorVisible(true);
     }
-    previousValue.current = next;
-    setValue(next);
+    previousPercent.current = next;
+    setPercent(next);
   };
 
   const scheduleRelease = () => {
@@ -92,12 +92,12 @@ export function useComparisonSlider({
 
   const onInput = (event: FormEvent<HTMLInputElement>) => {
     if (isDragging.current || pointerMode.current === "pending") return;
-    const next = clamp(Number(event.currentTarget.value));
-    previousValue.current = next;
+    const next = clampPercent(Number(event.currentTarget.value));
+    previousPercent.current = next;
     directionRef.current = null;
     setDirection(null);
     setIndicatorVisible(false);
-    setValue(next);
+    setPercent(next);
   };
 
   const onPointerDown = (event: PointerEvent<HTMLInputElement>) => {
@@ -107,7 +107,7 @@ export function useComparisonSlider({
     directionRef.current = null;
     setDirection(null);
     setIndicatorVisible(false);
-    pointerStart.current = { x: event.clientX, y: event.clientY, value };
+    pointerStart.current = { x: event.clientX, y: event.clientY, percent };
     const bounds = event.currentTarget.getBoundingClientRect();
     dragBounds.current = { left: bounds.left, width: bounds.width };
     activePointerId.current = event.pointerId;
@@ -117,7 +117,7 @@ export function useComparisonSlider({
     if (event.pointerType === "mouse") {
       pointerMode.current = "dragging";
       isDragging.current = true;
-      previousValue.current = value;
+      previousPercent.current = percent;
       try {
         event.currentTarget.setPointerCapture(event.pointerId);
       } catch {
@@ -135,7 +135,7 @@ export function useComparisonSlider({
     if (pointerMode.current === "pending") {
       const dx = event.clientX - pointerStart.current.x;
       const dy = event.clientY - pointerStart.current.y;
-      if (Math.abs(dx) < intentThreshold && Math.abs(dy) < intentThreshold)
+      if (Math.abs(dx) < intentThresholdPx && Math.abs(dy) < intentThresholdPx)
         return;
       if (Math.abs(dy) > Math.abs(dx)) {
         finish(event.pointerId);
@@ -143,7 +143,7 @@ export function useComparisonSlider({
       }
       pointerMode.current = "dragging";
       isDragging.current = true;
-      previousValue.current = pointerStart.current.value;
+      previousPercent.current = pointerStart.current.percent;
       try {
         event.currentTarget.setPointerCapture(event.pointerId);
       } catch {
@@ -174,7 +174,7 @@ export function useComparisonSlider({
     finish(event.pointerId);
 
   return {
-    value,
+    percent,
     direction,
     indicatorVisible,
     pointerFocusActive,

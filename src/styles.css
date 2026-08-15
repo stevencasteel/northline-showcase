@@ -16,9 +16,6 @@
   --copper-edge-shadow-height: clamp(6px, 0.6cqw, 15px);
   --section-rail-width: clamp(6.8rem, 8cqw, 9rem);
   --section-layout-gap: clamp(1rem, 1.8cqw, 2rem);
-  --hologram-period: 4.2s;
-  --hologram-width: 720;
-  --hologram-height: 1626;
   font-family: Inter, sans-serif;
   color: var(--color-ink);
   background: var(--color-cream);
@@ -402,6 +399,7 @@ a {
   --hero-copper-edge-height: clamp(5px, 0.55cqw, 14px);
   --hero-copper-edge-shadow-height: clamp(6px, 0.6cqw, 15px);
   z-index: 2;
+  /* Calibrated hero stage ratio; this is intentionally not a source-image ratio. */
   aspect-ratio: 6821 / 2354.7;
   position: relative;
   overflow: hidden;
@@ -462,7 +460,7 @@ a {
   width: auto;
   height: 100%;
   max-width: none;
-  aspect-ratio: 4599 / 734;
+  aspect-ratio: var(--hero-sky-aspect-ratio);
 }
 .hero.is-sky-active .hero-sky-track {
   will-change: transform;
@@ -905,6 +903,8 @@ a {
   }
 }
 .badge-strip {
+  /* Calibrated workshirt stage geometry, not the current banner image ratio. */
+  --badge-workshirt-stage-height-ratio: 548 / 6821;
   --shirt-hem-height: max(26px, 3.15cqw);
   --copper-edge-height: clamp(5px, 0.55cqw, 14px);
   --copper-edge-shadow-height: clamp(6px, 0.6cqw, 15px);
@@ -954,7 +954,7 @@ a {
   left: 4.5%;
   z-index: 2;
   width: 91%;
-  aspect-ratio: 2127 / 171;
+  aspect-ratio: var(--badge-sprite-aspect-ratio);
   transform: translateY(-50%);
 }
 .badge-slice {
@@ -966,75 +966,17 @@ a {
   transform: translateY(88%) scale(0.98);
   transform-origin: center bottom;
   animation: badge-cascade 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  left: var(--badge-destination-left);
+  width: var(--badge-destination-width);
+  animation-delay: var(--badge-animation-delay);
 }
 .badge-slice img {
   position: absolute;
   top: 0;
   height: auto;
   max-width: none;
-}
-.badge-slice-one {
-  left: 3.06%;
-  width: 17.4%;
-  animation-delay: 0.08s;
-}
-.badge-slice-one img {
-  left: -17.11%;
-  width: 559.74%;
-}
-.badge-divider-one {
-  left: 22.8%;
-  width: 1.65%;
-  animation-delay: 0.2s;
-}
-.badge-divider-one img {
-  left: -1385.71%;
-  width: 6077.14%;
-}
-.badge-slice-two {
-  left: 25.86%;
-  width: 17.4%;
-  animation-delay: 0.31s;
-}
-.badge-slice-two img {
-  left: -148.65%;
-  width: 574.86%;
-}
-.badge-divider-two {
-  left: 45.13%;
-  width: 1.65%;
-  animation-delay: 0.42s;
-}
-.badge-divider-two img {
-  left: -2742.86%;
-  width: 6077.14%;
-}
-.badge-slice-three {
-  left: 48.19%;
-  width: 23.51%;
-  animation-delay: 0.53s;
-}
-.badge-slice-three img {
-  left: -205%;
-  width: 425.4%;
-}
-.badge-divider-three {
-  left: 73.11%;
-  width: 1.65%;
-  animation-delay: 0.64s;
-}
-.badge-divider-three img {
-  left: -4442.86%;
-  width: 6077.14%;
-}
-.badge-slice-four {
-  left: 76.16%;
-  width: 21.63%;
-  animation-delay: 0.75s;
-}
-.badge-slice-four img {
-  left: -352.17%;
-  width: 462.39%;
+  left: var(--badge-image-left);
+  width: var(--badge-image-width);
 }
 @keyframes badge-cascade {
   from {
@@ -1549,7 +1491,7 @@ a {
   align-self: end;
   width: 100%;
   min-height: 0;
-  aspect-ratio: 1013 / 1520;
+  aspect-ratio: var(--gallery-material-aspect-ratio);
   overflow: visible;
   isolation: isolate;
   background: transparent;
@@ -1593,9 +1535,10 @@ a {
 }
 .gallery-material-label {
   position: absolute;
-  width: 50%;
-  height: var(--material-row-height);
-  top: var(--material-row-top);
+  width: var(--material-label-width);
+  height: var(--material-label-height);
+  top: var(--material-label-top);
+  left: var(--material-label-left);
   display: grid;
   align-content: center;
   justify-items: end;
@@ -1613,57 +1556,13 @@ a {
     opacity 0.25s ease,
     background 0.25s ease;
 }
-.gallery-material-label:nth-child(1),
-.gallery-material-label:nth-child(9) {
-  --material-row-top: 4.736842%;
-  --material-row-height: 10.526316%;
-}
-.gallery-material-label:nth-child(2),
-.gallery-material-label:nth-child(10) {
-  --material-row-top: 16.052632%;
-  --material-row-height: 10.197368%;
-}
-.gallery-material-label:nth-child(3),
-.gallery-material-label:nth-child(11) {
-  --material-row-top: 27.302632%;
-  --material-row-height: 10.328947%;
-}
-.gallery-material-label:nth-child(4),
-.gallery-material-label:nth-child(12) {
-  --material-row-top: 38.486842%;
-  --material-row-height: 10.263158%;
-}
-.gallery-material-label:nth-child(5),
-.gallery-material-label:nth-child(13) {
-  --material-row-top: 49.671053%;
-  --material-row-height: 10.460526%;
-}
-.gallery-material-label:nth-child(6),
-.gallery-material-label:nth-child(14) {
-  --material-row-top: 61.052632%;
-  --material-row-height: 10.526316%;
-}
-.gallery-material-label:nth-child(7),
-.gallery-material-label:nth-child(15) {
-  --material-row-top: 72.565789%;
-  --material-row-height: 10.657895%;
-}
-.gallery-material-label:nth-child(8),
-.gallery-material-label:nth-child(16) {
-  --material-row-top: 84.210526%;
-  --material-row-height: 10.986842%;
-}
-.gallery-material-label:nth-child(-n + 8) {
-  left: 5.528135%;
-  width: 44.471865%;
-}
-.gallery-material-label:nth-child(n + 9) {
-  left: 50%;
-  width: 44.866732%;
-}
-.gallery-material-label:nth-child(-n + 8) {
+.gallery-material-label-left {
   justify-items: start;
   text-align: left;
+}
+.gallery-material-label-right {
+  justify-items: end;
+  text-align: right;
 }
 .gallery-material-label span {
   color: #f18a54;
@@ -1692,8 +1591,8 @@ a {
     background: linear-gradient(90deg, transparent, rgba(4, 20, 33, 0.82));
     outline: none;
   }
-  .gallery-material-label:nth-child(-n + 8):hover,
-  .gallery-material-label:nth-child(-n + 8):focus-visible {
+  .gallery-material-label-left:hover,
+  .gallery-material-label-left:focus-visible {
     background: linear-gradient(90deg, rgba(4, 20, 33, 0.82), transparent);
   }
 }
@@ -2363,6 +2262,7 @@ a {
     transform: translateY(1.5vw) scale(0.985);
   }
 }
+/* Breakpoint contract: keep in sync with NARROW_VIEWPORT_MAX_WIDTH_PX in config/layout.ts. */
 @media (max-width: 700px) {
   .appointment-backdrop {
     place-items: end center;
@@ -2565,6 +2465,7 @@ a {
   }
 }
 
+/* Breakpoint contract: keep in sync with NARROW_VIEWPORT_MAX_WIDTH_PX in config/layout.ts. */
 @media (max-width: 700px) and (orientation: landscape) {
   .gallery-modal-backdrop {
     padding-inline: 8px;
@@ -2638,11 +2539,12 @@ a {
     opacity: 1;
     background: linear-gradient(90deg, transparent, rgba(4, 20, 33, 0.82));
   }
-  .gallery-material-label:nth-child(-n + 8).is-active {
+  .gallery-material-label-left.is-active {
     background: linear-gradient(90deg, rgba(4, 20, 33, 0.82), transparent);
   }
 }
 
+/* Breakpoint contract: keep in sync with NARROW_VIEWPORT_MAX_WIDTH_PX in config/layout.ts. */
 @media (max-width: 700px) {
   .gallery-material-library {
     row-gap: clamp(3px, 0.3cqw, 6px);

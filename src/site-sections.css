@@ -874,7 +874,7 @@
 .site-footer-brand-plaque {
   position: relative;
   width: 100%;
-  aspect-ratio: 1905 / 826;
+  aspect-ratio: var(--footer-brand-plaque-aspect-ratio);
   filter: drop-shadow(0 1.25cqw 2.5cqw rgba(0, 0, 0, 0.4));
 }
 .site-footer-brand-frame {
@@ -960,7 +960,7 @@
 .site-footer-map-frame {
   position: relative;
   width: 100%;
-  aspect-ratio: 1672 / 941;
+  aspect-ratio: var(--footer-map-frame-aspect-ratio);
   filter: drop-shadow(0 1.5cqw 3cqw rgba(0, 0, 0, 0.42));
 }
 .site-footer-map-frame > img {
@@ -995,7 +995,7 @@
   bottom: max(0.4rem, env(safe-area-inset-bottom, 0px));
   z-index: 18;
   width: clamp(12rem, 19vw, 18rem);
-  aspect-ratio: var(--hologram-width) / var(--hologram-height);
+  aspect-ratio: var(--hologram-aspect-ratio);
   opacity: 0;
   overflow: visible;
   background: transparent;
@@ -1216,6 +1216,7 @@
   }
 }
 
+/* Breakpoint contract: keep in sync with NARROW_VIEWPORT_MAX_WIDTH_PX in config/layout.ts. */
 @media (max-width: 700px) {
   .site-footer {
     height: 68cqw;

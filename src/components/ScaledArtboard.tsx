@@ -5,10 +5,11 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
-import { NARROW_VIEWPORT_MEDIA_QUERY } from "../config/layout";
+import {
+  ARTBOARD_REFERENCE_WIDTH_PX,
+  NARROW_VIEWPORT_MEDIA_QUERY,
+} from "../config/layout";
 
-const DESKTOP_ARTBOARD_REFERENCE_WIDTH_PX = 1440;
-const MOBILE_ARTBOARD_REFERENCE_WIDTH_PX = 720;
 const SCALE_CHANGE_EPSILON = 0.0001;
 const HEIGHT_CHANGE_EPSILON_PX = 0.5;
 const MIN_MEASURABLE_WIDTH_PX = 1;
@@ -20,10 +21,14 @@ type ScaledArtboardProps = {
 export function ScaledArtboard({ children }: ScaledArtboardProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
-  const [layout, setLayout] = useState({
-    artboardWidth: DESKTOP_ARTBOARD_REFERENCE_WIDTH_PX,
+  const [layout, setLayout] = useState<{
+    artboardWidthPx: number;
+    scale: number;
+    scaledHeightPx: number;
+  }>({
+    artboardWidthPx: ARTBOARD_REFERENCE_WIDTH_PX.wide,
     scale: 1,
-    height: 0,
+    scaledHeightPx: 0,
   });
 
   useLayoutEffect(() => {
@@ -34,23 +39,24 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
     let resizeFrame = 0;
 
     const update = () => {
-      const hostWidth = Math.max(
+      const hostWidthPx = Math.max(
         host.getBoundingClientRect().width,
         MIN_MEASURABLE_WIDTH_PX,
       );
-      const referenceWidth = window.matchMedia(NARROW_VIEWPORT_MEDIA_QUERY)
+      const referenceWidthPx = window.matchMedia(NARROW_VIEWPORT_MEDIA_QUERY)
         .matches
-        ? MOBILE_ARTBOARD_REFERENCE_WIDTH_PX
-        : DESKTOP_ARTBOARD_REFERENCE_WIDTH_PX;
-      const artboardWidth = Math.max(referenceWidth, hostWidth);
-      const scale = hostWidth / artboardWidth;
-      const height = inner.scrollHeight * scale;
+        ? ARTBOARD_REFERENCE_WIDTH_PX.narrow
+        : ARTBOARD_REFERENCE_WIDTH_PX.wide;
+      const artboardWidthPx = Math.max(referenceWidthPx, hostWidthPx);
+      const scale = hostWidthPx / artboardWidthPx;
+      const scaledHeightPx = inner.scrollHeight * scale;
       setLayout((current) =>
-        current.artboardWidth === artboardWidth &&
+        current.artboardWidthPx === artboardWidthPx &&
         Math.abs(current.scale - scale) < SCALE_CHANGE_EPSILON &&
-        Math.abs(current.height - height) < HEIGHT_CHANGE_EPSILON_PX
+        Math.abs(current.scaledHeightPx - scaledHeightPx) <
+          HEIGHT_CHANGE_EPSILON_PX
           ? current
-          : { artboardWidth, scale, height },
+          : { artboardWidthPx, scale, scaledHeightPx },
       );
     };
 
@@ -89,7 +95,6 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
   }, []);
 
   const innerStyle = {
-    width: `${layout.artboardWidth}px`,
     maxWidth: "none",
     transform: `scale(${layout.scale})`,
     transformOrigin: "top left",
@@ -99,13 +104,16 @@ export function ScaledArtboard({ children }: ScaledArtboardProps) {
     <div
       className="scaled-artboard"
       ref={hostRef}
-      style={{ height: layout.height || undefined }}
+      style={{ height: layout.scaledHeightPx || undefined }}
     >
       <div
         className="scaled-artboard-inner"
         ref={innerRef}
-        style={innerStyle}
-        data-artboard-width={layout.artboardWidth}
+        style={{
+          ...innerStyle,
+          width: `${layout.artboardWidthPx}px`,
+        }}
+        data-artboard-width={layout.artboardWidthPx}
       >
         {children}
       </div>
