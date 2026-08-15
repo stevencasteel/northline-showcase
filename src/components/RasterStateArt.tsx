@@ -1,37 +1,30 @@
-import { responsiveImage } from "../lib/responsiveImage";
+import {
+  responsiveImage,
+  type ResponsiveAssetBase,
+} from "../lib/responsiveImage";
 
-export type RasterAsset = {
-  file?: string;
-  responsiveBase?: Parameters<typeof responsiveImage>[0];
-};
+export type RasterAsset =
+  | { kind: "responsive"; base: ResponsiveAssetBase }
+  | { kind: "static"; src: string; width: number; height: number };
 
 type RasterStateArtProps = {
   defaultAsset: RasterAsset;
   hoverAsset?: RasterAsset;
   stateAsset?: RasterAsset;
-  width: number;
-  height: number;
   alt: string;
   sizes?: string;
 };
 
-function imageProps(
-  asset: RasterAsset,
-  width: number,
-  height: number,
-  sizes: string,
-) {
-  return asset.responsiveBase
-    ? responsiveImage(asset.responsiveBase, sizes, 640)
-    : { src: asset.file ?? "", width, height };
+function imageProps(asset: RasterAsset, sizes: string) {
+  return asset.kind === "responsive"
+    ? responsiveImage(asset.base, sizes, 640)
+    : { src: asset.src, width: asset.width, height: asset.height };
 }
 
 export function RasterStateArt({
   defaultAsset,
   hoverAsset,
   stateAsset,
-  width,
-  height,
   alt,
   sizes = "15vw",
 }: RasterStateArtProps) {
@@ -39,13 +32,13 @@ export function RasterStateArt({
     <span className="raster-art" aria-hidden={alt ? undefined : true}>
       <img
         className="raster-art-default"
-        {...imageProps(defaultAsset, width, height, sizes)}
+        {...imageProps(defaultAsset, sizes)}
         alt={alt}
       />
       {hoverAsset && (
         <img
           className="raster-art-hover"
-          {...imageProps(hoverAsset, width, height, sizes)}
+          {...imageProps(hoverAsset, sizes)}
           alt=""
           aria-hidden="true"
         />
@@ -53,7 +46,7 @@ export function RasterStateArt({
       {stateAsset && (
         <img
           className="raster-art-state"
-          {...imageProps(stateAsset, width, height, sizes)}
+          {...imageProps(stateAsset, sizes)}
           alt=""
           aria-hidden="true"
         />

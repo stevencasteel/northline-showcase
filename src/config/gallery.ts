@@ -5,7 +5,7 @@ export const GALLERY_PREVIEW_SLOTS = [
   { initialImage: 9, neighbors: [0, 4] },
   { initialImage: 13, neighbors: [0, 2, 3, 5] },
   { initialImage: 16, neighbors: [2, 4] },
-] as const
+] as const;
 
 export const GALLERY_SWAP_CONFIG = {
   minimumGlobalIntervalMs: 850,
@@ -14,4 +14,4 @@ export const GALLERY_SWAP_CONFIG = {
   randomDelayRangeMs: 4000,
   idleRetryMs: 500,
   schedulerFloorMs: 250,
-} as const
+} as const;

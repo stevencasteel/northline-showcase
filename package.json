@@ -10,11 +10,11 @@
     "convert-avif": "node scripts/convert-avif.js",
     "images:webp": "node scripts/generate-responsive-webp.js",
     "typecheck": "tsc -b",
-    "check": "npm run typecheck && npm run lint && prettier --check package.json eslint.config.js",
-    "format": "prettier --write package.json eslint.config.js",
-    "lint": "eslint .",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run validate:assets",
+    "format": "prettier --write .",
+    "lint": "eslint . --max-warnings=0",
     "validate:assets": "node scripts/validate-responsive-assets.js",
-    "format:check": "prettier --check src/components/DialogModal.tsx src/components/RasterStateArt.tsx src/config/services.ts src/hooks/useReducedMotion.ts src/lib/responsiveImage.ts scripts/validate-responsive-assets.js vite.config.ts"
+    "format:check": "prettier --check ."
   },
   "engines": {
     "node": ">=22.14.0"

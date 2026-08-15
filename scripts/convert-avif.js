@@ -1,13 +1,13 @@
 import fs from "node:fs";
-import path from 'path';
-import process from 'node:process';
-import readline from 'readline';
-import { Writable } from 'stream';
-import { spawn, execSync } from 'child_process';
-import { clearInterval, setInterval } from 'node:timers';
-import os from 'os';
-import sizeOf from 'image-size';
-import sharp from 'sharp';
+import path from "path";
+import process from "node:process";
+import readline from "readline";
+import { Writable } from "stream";
+import { spawn, execSync } from "child_process";
+import { clearInterval, setInterval } from "node:timers";
+import os from "os";
+import sizeOf from "image-size";
+import sharp from "sharp";
 
 // OPTIMIZATION: Because we process files in parallel using Promise.race,
 // we restrict sharp to 1 thread per image to prevent CPU thread contention.
@@ -30,7 +30,7 @@ function parseDraggedPaths(input) {
     let p = match[1] || match[2] || match[3];
     if (p) {
       if (match[3]) {
-        p = p.replace(/\\(.)/g, '$1');
+        p = p.replace(/\\(.)/g, "$1");
       }
       paths.push(p);
     }
@@ -39,14 +39,20 @@ function parseDraggedPaths(input) {
 }
 
 async function promptForPath() {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
   return new Promise((resolve) => {
-    console.log('  \x1b[36m--- Target File(s) or Directory ---\x1b[0m');
-    rl.question('  \x1b[90mDrag and drop file(s) or folder(s) here, then press Enter:\x1b[0m\n  > ', (answer) => {
-      rl.close();
-      console.log();
-      resolve(parseDraggedPaths(answer.trim()));
-    });
+    console.log("  \x1b[36m--- Target File(s) or Directory ---\x1b[0m");
+    rl.question(
+      "  \x1b[90mDrag and drop file(s) or folder(s) here, then press Enter:\x1b[0m\n  > ",
+      (answer) => {
+        rl.close();
+        console.log();
+        resolve(parseDraggedPaths(answer.trim()));
+      },
+    );
   });
 }
 
@@ -56,16 +62,20 @@ async function promptSingleSelect(title, options) {
     let linesRendered = 0;
 
     console.log(`  \x1b[36m--- ${title} ---\x1b[0m`);
-    console.log('  \x1b[90m(Use arrow keys to navigate, Enter to confirm)\x1b[0m\n');
+    console.log(
+      "  \x1b[90m(Use arrow keys to navigate, Enter to confirm)\x1b[0m\n",
+    );
 
     const render = () => {
       clearLines(linesRendered);
-      let output = '';
+      let output = "";
       options.forEach((opt, i) => {
         const isHovered = i === cursor;
-        const cursorStr = isHovered ? '\x1b[36m➔\x1b[0m' : ' ';
-        const boxStr = isHovered ? '\x1b[36m◉\x1b[0m' : '\x1b[90m○\x1b[0m';
-        const labelText = isHovered ? `\x1b[1;36m${opt.label}\x1b[0m` : `\x1b[2;37m${opt.label}\x1b[0m`;
+        const cursorStr = isHovered ? "\x1b[36m➔\x1b[0m" : " ";
+        const boxStr = isHovered ? "\x1b[36m◉\x1b[0m" : "\x1b[90m○\x1b[0m";
+        const labelText = isHovered
+          ? `\x1b[1;36m${opt.label}\x1b[0m`
+          : `\x1b[2;37m${opt.label}\x1b[0m`;
         output += `  ${cursorStr}  ${boxStr}  ${labelText}\n`;
       });
       process.stdout.write(output);
@@ -75,38 +85,38 @@ async function promptSingleSelect(title, options) {
     const mutedOut = new Writable({
       write(chunk, encoding, callback) {
         callback();
-      }
+      },
     });
 
     const rl = readline.createInterface({
       input: process.stdin,
       output: mutedOut,
-      terminal: true
+      terminal: true,
     });
 
     if (process.stdin.isTTY) process.stdin.setRawMode(true);
-    process.stdout.write('\x1b[?25l');
+    process.stdout.write("\x1b[?25l");
 
     render();
 
     const keypressHandler = (str, key) => {
-      if (key.ctrl && key.name === 'c') {
-        process.stdout.write('\x1b[?25h\n');
+      if (key.ctrl && key.name === "c") {
+        process.stdout.write("\x1b[?25h\n");
         process.exit(0);
       }
 
-      if (key.name === 'up') {
-        cursor = (cursor > 0) ? cursor - 1 : options.length - 1;
+      if (key.name === "up") {
+        cursor = cursor > 0 ? cursor - 1 : options.length - 1;
         render();
-      } else if (key.name === 'down') {
-        cursor = (cursor < options.length - 1) ? cursor + 1 : 0;
+      } else if (key.name === "down") {
+        cursor = cursor < options.length - 1 ? cursor + 1 : 0;
         render();
-      } else if (key.name === 'return' || key.name === 'enter') {
-        process.stdin.removeListener('keypress', keypressHandler);
+      } else if (key.name === "return" || key.name === "enter") {
+        process.stdin.removeListener("keypress", keypressHandler);
 
         if (process.stdin.isTTY) process.stdin.setRawMode(false);
 
-        process.stdout.write('\x1b[?25h\n');
+        process.stdout.write("\x1b[?25h\n");
         process.stdin.pause();
 
         rl.close();
@@ -117,36 +127,39 @@ async function promptSingleSelect(title, options) {
       }
     };
 
-    process.stdin.on('keypress', keypressHandler);
+    process.stdin.on("keypress", keypressHandler);
   });
 }
 
 async function promptForDimension(title) {
   let dimension = await promptSingleSelect(title, [
-    { label: '600px', value: 600 },
-    { label: '800px', value: 800 },
-    { label: '1000px', value: 1000 },
-    { label: '1200px', value: 1200 },
-    { label: 'Custom...', value: 'custom' }
+    { label: "600px", value: 600 },
+    { label: "800px", value: 800 },
+    { label: "1000px", value: 1000 },
+    { label: "1200px", value: 1200 },
+    { label: "Custom...", value: "custom" },
   ]);
 
-  if (dimension === 'custom') {
+  if (dimension === "custom") {
     const rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
+      output: process.stdout,
     });
 
-    const answer = await new Promise(resolve => {
-      rl.question('  \x1b[36mEnter custom max edge in pixels (e.g. 1500):\x1b[0m ', (ans) => {
-        rl.close();
-        resolve(ans.trim());
-      });
+    const answer = await new Promise((resolve) => {
+      rl.question(
+        "  \x1b[36mEnter custom max edge in pixels (e.g. 1500):\x1b[0m ",
+        (ans) => {
+          rl.close();
+          resolve(ans.trim());
+        },
+      );
     });
 
     dimension = parseInt(answer, 10);
 
     if (isNaN(dimension) || dimension <= 0) {
-      console.log('  \x1b[31mInvalid dimension. Defaulting to 1000px.\x1b[0m');
+      console.log("  \x1b[31mInvalid dimension. Defaulting to 1000px.\x1b[0m");
       dimension = 1000;
     }
 
@@ -157,70 +170,77 @@ async function promptForDimension(title) {
 }
 
 function getShortPath(fullPath) {
-  if (!fullPath) return '';
+  if (!fullPath) return "";
 
-  const sep = fullPath.includes('\\') ? '\\' : '/';
+  const sep = fullPath.includes("\\") ? "\\" : "/";
   const parts = fullPath.split(sep).filter(Boolean);
 
   if (parts.length <= 3) return fullPath;
 
-  return '...' + sep + parts.slice(-3).join(sep);
+  return "..." + sep + parts.slice(-3).join(sep);
 }
 
-function printBoxLine(label, value, labelColor = '\x1b[37m', valueColor = '\x1b[37m') {
+function printBoxLine(
+  label,
+  value,
+  labelColor = "\x1b[37m",
+  valueColor = "\x1b[37m",
+) {
   const BOX_INNER_WIDTH = 58;
-  const LEFT_PADDING = '      ';
+  const LEFT_PADDING = "      ";
   const availableSpace = BOX_INNER_WIDTH - LEFT_PADDING.length;
 
   const rawString = `${label} ${value}`;
   let displayValue = value;
 
   if (rawString.length > availableSpace) {
-    displayValue = value.slice(0, availableSpace - label.length - 4) + '...';
+    displayValue = value.slice(0, availableSpace - label.length - 4) + "...";
   }
 
   const visualLength = label.length + 1 + displayValue.length;
-  const rightPadding = ' '.repeat(availableSpace - visualLength);
+  const rightPadding = " ".repeat(availableSpace - visualLength);
 
   console.log(
-    `\x1b[32m  │${LEFT_PADDING}${labelColor}${label} ${valueColor}${displayValue}\x1b[0m${rightPadding}\x1b[32m│\x1b[0m`
+    `\x1b[32m  │${LEFT_PADDING}${labelColor}${label} ${valueColor}${displayValue}\x1b[0m${rightPadding}\x1b[32m│\x1b[0m`,
   );
 }
 
 async function promptEndAction() {
   return new Promise((resolve) => {
-    console.log('  \x1b[90mPress [Space] to convert more files, or [Enter] to exit.\x1b[0m\n');
+    console.log(
+      "  \x1b[90mPress [Space] to convert more files, or [Enter] to exit.\x1b[0m\n",
+    );
 
     const mutedOut = new Writable({
       write(chunk, encoding, callback) {
         callback();
-      }
+      },
     });
 
     const rl = readline.createInterface({
       input: process.stdin,
       output: mutedOut,
-      terminal: true
+      terminal: true,
     });
 
     if (process.stdin.isTTY) process.stdin.setRawMode(true);
 
     const keypressHandler = (str, key) => {
       if (
-        (key.ctrl && key.name === 'c') ||
-        key.name === 'return' ||
-        key.name === 'enter' ||
-        key.name === 'escape'
+        (key.ctrl && key.name === "c") ||
+        key.name === "return" ||
+        key.name === "enter" ||
+        key.name === "escape"
       ) {
-        process.stdin.removeListener('keypress', keypressHandler);
+        process.stdin.removeListener("keypress", keypressHandler);
 
         if (process.stdin.isTTY) process.stdin.setRawMode(false);
 
         rl.close();
 
         resolve(false);
-      } else if (key.name === 'space') {
-        process.stdin.removeListener('keypress', keypressHandler);
+      } else if (key.name === "space") {
+        process.stdin.removeListener("keypress", keypressHandler);
 
         if (process.stdin.isTTY) process.stdin.setRawMode(false);
 
@@ -230,13 +250,15 @@ async function promptEndAction() {
       }
     };
 
-    process.stdin.on('keypress', keypressHandler);
+    process.stdin.on("keypress", keypressHandler);
   });
 }
 
 function closeTerminalWindow() {
   try {
-    execSync(`osascript -e 'tell application "Terminal" to close front window'`);
+    execSync(
+      `osascript -e 'tell application "Terminal" to close front window'`,
+    );
   } catch {
     process.exit(0);
   }
@@ -250,12 +272,12 @@ function convertFile(inputPath, outputPath, dim, quality) {
       .resize({
         width: dim,
         height: dim,
-        fit: 'inside',
-        withoutEnlargement: true
+        fit: "inside",
+        withoutEnlargement: true,
       })
       .avif({
         quality: quality,
-        effort: 4
+        effort: 4,
       })
       .toFile(outputPath)
       .then(() => resolve())
@@ -268,10 +290,18 @@ function convertFile(inputPath, outputPath, dim, quality) {
 async function runSession() {
   console.clear();
 
-  console.log('\n\x1b[33m  ┌────────────────────────────────────────────────────────────┐\x1b[0m');
-  console.log('\x1b[33m  │\x1b[0m                   STEVEN CASTEEL // WEB                    \x1b[33m│\x1b[0m');
-  console.log('\x1b[33m  │\x1b[0m                    AVIF Image Converter                    \x1b[33m│\x1b[0m');
-  console.log('\x1b[33m  └────────────────────────────────────────────────────────────┘\x1b[0m\n');
+  console.log(
+    "\n\x1b[33m  ┌────────────────────────────────────────────────────────────┐\x1b[0m",
+  );
+  console.log(
+    "\x1b[33m  │\x1b[0m                   STEVEN CASTEEL // WEB                    \x1b[33m│\x1b[0m",
+  );
+  console.log(
+    "\x1b[33m  │\x1b[0m                    AVIF Image Converter                    \x1b[33m│\x1b[0m",
+  );
+  console.log(
+    "\x1b[33m  └────────────────────────────────────────────────────────────┘\x1b[0m\n",
+  );
 
   // 1. Get Directory or Files
 
@@ -283,7 +313,7 @@ async function runSession() {
   }
 
   let filesQueue = [];
-  let primaryOutputDir = '';
+  let primaryOutputDir = "";
 
   for (const p of targetPaths) {
     if (!fs.existsSync(p)) continue;
@@ -302,9 +332,10 @@ async function runSession() {
         primaryOutputDir = p;
       }
 
-      const dirFiles = fs.readdirSync(p)
-        .filter(f => /\.(jpe?g|png|webp)$/i.test(f))
-        .map(f => path.join(p, f));
+      const dirFiles = fs
+        .readdirSync(p)
+        .filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+        .map((f) => path.join(p, f));
 
       filesQueue.push(...dirFiles);
     }
@@ -313,7 +344,9 @@ async function runSession() {
   filesQueue = [...new Set(filesQueue)];
 
   if (filesQueue.length === 0) {
-    console.log(`  \x1b[31mNo .jpg, .png, or .webp files found in the provided targets.\x1b[0m\n`);
+    console.log(
+      `  \x1b[31mNo .jpg, .png, or .webp files found in the provided targets.\x1b[0m\n`,
+    );
     return;
   }
 
@@ -332,7 +365,7 @@ async function runSession() {
       const dimensions = sizeOf(buffer);
 
       if (dimensions.width && dimensions.height) {
-        isSquare = Math.abs((dimensions.width / dimensions.height) - 1) < 0.05;
+        isSquare = Math.abs(dimensions.width / dimensions.height - 1) < 0.05;
       }
     } catch {
       // ignore
@@ -347,7 +380,7 @@ async function runSession() {
     fileData.push({
       filePath,
       isSquare,
-      fileName: path.basename(filePath)
+      fileName: path.basename(filePath),
     });
   }
 
@@ -361,24 +394,30 @@ async function runSession() {
 
   if (isMixed) {
     console.log(
-      `  \x1b[35m[!] Mixed aspect ratios detected (${squareCount} Square, ${nonSquareCount} Non-Square).\x1b[0m\n`
+      `  \x1b[35m[!] Mixed aspect ratios detected (${squareCount} Square, ${nonSquareCount} Non-Square).\x1b[0m\n`,
     );
 
-    dimSquare = await promptForDimension('Dimensions for SQUARE images (1:1)');
-    dimNonSquare = await promptForDimension('Dimensions for NON-SQUARE images');
+    dimSquare = await promptForDimension("Dimensions for SQUARE images (1:1)");
+    dimNonSquare = await promptForDimension("Dimensions for NON-SQUARE images");
   } else {
-    dimension = await promptForDimension('Target Dimensions (Max Edge)');
+    dimension = await promptForDimension("Target Dimensions (Max Edge)");
   }
 
-  const quality = await promptSingleSelect('Visual Quality / Compression Level', [
-    { label: 'Standard (Q: 50) - Good quality, smallest file (Default)', value: 50 },
-    { label: 'High     (Q: 65) - Great quality, medium file', value: 65 },
-    { label: 'Ultra    (Q: 80) - Best quality, largest file', value: 80 }
-  ]);
+  const quality = await promptSingleSelect(
+    "Visual Quality / Compression Level",
+    [
+      {
+        label: "Standard (Q: 50) - Good quality, smallest file (Default)",
+        value: 50,
+      },
+      { label: "High     (Q: 65) - Great quality, medium file", value: 65 },
+      { label: "Ultra    (Q: 80) - Best quality, largest file", value: 80 },
+    ],
+  );
 
-  const suffix = await promptSingleSelect('Append Size Suffix?', [
-    { label: 'Yes, append "_sm" to filename', value: '_sm' },
-    { label: 'No suffix', value: '' }
+  const suffix = await promptSingleSelect("Append Size Suffix?", [
+    { label: 'Yes, append "_sm" to filename', value: "_sm" },
+    { label: "No suffix", value: "" },
   ]);
 
   // 4. Queue Preparation
@@ -400,21 +439,23 @@ async function runSession() {
       skipped++;
     } else {
       const targetDim = isMixed
-        ? (data.isSquare ? dimSquare : dimNonSquare)
+        ? data.isSquare
+          ? dimSquare
+          : dimNonSquare
         : dimension;
 
       queue.push({
         inputPath: data.filePath,
         outputPath,
         fileName: data.fileName,
-        targetDim
+        targetDim,
       });
     }
   }
 
   if (queue.length === 0) {
     console.log(
-      `  \x1b[32mAll ${filesQueue.length} files already have matching .avif versions. Nothing to do!\x1b[0m\n`
+      `  \x1b[32mAll ${filesQueue.length} files already have matching .avif versions. Nothing to do!\x1b[0m\n`,
     );
 
     return;
@@ -423,7 +464,7 @@ async function runSession() {
   // 5. Processing
 
   console.log(
-    `  \x1b[36mProcessing ${queue.length} file${queue.length === 1 ? '' : 's'} (${skipped} skipped)...\x1b[0m\n`
+    `  \x1b[36mProcessing ${queue.length} file${queue.length === 1 ? "" : "s"} (${skipped} skipped)...\x1b[0m\n`,
   );
 
   let completed = 0;
@@ -434,9 +475,9 @@ async function runSession() {
 
   let frameIndex = 0;
 
-  const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+  const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
-  let currentFileText = '';
+  let currentFileText = "";
 
   const throbber = setInterval(() => {
     const progress = completed / queue.length;
@@ -447,12 +488,12 @@ async function runSession() {
 
     const empty = barWidth - filled;
 
-    const bar = '█'.repeat(filled) + '░'.repeat(empty);
+    const bar = "█".repeat(filled) + "░".repeat(empty);
 
     const percent = Math.round(progress * 100);
 
     process.stdout.write(
-      `\r  \x1b[36m${frames[frameIndex % frames.length]}\x1b[0m \x1b[1m[${bar}]\x1b[0m ${percent}% \x1b[2m| ${currentFileText}\x1b[0m\x1b[K`
+      `\r  \x1b[36m${frames[frameIndex % frames.length]}\x1b[0m \x1b[1m[${bar}]\x1b[0m ${percent}% \x1b[2m| ${currentFileText}\x1b[0m\x1b[K`,
     );
 
     frameIndex++;
@@ -464,12 +505,7 @@ async function runSession() {
         ? `...${item.fileName.slice(-40)}`
         : item.fileName;
 
-    await convertFile(
-      item.inputPath,
-      item.outputPath,
-      item.targetDim,
-      quality
-    );
+    await convertFile(item.inputPath, item.outputPath, item.targetDim, quality);
 
     completed++;
   };
@@ -490,68 +526,67 @@ async function runSession() {
 
   clearInterval(throbber);
 
-  process.stdout.write('\r\x1b[K');
+  process.stdout.write("\r\x1b[K");
 
   // 6. Completion
 
-  spawn('afplay', ['/System/Library/Sounds/Glass.aiff'], {
+  spawn("afplay", ["/System/Library/Sounds/Glass.aiff"], {
     detached: true,
-    stdio: 'ignore'
+    stdio: "ignore",
   }).unref();
 
   if (primaryOutputDir) {
-    spawn('open', [primaryOutputDir], {
+    spawn("open", [primaryOutputDir], {
       detached: true,
-      stdio: 'ignore'
+      stdio: "ignore",
     }).unref();
   }
 
   const exampleFile =
-    queue.length > 0
-      ? path.basename(queue[0].outputPath)
-      : '';
+    queue.length > 0 ? path.basename(queue[0].outputPath) : "";
 
   const shortOutputDir = getShortPath(primaryOutputDir);
 
   console.clear();
 
-  console.log('\n\x1b[32m  ┌──────────────────────────────────────────────────────────┐\x1b[0m');
-  console.log('\x1b[32m  │                                                          │\x1b[0m');
-  console.log('\x1b[32m  │               \x1b[1;32m✔  AVIF CONVERSION COMPLETE\x1b[0;32m                │\x1b[0m');
-  console.log('\x1b[32m  │                                                          │\x1b[0m');
+  console.log(
+    "\n\x1b[32m  ┌──────────────────────────────────────────────────────────┐\x1b[0m",
+  );
+  console.log(
+    "\x1b[32m  │                                                          │\x1b[0m",
+  );
+  console.log(
+    "\x1b[32m  │               \x1b[1;32m✔  AVIF CONVERSION COMPLETE\x1b[0;32m                │\x1b[0m",
+  );
+  console.log(
+    "\x1b[32m  │                                                          │\x1b[0m",
+  );
 
   printBoxLine(
-    'Processed:',
-    `${queue.length} file${queue.length === 1 ? '' : 's'}`
+    "Processed:",
+    `${queue.length} file${queue.length === 1 ? "" : "s"}`,
   );
 
   if (skipped > 0) {
-    printBoxLine(
-      'Skipped:',
-      `${skipped} file${skipped === 1 ? '' : 's'}`
-    );
+    printBoxLine("Skipped:", `${skipped} file${skipped === 1 ? "" : "s"}`);
   }
 
-  console.log('\x1b[32m  │                                                          │\x1b[0m');
-
-  printBoxLine(
-    'Out:',
-    shortOutputDir,
-    '\x1b[36m',
-    '\x1b[37m'
+  console.log(
+    "\x1b[32m  │                                                          │\x1b[0m",
   );
 
+  printBoxLine("Out:", shortOutputDir, "\x1b[36m", "\x1b[37m");
+
   if (exampleFile) {
-    printBoxLine(
-      'Ex:',
-      exampleFile,
-      '\x1b[36m',
-      '\x1b[37m'
-    );
+    printBoxLine("Ex:", exampleFile, "\x1b[36m", "\x1b[37m");
   }
 
-  console.log('\x1b[32m  │                                                          │\x1b[0m');
-  console.log('\x1b[32m  └──────────────────────────────────────────────────────────┘\x1b[0m\n');
+  console.log(
+    "\x1b[32m  │                                                          │\x1b[0m",
+  );
+  console.log(
+    "\x1b[32m  └──────────────────────────────────────────────────────────┘\x1b[0m\n",
+  );
 }
 
 // --- App Entry Point ---
@@ -569,7 +604,7 @@ async function main() {
   }
 }
 
-main().catch(err => {
-  console.error('\n  \x1b[31mFatal Error:\x1b[0m', err.message);
+main().catch((err) => {
+  console.error("\n  \x1b[31mFatal Error:\x1b[0m", err.message);
   process.exit(1);
 });

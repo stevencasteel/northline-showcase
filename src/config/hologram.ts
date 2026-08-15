@@ -1,7 +1,7 @@
 export const HOLOGRAM = {
   width: 720,
   height: 1626,
-  image: '/assets/customer service/customer_service_hologram_full',
+  image: "/assets/customer service/customer_service_hologram_full",
   periodMs: 4200,
   phaseOffset: 0.5,
   rippleStartY: -180,
@@ -10,4 +10,4 @@ export const HOLOGRAM = {
   alphaFadeInStart: 0.42,
   alphaFadeInEnd: 0.5,
   alphaFadeOutStart: 0.92,
-} as const
+} as const;

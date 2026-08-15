@@ -14,6 +14,7 @@ import {
   responsiveSource,
   type ResponsiveAssetBase,
 } from "./responsiveImage";
+import { CONSTRAINED_MEDIA_QUERY } from "../config/layout";
 
 export type AssetStage =
   | "hero"
@@ -37,17 +38,20 @@ const stageOrder: AssetStage[] = [
   "founder",
   "footer",
 ];
-const stageSelectors: Record<AssetStage, string> = {
-  hero: "#top",
-  badges: "#about",
-  services: "#services",
-  gallery: "#work",
-  associations: "#associations",
-  protection: "#protection",
-  reviews: "#reviews",
-  founder: "#founder",
-  footer: "#contact",
-};
+export const sections = {
+  hero: { id: "top" },
+  badges: { id: "about" },
+  services: { id: "services", navLabel: "Services" },
+  gallery: { id: "work", navLabel: "Gallery" },
+  associations: { id: "associations", navLabel: "Associations" },
+  protection: { id: "protection", navLabel: "Protection" },
+  reviews: { id: "reviews", navLabel: "Reviews" },
+  founder: { id: "founder", navLabel: "Founder" },
+  footer: { id: "contact", navLabel: "Contact" },
+} as const;
+
+export type SectionKey = keyof typeof sections;
+const sectionSelector = (stage: AssetStage) => `#${sections[stage].id}`;
 
 // Only assets needed to establish the first complete view of each section belong here.
 // Rotating gallery images, association clones, hover art, and map tiles remain on demand.
@@ -101,6 +105,36 @@ const requiredAssets: Record<AssetStage, string[]> = {
   ],
 };
 
+const stageBackgroundAssets = {
+  hero: {
+    "--asset-navbar-underlayment": "/assets/navbar/navbar-underlayment",
+    "--asset-copper-edge": "/assets/ui/copper-edge",
+  },
+  badges: {
+    "--asset-badge-workshirt": "/assets/badges/badge-banner-workshirt",
+    "--asset-badge-workshirt-hem":
+      "/assets/badges/badge-banner-workshirt-full-hem",
+  },
+  services: {
+    "--asset-services-cover-board": "/assets/services/services-cover-board",
+  },
+  gallery: { "--asset-gallery-paper": "/assets/gallery/paper_texture" },
+  associations: {
+    "--asset-associations-texture":
+      "/assets/associations/associations_bg_texture",
+  },
+  protection: {
+    "--asset-protection-texture":
+      "/assets/protection/copper_background_texture",
+  },
+  reviews: {
+    "--asset-reviews-texture": "/assets/reviews/leaf_background_texture",
+  },
+  founder: {
+    "--asset-founder-texture": "/assets/founder/founder-jean-texture",
+  },
+} as const satisfies Partial<Record<AssetStage, Record<string, string>>>;
+
 type AssetStageContextValue = {
   constrained: boolean;
   enabled: (stage: AssetStage) => boolean;
@@ -141,13 +175,13 @@ export function AssetStageProvider({
 }) {
   const initialConstrained =
     typeof window !== "undefined" &&
-    window.matchMedia("(max-width: 700px)").matches;
+    window.matchMedia(CONSTRAINED_MEDIA_QUERY).matches;
   const [constrained, setConstrained] = useState(initialConstrained);
   const [enabledStages, setEnabledStages] = useState<AssetStage[]>(["hero"]);
   const enabledStagesRef = useRef<AssetStage[]>(["hero"]);
 
   useEffect(() => {
-    const media = window.matchMedia("(max-width: 700px)");
+    const media = window.matchMedia(CONSTRAINED_MEDIA_QUERY);
     const update = () => {
       setConstrained(media.matches);
     };
@@ -188,9 +222,8 @@ export function AssetStageProvider({
 
     const pending = new Set<AssetStage>();
     const observedStages = stageOrder.slice(1).flatMap((stage) => {
-      const element = document.querySelector(stageSelectors[stage]);
+      const element = document.querySelector(sectionSelector(stage));
       if (element) {
-        element.setAttribute("data-asset-stage", stage);
         return [{ stage, element }];
       }
       void enableStage(stage);
@@ -201,15 +234,17 @@ export function AssetStageProvider({
     let lastViewportHeight = 0;
     const rebuildObserver = () => {
       observer?.disconnect();
-      const margin = Math.round(window.innerHeight * 1.5);
+      // Keep one viewport of lead time without decoding several below-fold
+      // sections before the visitor is likely to reach them.
+      const margin = Math.round(window.innerHeight * 0.9);
       lastViewportHeight = window.innerHeight;
       observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             if (!entry.isIntersecting) return;
-            const stage = (entry.target as HTMLElement).dataset.assetStage as
-              | AssetStage
-              | undefined;
+            const stage = observedStages.find(
+              ({ element }) => element === entry.target,
+            )?.stage;
             if (
               !stage ||
               pending.has(stage) ||
@@ -247,10 +282,25 @@ export function AssetStageProvider({
   }, [constrained, galleryAssets]);
 
   const value = useMemo<AssetStageContextValue>(() => {
+    const width = constrained ? 640 : 1440;
+    const style = Object.fromEntries(
+      enabledStages.flatMap((stage) =>
+        Object.entries(
+          (
+            stageBackgroundAssets as Partial<
+              Record<AssetStage, Record<string, string>>
+            >
+          )[stage] ?? {},
+        ).map(([property, base]) => [
+          property,
+          `url("${responsiveSource(asResponsiveAsset(base), width)}")`,
+        ]),
+      ),
+    ) as CSSProperties;
     return {
       constrained,
       enabled: (stage) => enabledStages.includes(stage),
-      style: {},
+      style,
       stageClassName: enabledStages
         .map((stage) => `asset-stage-${stage}`)
         .join(" "),

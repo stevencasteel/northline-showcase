@@ -3,7 +3,11 @@ import { useRef, type ReactNode } from "react";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 import { useDialogFocus } from "../hooks/useDialogFocus";
 
-type DialogModalProps = {
+type DialogLabel =
+  | { ariaLabel: string; ariaLabelledBy?: never }
+  | { ariaLabel?: never; ariaLabelledBy: string };
+
+type DialogModalProps = DialogLabel & {
   children: ReactNode;
   backdropClassName: string;
   dialogClassName: string;

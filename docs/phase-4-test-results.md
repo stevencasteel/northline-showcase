@@ -4,12 +4,12 @@
 
 The final GitHub Actions Linux run for commit `3a1a3b3` passed:
 
-| Project group | Browser engine | Geometry | Result |
-| --- | --- | --- | --- |
-| `chromium-desktop` | Chromium | 1280×800 | 13 passed, 17 skipped |
-| `chromium-mobile` | Chromium | 390×844, touch enabled | Included above |
-| `webkit-desktop` | WebKit | 1280×800 | Included above |
-| `webkit-mobile` | WebKit | 390×844, touch enabled | Included above |
+| Project group      | Browser engine | Geometry               | Result                |
+| ------------------ | -------------- | ---------------------- | --------------------- |
+| `chromium-desktop` | Chromium       | 1280×800               | 13 passed, 17 skipped |
+| `chromium-mobile`  | Chromium       | 390×844, touch enabled | Included above        |
+| `webkit-desktop`   | WebKit         | 1280×800               | Included above        |
+| `webkit-mobile`    | WebKit         | 390×844, touch enabled | Included above        |
 
 The Playwright commands ran 30 project/test combinations per browser group. Skips were intentional: each project skipped the opposite viewport’s tests, and Chromium visual snapshots were not applicable to WebKit or Linux CI.
 

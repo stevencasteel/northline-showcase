@@ -2,7 +2,7 @@ import { RESPONSIVE_ASSETS } from "../config/generatedResponsiveAssets";
 
 export type ResponsiveAssetBase = keyof typeof RESPONSIVE_ASSETS;
 
-type ResponsiveAssetMetadata = {
+export type ResponsiveAssetMetadata = {
   sourceWidth: number;
   sourceHeight: number;
   format: "webp" | "avif";
@@ -13,6 +13,15 @@ const assetMetadata = RESPONSIVE_ASSETS as Record<
   ResponsiveAssetBase,
   ResponsiveAssetMetadata
 >;
+
+export function responsiveAssetMetadata(
+  base: ResponsiveAssetBase,
+): ResponsiveAssetMetadata {
+  const metadata = assetMetadata[base];
+  if (!metadata)
+    throw new Error(`Missing responsive asset metadata for ${base}`);
+  return metadata;
+}
 
 function assetPath(
   base: string,
@@ -33,9 +42,7 @@ export function responsiveImage(
   sizes: string,
   defaultWidth?: number,
 ) {
-  const metadata = assetMetadata[base];
-  if (!metadata)
-    throw new Error(`Missing responsive asset metadata for ${base}`);
+  const metadata = responsiveAssetMetadata(base);
   const fallbackWidth = metadata.widths.length
     ? defaultWidth && metadata.widths.includes(defaultWidth)
       ? defaultWidth
@@ -63,9 +70,7 @@ export function responsiveSource(
   base: ResponsiveAssetBase,
   defaultWidth?: number,
 ) {
-  const metadata = assetMetadata[base];
-  if (!metadata)
-    throw new Error(`Missing responsive asset metadata for ${base}`);
+  const metadata = responsiveAssetMetadata(base);
   const fallbackWidth = metadata.widths.length
     ? defaultWidth && metadata.widths.includes(defaultWidth)
       ? defaultWidth

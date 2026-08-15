@@ -25,14 +25,15 @@ import {
 } from "./PremiumSections";
 import { useDocumentVisibility } from "./hooks/useDocumentVisibility";
 import { useReducedMotion } from "./hooks/useReducedMotion";
-import { useInView } from "./hooks/useInView";
 import { useRevealOnce } from "./hooks/useRevealOnce";
+import { useInView } from "./hooks/useInView";
 import { useGalleryKeyboardNavigation } from "./hooks/useGalleryKeyboardNavigation";
 import { useActiveThumbnailScroll } from "./hooks/useActiveThumbnailScroll";
 import { useGalleryPreviewRotation } from "./hooks/useGalleryPreviewRotation";
 import { ScaledArtboard } from "./components/ScaledArtboard";
 import { RasterStateArt } from "./components/RasterStateArt";
 import { siteConfig } from "./config/site";
+import { appointmentConfig, appointmentHoursLabel } from "./config/appointment";
 import { services } from "./config/services";
 import { GALLERY_PREVIEW_SLOTS, GALLERY_SWAP_CONFIG } from "./config/gallery";
 import { asResponsiveAsset, responsiveImage } from "./lib/responsiveImage";
@@ -42,12 +43,9 @@ import {
   useAssetStage,
 } from "./lib/assetStages";
 import { DialogModal } from "./components/DialogModal";
+import { CopperEdgeSeam } from "./components/CopperEdgeSeam";
 
 const asset = "/assets/";
-
-function CopperEdgeSeam() {
-  return <span className="copper-edge-seam" aria-hidden="true" />;
-}
 
 function AnimatedHeroLine({
   text,
@@ -95,19 +93,35 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
       <nav className="primary-nav" aria-label="Primary navigation">
         <a className="raster-control" href="#services" aria-label="Services">
           <RasterStateArt
-            defaultAsset={{ file: `${asset}navbar/nav_services_default.png` }}
-            hoverAsset={{ file: `${asset}navbar/nav_services_hover.png` }}
-            width={447}
-            height={164}
+            defaultAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_services_default.png`,
+              width: 447,
+              height: 164,
+            }}
+            hoverAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_services_hover.png`,
+              width: 447,
+              height: 164,
+            }}
             alt="Services"
           />
         </a>
         <a className="raster-control" href="#work" aria-label="Gallery">
           <RasterStateArt
-            defaultAsset={{ file: `${asset}navbar/nav_gallery_default.png` }}
-            hoverAsset={{ file: `${asset}navbar/nav_gallery_hover.png` }}
-            width={440}
-            height={154}
+            defaultAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_gallery_default.png`,
+              width: 440,
+              height: 154,
+            }}
+            hoverAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_gallery_hover.png`,
+              width: 440,
+              height: 154,
+            }}
             alt="Gallery"
           />
         </a>
@@ -118,11 +132,17 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
         >
           <RasterStateArt
             defaultAsset={{
-              file: `${asset}navbar/nav_associations_default.png`,
+              kind: "static",
+              src: `${asset}navbar/nav_associations_default.png`,
+              width: 492,
+              height: 150,
             }}
-            hoverAsset={{ file: `${asset}navbar/nav_associations_hover.png` }}
-            width={492}
-            height={150}
+            hoverAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_associations_hover.png`,
+              width: 492,
+              height: 150,
+            }}
             alt="Associations"
           />
         </a>
@@ -132,37 +152,69 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
           aria-label="Protection"
         >
           <RasterStateArt
-            defaultAsset={{ file: `${asset}navbar/nav_protection_default.png` }}
-            hoverAsset={{ file: `${asset}navbar/nav_protection_hover.png` }}
-            width={464}
-            height={142}
+            defaultAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_protection_default.png`,
+              width: 464,
+              height: 142,
+            }}
+            hoverAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_protection_hover.png`,
+              width: 464,
+              height: 142,
+            }}
             alt="Protection"
           />
         </a>
         <a className="raster-control" href="#reviews" aria-label="Reviews">
           <RasterStateArt
-            defaultAsset={{ file: `${asset}navbar/nav_reviews_default.png` }}
-            hoverAsset={{ file: `${asset}navbar/nav_reviews_hover.png` }}
-            width={415}
-            height={163}
+            defaultAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_reviews_default.png`,
+              width: 415,
+              height: 163,
+            }}
+            hoverAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_reviews_hover.png`,
+              width: 415,
+              height: 163,
+            }}
             alt="Reviews"
           />
         </a>
         <a className="raster-control" href="#founder" aria-label="Founder">
           <RasterStateArt
-            defaultAsset={{ file: `${asset}navbar/nav_founder_default.png` }}
-            hoverAsset={{ file: `${asset}navbar/nav_founder_hover.png` }}
-            width={414}
-            height={154}
+            defaultAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_founder_default.png`,
+              width: 414,
+              height: 154,
+            }}
+            hoverAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_founder_hover.png`,
+              width: 414,
+              height: 154,
+            }}
             alt="Founder"
           />
         </a>
         <a className="raster-control" href="#contact" aria-label="Contact">
           <RasterStateArt
-            defaultAsset={{ file: `${asset}navbar/nav_contact_default.png` }}
-            hoverAsset={{ file: `${asset}navbar/nav_contact_hover.png` }}
-            width={426}
-            height={150}
+            defaultAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_contact_default.png`,
+              width: 426,
+              height: 150,
+            }}
+            hoverAsset={{
+              kind: "static",
+              src: `${asset}navbar/nav_contact_hover.png`,
+              width: 426,
+              height: 150,
+            }}
             alt="Contact"
           />
         </a>
@@ -173,10 +225,14 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
         aria-label={`Call ${siteConfig.phoneDisplay}`}
       >
         <RasterStateArt
-          defaultAsset={{ responsiveBase: "/assets/navbar/nav_phone_default" }}
-          hoverAsset={{ responsiveBase: "/assets/navbar/nav_phone_hover" }}
-          width={1154}
-          height={244}
+          defaultAsset={{
+            kind: "responsive",
+            base: "/assets/navbar/nav_phone_default",
+          }}
+          hoverAsset={{
+            kind: "responsive",
+            base: "/assets/navbar/nav_phone_hover",
+          }}
           sizes="18vw"
           alt={`Call ${siteConfig.phoneDisplay}`}
         />
@@ -189,11 +245,13 @@ function Header({ onBookAppointment }: { onBookAppointment: () => void }) {
       >
         <RasterStateArt
           defaultAsset={{
-            responsiveBase: "/assets/navbar/nav_book-appt_default",
+            kind: "responsive",
+            base: "/assets/navbar/nav_book-appt_default",
           }}
-          hoverAsset={{ responsiveBase: "/assets/navbar/nav_book-appt_hover" }}
-          width={966}
-          height={180}
+          hoverAsset={{
+            kind: "responsive",
+            base: "/assets/navbar/nav_book-appt_hover",
+          }}
           sizes="16vw"
           alt="Book an appointment"
         />
@@ -352,6 +410,9 @@ function Hero({ onBookAppointment }: { onBookAppointment: () => void }) {
         className="hero-image"
         ref={foregroundImageRef}
         {...responsiveImage("/assets/hero/foreground", "100vw", 1920)}
+        fetchPriority="high"
+        loading="eager"
+        decoding="async"
         alt="A wide panoramic scene showing a human construction worker and a green-skinned orc installing tiles on the vast, intricate roof of a grand estate overlooking a pristine lake landscape. A middle-aged human with grey stubble leans forward on the right slope beside a muscular orc operating a bright orange power tool. The sweeping roof is clad in glossy bluish-green solar shingles with polished copper trim, arched dormers, and elegant finials; below, evergreen trees line a deep-blue bay toward distant mountains. The sky area is transparent so this foreground layer can be paired with a separate sky layer."
       />
       <div className="hero-reveal-curtain" aria-hidden="true" />
@@ -511,7 +572,10 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
                 <CalendarDays aria-hidden="true" />
                 <input required name="date" type="date" />
               </div>
-              <small>Mon–Fri · 24hr advance notice</small>
+              <small>
+                {appointmentHoursLabel} · {appointmentConfig.advanceNoticeHours}
+                hr advance notice
+              </small>
             </label>
             <label>
               <span>
@@ -519,9 +583,12 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
               </span>
               <select required name="time">
                 <option value="">Select a time</option>
-                <option value="morning">Morning · 8am–12pm</option>
-                <option value="afternoon">Afternoon · 12pm–4pm</option>
-                <option value="late-afternoon">Late afternoon · 4pm–6pm</option>
+                {appointmentConfig.windows.map((window) => (
+                  <option value={window.id} key={window.id}>
+                    {window.label} · {window.start.slice(0, 2)}–
+                    {window.end.slice(0, 2)}
+                  </option>
+                ))}
               </select>
               <small>We’ll call when we’re on the way</small>
             </label>
@@ -532,13 +599,14 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
             </span>
             <select required name="service">
               <option value="">Select a service</option>
-              <option value="residential">Residential roofing system</option>
-              <option value="commercial">Commercial roofing system</option>
-              <option value="custom-metal">Custom metal fabrication</option>
-              <option value="storm-inspection">
-                Storm or weather damage inspection
-              </option>
-              <option value="repair">Roof repair and maintenance</option>
+              {appointmentConfig.serviceOptions.map((service) => (
+                <option
+                  value={service.toLowerCase().replaceAll(" ", "-")}
+                  key={service}
+                >
+                  {service}
+                </option>
+              ))}
             </select>
           </label>
           <label>
@@ -561,7 +629,7 @@ function AppointmentModal({ onClose }: { onClose: () => void }) {
             <Send aria-hidden="true" /> <span>Book My Free Appointment</span>
           </button>
           <p className="appointment-footnote">
-            Mon–Fri, 8am–6pm · We’ll call to confirm · No obligation
+            {appointmentHoursLabel} · We’ll call to confirm · No obligation
           </p>
         </form>
       </div>
@@ -614,36 +682,15 @@ function BadgeStrip() {
 }
 
 function Services() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-    if (!("IntersectionObserver" in window)) {
-      setVisible(true);
-      return;
-    }
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.16 },
-    );
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, []);
+  const reveal = useRevealOnce<HTMLElement>({ threshold: 0.16 });
 
   return (
     <section
-      className={`services-section${visible ? " is-visible" : ""}`}
+      className={`services-section${reveal.revealed ? " is-visible" : ""}`}
       id="services"
       aria-label="Services"
       aria-describedby="services-background-description"
-      ref={sectionRef}
+      ref={reveal.ref}
     >
       <span id="services-background-description" className="visually-hidden">
         Background image: A wide, light beige background featuring a subtle,
@@ -658,7 +705,7 @@ function Services() {
               style={{ "--service-index": index } as React.CSSProperties}
             >
               <StageImage
-                base={asResponsiveAsset(`${asset}${service.image}`)}
+                base={service.image}
                 sizes="44vw"
                 defaultWidth={1440}
                 stage="services"
@@ -1370,7 +1417,10 @@ function preloadGalleryImage(image: GalleryImage) {
     if (srcSet) element.srcset = srcSet;
     element.onload = () => {
       if (typeof element.decode === "function") {
-        void element.decode().catch(() => undefined).finally(resolve);
+        void element
+          .decode()
+          .catch(() => undefined)
+          .finally(resolve);
       } else resolve();
     };
     element.onerror = () => resolve();
@@ -1659,7 +1709,8 @@ function GalleryCard({
         stage="gallery"
         className={`gallery-card-image gallery-card-image-current${incoming ? ` gallery-card-image-outgoing gallery-card-image-out-${incomingDirection}` : ""}`}
         alt={displayed.image.alt}
-        loading={slot < 3 ? "eager" : "lazy"}
+        loading={slot === 0 ? "eager" : "lazy"}
+        decoding="async"
       />
       {incoming && (
         <StageImage
@@ -1863,9 +1914,12 @@ function App() {
   const stickyHeaderShellRef = useRef<HTMLDivElement>(null);
   const navbarScrolled = useNavbarScrollState();
   useNavbarScrollOffset(stickyHeaderShellRef);
-  const { style, stageClassName } = useAssetStage();
+  const { constrained, style, stageClassName } = useAssetStage();
   return (
-    <div className={`app ${stageClassName}`} style={style}>
+    <div
+      className={`app${constrained ? " asset-constrained" : ""} ${stageClassName}`}
+      style={style}
+    >
       <div
         className={`sticky-header-shell${navbarScrolled ? " is-scrolled" : ""}`}
         ref={stickyHeaderShellRef}
