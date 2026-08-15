@@ -961,7 +961,8 @@
   position: relative;
   width: 100%;
   aspect-ratio: var(--footer-map-frame-aspect-ratio);
-  filter: drop-shadow(0 1.5cqw 3cqw rgba(0, 0, 0, 0.42));
+  background: #45474a;
+  filter: none;
 }
 .site-footer-map-frame > img {
   position: absolute;
@@ -969,15 +970,16 @@
   z-index: 1;
   width: 100%;
   height: 100%;
+  clip-path: inset(3px);
   pointer-events: none;
 }
 .site-footer-map-frame iframe {
   position: absolute;
   z-index: 2;
-  top: 5.2%;
-  left: 2.65%;
-  width: 94.7%;
-  height: 89.2%;
+  top: var(--footer-map-opening-top);
+  left: var(--footer-map-opening-left);
+  width: var(--footer-map-opening-width);
+  height: var(--footer-map-opening-height);
   border: 0;
   background: #0b1d2b;
   filter: saturate(0.78) sepia(0.1) contrast(1.04);

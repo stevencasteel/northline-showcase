@@ -22,6 +22,7 @@ import {
 import { SectionImage } from "./lib/assetStages";
 import { CopperEdgeSeam } from "./components/CopperEdgeSeam";
 import { RasterStateArt } from "./components/RasterStateArt";
+import { sourceRectToPercentVariables } from "./lib/geometry";
 
 type BookHandler = { onBook: () => void };
 
@@ -45,6 +46,10 @@ const footerBrandPlaqueMetadata = responsiveAssetMetadata(
 );
 const footerMapFrameMetadata = responsiveAssetMetadata(
   asResponsiveAsset("/assets/footer/map-frame"),
+);
+const footerMapOpeningCss = sourceRectToPercentVariables(
+  { xPx: 48, yPx: 49, widthPx: 1575, heightPx: 842 },
+  footerMapFrameMetadata,
 );
 
 type AssociationBadgeKind = "standard" | "landscape" | "wide" | "ultrawide";
@@ -792,6 +797,10 @@ export function PremiumFooter({ onBook }: BookHandler) {
               style={
                 {
                   "--footer-map-frame-aspect-ratio": `${footerMapFrameMetadata.sourceWidth} / ${footerMapFrameMetadata.sourceHeight}`,
+                  "--footer-map-opening-top": footerMapOpeningCss.top,
+                  "--footer-map-opening-left": footerMapOpeningCss.left,
+                  "--footer-map-opening-width": footerMapOpeningCss.width,
+                  "--footer-map-opening-height": footerMapOpeningCss.height,
                 } as CSSProperties
               }
             >
