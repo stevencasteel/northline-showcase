@@ -1731,6 +1731,11 @@ a {
   animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
   animation-fill-mode: both;
 }
+
+.gallery-card-image-incoming,
+.gallery-card-image-outgoing {
+  transition: none !important;
+}
 .gallery-card-image-from-top {
   animation-name: gallery-image-slide-from-top;
 }

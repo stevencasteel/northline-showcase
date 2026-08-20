@@ -1910,13 +1910,24 @@ function GalleryCard({
   };
 
   useEffect(() => {
-    if (imageIndex !== displayed.imageIndex) {
-      const direction =
-        slideDirections[directionCursorRef.current % slideDirections.length];
+    if (imageIndex === displayed.imageIndex) return;
+
+    let cancelled = false;
+
+    const direction =
+      slideDirections[directionCursorRef.current % slideDirections.length];
+
+    void preloadGalleryImage(image).then(() => {
+      if (cancelled) return;
+
       directionCursorRef.current += 1;
       setIncomingDirection(direction);
       setIncoming({ image, imageIndex });
-    }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [displayed.imageIndex, image, imageIndex, slideDirections]);
 
   const cardSizes = slot === 0 ? "66.7vw" : "33.3vw";
@@ -1934,6 +1945,7 @@ function GalleryCard({
       style={{ "--gallery-index": slot } as React.CSSProperties}
     >
       <SectionImage
+        key={displayed.imageIndex}
         base={asResponsiveAsset(`${asset}gallery/${displayed.image.assetBase}`)}
         sizes={cardSizes}
         defaultWidth={960}
@@ -1945,6 +1957,7 @@ function GalleryCard({
       />
       {incoming && (
         <SectionImage
+          key={incoming.imageIndex}
           base={asResponsiveAsset(
             `${asset}gallery/${incoming.image.assetBase}`,
           )}
