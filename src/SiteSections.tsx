@@ -250,9 +250,10 @@ function AssociationBadgeImage({
       alt={clone ? "" : associationLabel(badge.assetBase)}
       aria-hidden={clone || undefined}
       decoding="async"
-      loading="lazy"
+      loading="eager"
       style={
         {
+          aspectRatio: `${metadata.sourceWidth} / ${metadata.sourceHeight}`,
           "--association-scale": badge.scale ?? 1,
           "--association-hover-scale":
             badge.hoverScale ?? (badge.scale ?? 1) * 1.14,
@@ -266,6 +267,13 @@ const associationRowsConfig = [
   { direction: -1, durationSeconds: 145, initialProgress: 0.27 },
   { direction: 1, durationSeconds: 155, initialProgress: 0.61 },
 ] as const;
+
+function getMarqueeTranslatePercent(progress: number, direction: number) {
+  return direction < 0
+    ? -progress * ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT
+    : -ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT +
+        progress * ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT;
+}
 
 const reviews = [
   {
@@ -604,11 +612,10 @@ export function AssociationsMarquee() {
           1;
         marqueeProgress.current[rowIndex] = nextProgress;
         // The track contains two equal groups, so 50% of its width is one loop.
-        const translate =
-          rowConfig.direction < 0
-            ? -nextProgress * ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT
-            : -ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT +
-              nextProgress * ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT;
+        const translate = getMarqueeTranslatePercent(
+          nextProgress,
+          rowConfig.direction,
+        );
         trackRefs.current[rowIndex]?.style.setProperty(
           "transform",
           `translate3d(${translate}%,0,0)`,
@@ -664,9 +671,17 @@ export function AssociationsMarquee() {
                 className="associations-marquee-track"
                 ref={(element) => {
                   trackRefs.current[rowIndex] = element;
-                }}
-                style={{
-                  transform: `translate3d(${-ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT + associationRowsConfig[rowIndex].initialProgress * ASSOCIATION_MARQUEE_LOOP_SPAN_PERCENT}%,0,0)`,
+                  if (element && !element.style.transform) {
+                    const rowConfig = associationRowsConfig[rowIndex];
+                    const initialTranslate = getMarqueeTranslatePercent(
+                      marqueeProgress.current[rowIndex],
+                      rowConfig.direction,
+                    );
+                    element.style.setProperty(
+                      "transform",
+                      `translate3d(${initialTranslate}%,0,0)`,
+                    );
+                  }
                 }}
               >
                 {renderGroup(row, false)}
